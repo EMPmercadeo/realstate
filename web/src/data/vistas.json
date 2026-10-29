@@ -1,0 +1,773 @@
+{
+ "edificios": [
+  {
+   "id": "gris",
+   "nombre": "Edificio gris",
+   "pisos": [
+    {
+     "n": 1,
+     "nombre": "Planta baja",
+     "rooms": [
+      {
+       "id": "salon_b",
+       "nombre": "Salón B",
+       "tipo": "hospital",
+       "camas": 6,
+       "centro": [
+        8.0,
+        1.2,
+        -20.0
+       ],
+       "cam": [
+        8.0,
+        1.6,
+        -16.6
+       ],
+       "abierto": false
+      },
+      {
+       "id": "salon_a",
+       "nombre": "Salón A",
+       "tipo": "hospital",
+       "camas": 4,
+       "centro": [
+        17.0,
+        1.2,
+        -20.0
+       ],
+       "cam": [
+        17.0,
+        1.6,
+        -16.6
+       ],
+       "abierto": false
+      },
+      {
+       "id": "pasillo",
+       "nombre": "Pasillo",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        12.0,
+        1.2,
+        -14.75
+       ],
+       "cam": [
+        3.7,
+        1.6,
+        -14.2
+       ],
+       "abierto": false
+      },
+      {
+       "id": "supervisor",
+       "nombre": "Oficina del supervisor",
+       "tipo": "oficina",
+       "camas": 0,
+       "centro": [
+        5.25,
+        1.2,
+        -10.75
+       ],
+       "cam": [
+        5.05,
+        1.6,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "admin",
+       "nombre": "Administración",
+       "tipo": "oficina",
+       "camas": 0,
+       "centro": [
+        9.75,
+        1.2,
+        -10.75
+       ],
+       "cam": [
+        9.55,
+        1.6,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "deposito",
+       "nombre": "Depósito",
+       "tipo": "deposito",
+       "camas": 0,
+       "centro": [
+        13.5,
+        1.2,
+        -10.75
+       ],
+       "cam": [
+        13.45,
+        1.6,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "escalera",
+       "nombre": "Escalera",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        16.5,
+        1.2,
+        -10.75
+       ],
+       "cam": [
+        16.5,
+        1.6,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "bano_acc",
+       "nombre": "Baño accesible",
+       "tipo": "bano",
+       "camas": 0,
+       "centro": [
+        19.5,
+        1.2,
+        -10.75
+       ],
+       "cam": [
+        19.45,
+        1.6,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "acceso",
+       "nombre": "Acceso y recepción",
+       "tipo": "recepcion",
+       "camas": 0,
+       "centro": [
+        25.0,
+        1.2,
+        -12.0
+       ],
+       "cam": [
+        28.4,
+        1.6,
+        -11.8
+       ],
+       "abierto": false
+      },
+      {
+       "id": "lavanderia",
+       "nombre": "Lavandería y servicio",
+       "tipo": "lavanderia",
+       "camas": 0,
+       "centro": [
+        25.0,
+        1.2,
+        -18.0
+       ],
+       "cam": [
+        22.45,
+        1.6,
+        -16.6
+       ],
+       "abierto": false
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "nombre": "Piso alto",
+     "rooms": [
+      {
+       "id": "salon_2",
+       "nombre": "Salón #2 · movilidad reducida",
+       "tipo": "hospital",
+       "camas": 4,
+       "centro": [
+        6.0,
+        4.45,
+        -20.0
+       ],
+       "cam": [
+        6.0,
+        4.85,
+        -16.6
+       ],
+       "abierto": false
+      },
+      {
+       "id": "hospitalizacion",
+       "nombre": "Sala de hospitalización",
+       "tipo": "hospital",
+       "camas": 10,
+       "centro": [
+        15.0,
+        4.45,
+        -20.0
+       ],
+       "cam": [
+        15.0,
+        4.85,
+        -16.6
+       ],
+       "abierto": false
+      },
+      {
+       "id": "pasillo2",
+       "nombre": "Pasillo",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        12.0,
+        4.45,
+        -14.75
+       ],
+       "cam": [
+        20.4,
+        4.85,
+        -14.7
+       ],
+       "abierto": false
+      },
+      {
+       "id": "cocina",
+       "nombre": "Cocina",
+       "tipo": "cocina",
+       "camas": 0,
+       "centro": [
+        5.5,
+        4.45,
+        -10.75
+       ],
+       "cam": [
+        5.45,
+        4.85,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "refrigerios",
+       "nombre": "Área de refrigerios",
+       "tipo": "comedor",
+       "camas": 0,
+       "centro": [
+        10.5,
+        4.45,
+        -10.75
+       ],
+       "cam": [
+        10.5,
+        4.85,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "insumos",
+       "nombre": "Depósito de insumos",
+       "tipo": "deposito",
+       "camas": 0,
+       "centro": [
+        14.0,
+        4.45,
+        -10.75
+       ],
+       "cam": [
+        13.95,
+        4.85,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "escalera2",
+       "nombre": "Escalera",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        16.5,
+        4.45,
+        -10.75
+       ],
+       "cam": [
+        16.5,
+        4.85,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "bano2",
+       "nombre": "Baño con regadera",
+       "tipo": "bano",
+       "camas": 0,
+       "centro": [
+        19.5,
+        4.45,
+        -10.75
+       ],
+       "cam": [
+        19.45,
+        4.85,
+        -12.9
+       ],
+       "abierto": false
+      },
+      {
+       "id": "terraza",
+       "nombre": "Terraza",
+       "tipo": "terraza",
+       "camas": 0,
+       "centro": [
+        25.0,
+        4.45,
+        -14.0
+       ],
+       "cam": [
+        21.7,
+        4.85,
+        -8.7
+       ],
+       "abierto": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "amarilla",
+   "nombre": "Casa amarilla",
+   "pisos": [
+    {
+     "n": 1,
+     "nombre": "Planta baja",
+     "rooms": [
+      {
+       "id": "lavanderia",
+       "nombre": "Lavandería",
+       "tipo": "lavanderia",
+       "camas": 0,
+       "centro": [
+        6.0,
+        1.2,
+        -55.75
+       ],
+       "cam": [
+        7.4,
+        1.6,
+        -55.65
+       ],
+       "abierto": false
+      },
+      {
+       "id": "cto1",
+       "nombre": "Cuarto privado #1",
+       "tipo": "habitacion",
+       "camas": 0,
+       "centro": [
+        6.0,
+        1.2,
+        -59.5
+       ],
+       "cam": [
+        7.4,
+        1.6,
+        -60.55
+       ],
+       "abierto": false
+      },
+      {
+       "id": "bano1",
+       "nombre": "Baño",
+       "tipo": "bano",
+       "camas": 0,
+       "centro": [
+        6.0,
+        1.2,
+        -62.25
+       ],
+       "cam": [
+        7.4,
+        1.6,
+        -62.2
+       ],
+       "abierto": false
+      },
+      {
+       "id": "bano2",
+       "nombre": "Baño",
+       "tipo": "bano",
+       "camas": 0,
+       "centro": [
+        6.0,
+        1.2,
+        -63.75
+       ],
+       "cam": [
+        7.4,
+        1.6,
+        -63.7
+       ],
+       "abierto": false
+      },
+      {
+       "id": "recamara2",
+       "nombre": "Recámara #2",
+       "tipo": "habitacion",
+       "camas": 0,
+       "centro": [
+        6.0,
+        1.2,
+        -66.25
+       ],
+       "cam": [
+        7.4,
+        1.6,
+        -66.15
+       ],
+       "abierto": false
+      },
+      {
+       "id": "cocina",
+       "nombre": "Cocina",
+       "tipo": "cocina",
+       "camas": 0,
+       "centro": [
+        11.0,
+        1.2,
+        -56.5
+       ],
+       "cam": [
+        10.9,
+        1.6,
+        -58.4
+       ],
+       "abierto": false
+      },
+      {
+       "id": "comedor",
+       "nombre": "Comedor y sala de familiares",
+       "tipo": "comedor",
+       "camas": 0,
+       "centro": [
+        11.0,
+        1.2,
+        -62.0
+       ],
+       "cam": [
+        8.7,
+        1.6,
+        -59.7
+       ],
+       "abierto": false
+      },
+      {
+       "id": "pasillo2",
+       "nombre": "Pasillo",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        9.0,
+        1.2,
+        -66.5
+       ],
+       "cam": [
+        9.0,
+        1.6,
+        -65.6
+       ],
+       "abierto": false
+      },
+      {
+       "id": "cto3",
+       "nombre": "Cuarto #3",
+       "tipo": "habitacion",
+       "camas": 0,
+       "centro": [
+        12.0,
+        1.2,
+        -66.5
+       ],
+       "cam": [
+        10.6,
+        1.6,
+        -66.45
+       ],
+       "abierto": false
+      },
+      {
+       "id": "consultorio",
+       "nombre": "Consultorio de salud",
+       "tipo": "oficina",
+       "camas": 0,
+       "centro": [
+        17.0,
+        1.2,
+        -56.5
+       ],
+       "cam": [
+        16.85,
+        1.6,
+        -58.4
+       ],
+       "abierto": false
+      },
+      {
+       "id": "recepcion",
+       "nombre": "Recepción",
+       "tipo": "recepcion",
+       "camas": 0,
+       "centro": [
+        17.0,
+        1.2,
+        -61.0
+       ],
+       "cam": [
+        19.4,
+        1.6,
+        -61.0
+       ],
+       "abierto": false
+      },
+      {
+       "id": "terapia",
+       "nombre": "Sala de terapia",
+       "tipo": "terapia",
+       "camas": 0,
+       "centro": [
+        17.0,
+        1.2,
+        -65.5
+       ],
+       "cam": [
+        14.6,
+        1.6,
+        -64.2
+       ],
+       "abierto": false
+      },
+      {
+       "id": "terraza",
+       "nombre": "Terraza",
+       "tipo": "terraza",
+       "camas": 0,
+       "centro": [
+        12.0,
+        1.2,
+        -69.5
+       ],
+       "cam": [
+        4.7,
+        1.6,
+        -68.7
+       ],
+       "abierto": true
+      },
+      {
+       "id": "porche",
+       "nombre": "Porche",
+       "tipo": "porche",
+       "camas": 0,
+       "centro": [
+        21.5,
+        1.2,
+        -58.5
+       ],
+       "cam": [
+        20.7,
+        1.6,
+        -54.7
+       ],
+       "abierto": true
+      },
+      {
+       "id": "carport",
+       "nombre": "Estacionamiento bajo techo",
+       "tipo": "porche",
+       "camas": 0,
+       "centro": [
+        22.5,
+        1.2,
+        -65.5
+       ],
+       "cam": [
+        20.7,
+        1.6,
+        -63.7
+       ],
+       "abierto": true
+      }
+     ]
+    },
+    {
+     "n": 2,
+     "nombre": "Piso alto",
+     "rooms": [
+      {
+       "id": "gerencia",
+       "nombre": "Oficina del gerente",
+       "tipo": "oficina",
+       "camas": 0,
+       "centro": [
+        10.5,
+        4.45,
+        -61.5
+       ],
+       "cam": [
+        12.4,
+        4.85,
+        -58.85
+       ],
+       "abierto": false
+      },
+      {
+       "id": "bano_ger",
+       "nombre": "Baño",
+       "tipo": "bano",
+       "camas": 0,
+       "centro": [
+        14.0,
+        4.45,
+        -59.5
+       ],
+       "cam": [
+        13.9,
+        4.85,
+        -60.4
+       ],
+       "abierto": false
+      },
+      {
+       "id": "balcon",
+       "nombre": "Balcón",
+       "tipo": "terraza",
+       "camas": 0,
+       "centro": [
+        14.0,
+        4.45,
+        -63.0
+       ],
+       "cam": [
+        13.7,
+        4.85,
+        -61.7
+       ],
+       "abierto": true
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "exteriores": [
+  {
+   "id": "estacionamiento",
+   "nombre": "Estacionamiento",
+   "centro": [
+    25.0,
+    1.0,
+    -34.0
+   ],
+   "cam": [
+    32.0,
+    1.7,
+    -28.0
+   ]
+  },
+  {
+   "id": "garage",
+   "nombre": "Entrada circular",
+   "centro": [
+    26.5,
+    1.0,
+    -60.5
+   ],
+   "cam": [
+    33.5,
+    1.7,
+    -54.5
+   ]
+  },
+  {
+   "id": "gazebo",
+   "nombre": "Gazebo · área de juegos",
+   "centro": [
+    22,
+    1.0,
+    -44
+   ],
+   "cam": [
+    29,
+    1.7,
+    -38
+   ]
+  },
+  {
+   "id": "piscina",
+   "nombre": "Terapia acuática",
+   "centro": [
+    10,
+    1.0,
+    -42
+   ],
+   "cam": [
+    17,
+    1.7,
+    -36
+   ]
+  },
+  {
+   "id": "huerto",
+   "nombre": "Huerto y jardín de siembra",
+   "centro": [
+    10.0,
+    1.0,
+    -4.0
+   ],
+   "cam": [
+    17.0,
+    1.7,
+    2.0
+   ]
+  },
+  {
+   "id": "rampa",
+   "nombre": "Rampas con barandales",
+   "centro": [
+    29,
+    1.0,
+    -28
+   ],
+   "cam": [
+    36,
+    1.7,
+    -22
+   ]
+  }
+ ],
+ "lote": [
+  [
+   0,
+   0
+  ],
+  [
+   30,
+   0
+  ],
+  [
+   30,
+   84
+  ],
+  [
+   0,
+   84
+  ]
+ ]
+}

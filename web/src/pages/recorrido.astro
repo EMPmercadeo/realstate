@@ -1,0 +1,35 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Recorrido 3D · Residencia Altos de San Cristóbal" full>
+  <div class="visor" id="visor">
+    <div class="carga-wrap"><div id="carga" class="carga"></div></div>
+    <div class="visor-ui">
+      <div class="grupo">
+        <button data-modo="orbita" class="on">Maqueta</button>
+        <button data-modo="recorrido">Caminar</button>
+      </div>
+      <div class="grupo">
+        <button data-vista="sitio:99" class="on">Todo</button>
+        <button data-vista="gris:1">Gris · PB</button>
+        <button data-vista="gris:2">Gris · PA</button>
+        <button data-vista="amarilla:1">Amarilla · PB</button>
+        <button data-vista="amarilla:2">Amarilla · PA</button>
+      </div>
+      <div id="hint" class="hint">Arrastra para girar · rueda para acercar · elige un espacio en el panel</div>
+    </div>
+    <aside class="panel">
+      <div class="panel-cab">
+        <h2>Residencia Altos de San Cristóbal</h2>
+        <p class="muted">Terreno de 2.500 m² · dos edificios · 27 residentes</p>
+      </div>
+      <div id="panel-lista" class="panel-lista"></div>
+      <p class="muted small">Maqueta digital preliminar. Medidas estimadas, pendientes de planos.</p>
+    </aside>
+    <div id="joy" class="joy"><span></span></div>
+  </div>
+  <script>
+    import { iniciarVisor } from '@/visor/visor';
+    iniciarVisor(document.getElementById('visor')!);
+  </script>
+</Base>

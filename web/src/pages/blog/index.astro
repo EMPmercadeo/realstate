@@ -1,0 +1,20 @@
+---
+import Base from '@/layouts/Base.astro';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog')).sort((a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf());
+---
+<Base title="Blog · Retiro y vida para adultos mayores en Panamá">
+  <section class="seccion container">
+    <h2>Blog</h2>
+    <p class="muted">Guías sobre retirarse en Panamá, cuidado de adultos mayores y vida en Chiriquí.</p>
+    <div class="espacios">
+      {posts.map((p) => (
+        <a class="espacio" href={`/blog/${p.id}`}><div>
+          <h3>{p.data.titulo}</h3>
+          <p class="muted">{p.data.resumen}</p>
+          <p class="small muted">{p.data.pais} · {p.data.fecha.toLocaleDateString('es-PA')}</p>
+        </div></a>
+      ))}
+    </div>
+  </section>
+</Base>
