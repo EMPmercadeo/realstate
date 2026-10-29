@@ -1,0 +1,74 @@
+---
+import '@/styles/recorrido.css';
+// Recorrido cinematográfico por scroll: la cámara "vuela" por la propiedad,
+// cada parada pasa de la foto real a la imagen "así quedará".
+import { PARADAS } from '@/data/recorrido';
+import { listarPublicos } from '@/data/existentes';
+const pad = (n: number) => String(n).padStart(2, '0');
+const existentes = listarPublicos('clips', 'fotos-despues');
+---
+<section class="rc" id="recorrido" data-paradas={PARADAS.length} data-existe={JSON.stringify(existentes)}>
+  <div class="rc-stage">
+    <div class="rc-escenas" aria-hidden="true"></div>
+    <div class="rc-velo"></div>
+
+    <div class="rc-barra"><span></span></div>
+
+    <div class="rc-top">
+      <a class="rc-marca" href="/"><i></i><span>Residencia Altos de San Cristóbal</span></a>
+      <nav class="rc-nav" aria-label="Paradas del recorrido">
+        {PARADAS.map((p) => <button type="button">{p.etiqueta}</button>)}
+      </nav>
+      <a class="rc-cta" href="#inversionistas">Solicitar expediente</a>
+    </div>
+
+    <div class="rc-copias">
+      {PARADAS.map((p, i) => (
+        <article class="rc-copy" style={`--acento:${p.acento || '#c99a3c'}`}>
+          <span class="rc-num">{pad(i + 1)} / {pad(PARADAS.length)}</span>
+          <span class="rc-eyebrow">{p.eyebrow}</span>
+          {i === 0 ? <h1 class="rc-titulo">{p.titulo}</h1> : <h2 class="rc-titulo">{p.titulo}</h2>}
+          <p class="rc-texto">{p.texto}</p>
+          {p.tags && <ul class="rc-tags">{p.tags.map((t) => <li>{t}</li>)}</ul>}
+          {p.cta && (
+            <div class="rc-botones">
+              <a class="rc-btn rc-btn-p" href={p.cta.principal.href}>{p.cta.principal.label}</a>
+              {p.cta.secundaria && <a class="rc-btn rc-btn-g" href={p.cta.secundaria.href}>{p.cta.secundaria.label}</a>}
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+
+    <div class="rc-ruta" role="group" aria-label="Ir a una parada">
+      {PARADAS.map((p) => (
+        <button type="button" style={`--acento:${p.acento || '#c99a3c'}`} aria-label={p.etiqueta}><span>{p.etiqueta}</span><i></i></button>
+      ))}
+    </div>
+
+    <div class="rc-hint"><span>Desliza para recorrer</span><i></i></div>
+  </div>
+</section>
+
+<script>
+  import Lenis from 'lenis';
+  import { montarRecorrido } from '@/recorrido/motor';
+  import { PARADAS } from '@/data/recorrido';
+
+  const root = document.getElementById('recorrido')!;
+  const base = document.body.dataset.base || '/';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce) {
+    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true, anchors: true });
+    (window as any).__lenis = lenis;
+    const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+  }
+  const existe = new Set<string>(JSON.parse(root.dataset.existe || '[]'));
+  const motor = montarRecorrido(root, PARADAS, { base, existe: (r) => existe.has(r) });
+  // Enlaces profundos: /#parada=hospitalizacion
+  const m = location.hash.match(/parada=([a-z-]+)/);
+  if (m) { const i = PARADAS.findIndex((p) => p.id === m[1]); if (i >= 0) setTimeout(() => motor.irA(i), 300); }
+</script>
+
+

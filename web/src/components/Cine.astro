@@ -1,0 +1,230 @@
+---
+import '@/styles/recorrido.css';
+// Portada cinematográfica: el scroll mueve la cámara por el mundo 3D.
+import { PARADAS_CINE } from '@/data/cine';
+import { listarPublicos } from '@/data/existentes';
+const pad = (n: number) => String(n).padStart(2, '0');
+const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'fotos-reales');
+---
+<section class="rc cine" id="recorrido" data-n={PARADAS_CINE.length} data-existe={JSON.stringify(existentes)}>
+  <div class="rc-stage">
+    <div class="visor cine" id="visor"></div>
+    <div class="rc-velo"></div>
+    <div class="rc-barra"><span></span></div>
+
+    <div class="cine-carga" id="cine-carga">
+      <div>
+        <p class="rc-eyebrow">Altos de San Cristóbal · David, Chiriquí</p>
+        <h1 class="rc-titulo">Residencia de retiro</h1>
+        <p class="rc-texto">Preparando el sobrevuelo…</p>
+        <div class="cine-barra"><span id="cine-pct"></span></div>
+      </div>
+    </div>
+
+    <div class="rc-top">
+      <a class="rc-marca" href="/"><i></i><span>Residencia Altos de San Cristóbal</span></a>
+      <nav class="rc-nav" aria-label="Paradas">
+        {PARADAS_CINE.map((p) => <button type="button" data-u={p.u}>{p.etiqueta}</button>)}
+      </nav>
+      <a class="rc-cta" href="#inversionistas">Solicitar expediente</a>
+    </div>
+
+    <div class="rc-copias">
+      {PARADAS_CINE.map((p, i) => (
+        <article class="rc-copy" data-u={p.u}>
+          <span class="rc-num">{pad(i + 1)} / {pad(PARADAS_CINE.length)}</span>
+          <span class="rc-eyebrow">{p.eyebrow}</span>
+          {i === 0 ? <h1 class="rc-titulo">{p.titulo}</h1> : <h2 class="rc-titulo">{p.titulo}</h2>}
+          <p class="rc-texto">{p.texto}</p>
+          {p.tags && <ul class="rc-tags">{p.tags.map((t) => <li>{t}</li>)}</ul>}
+          {p.cta && (
+            <div class="rc-botones">
+              <a class="rc-btn rc-btn-p" href={p.cta.principal.href}>{p.cta.principal.label}</a>
+              {p.cta.secundaria && <a class="rc-btn rc-btn-g" href={p.cta.secundaria.href}>{p.cta.secundaria.label}</a>}
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+
+    <div class="cine-fotos">
+      {PARADAS_CINE.filter((p) => p.foto).map((p) => (
+        <figure class="cine-foto" data-u={p.u} data-foto={p.foto} data-antes={p.fotoAntes || ''}>
+          <div class="cine-foto-marco"><img alt={p.titulo} /><span class="cine-foto-pill">Así quedará</span></div>
+          <figcaption>{p.etiqueta}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <div class="rc-ruta" role="group" aria-label="Ir a una parada">
+      {PARADAS_CINE.map((p) => <button type="button" data-u={p.u} aria-label={p.etiqueta}><span>{p.etiqueta}</span><i></i></button>)}
+    </div>
+    <div class="rc-hint"><span>Desliza para sobrevolar</span><i></i></div>
+  </div>
+</section>
+
+<script>
+  import Lenis from 'lenis';
+  import { iniciarVisor } from '@/visor/visor';
+  import { RUTA, PARADAS_CINE } from '@/data/cine';
+
+  const root = document.getElementById('recorrido')!;
+  const stage = root.querySelector<HTMLElement>('.rc-stage')!;
+  const base = document.body.dataset.base || '/';
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ALTO = 9;                      // alturas de pantalla que dura el sobrevuelo
+  root.style.height = `${(ALTO + 1) * 100}vh`;
+  const copias = Array.from(root.querySelectorAll<HTMLElement>('.rc-copy'));
+  const fotos = Array.from(root.querySelectorAll<HTMLElement>('.cine-foto'));
+  const puntos = Array.from(root.querySelectorAll<HTMLButtonElement>('.rc-ruta button'));
+  const navs = Array.from(root.querySelectorAll<HTMLButtonElement>('.rc-nav button'));
+  const barra = root.querySelector<HTMLElement>('.rc-barra span')!;
+  const hint = root.querySelector<HTMLElement>('.rc-hint')!;
+  const carga = document.getElementById('cine-carga')!;
+  const pct = document.getElementById('cine-pct')!;
+
+  if (!reduce) {
+    const lenis = new Lenis({ lerp: 0.085, smoothWheel: true, anchors: true });
+    (window as any).__lenis = lenis;
+    const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
+    requestAnimationFrame(raf);
+  }
+
+  // fotos "así quedará": el manifiesto de build dice cuáles existen; si falta, usa la foto actual
+  const existe = new Set<string>(JSON.parse(root.dataset.existe || '[]'));
+  for (const f of fotos) {
+    const img = f.querySelector('img')!; const pill = f.querySelector('.cine-foto-pill')!;
+    const d = base.replace(/\/$/, '') + f.dataset.foto!; const a = f.dataset.antes ? base.replace(/\/$/, '') + f.dataset.antes : '';
+    if (existe.size && !existe.has(f.dataset.foto!)) {
+      if (f.dataset.antes && existe.has(f.dataset.antes)) { img.src = a; pill.textContent = 'Hoy'; pill.classList.add('hoy'); } else f.remove();
+      continue;
+    }
+    const probe = new Image();
+    probe.onload = () => { img.src = d; };
+    probe.onerror = () => { if (a) { img.src = a; pill.textContent = 'Hoy'; pill.classList.add('hoy'); } else f.remove(); };
+    probe.src = d;
+  }
+
+  const uDbg = new URLSearchParams(location.search).get('u');
+  const esMovil = matchMedia('(hover: none) and (pointer: coarse)').matches || innerWidth <= 860;
+  // Motor: si existe el video renderizado (clips/sobrevuelo.mp4) se reproduce por scroll
+  // (fluido en cualquier dispositivo); si no, se usa el 3D en vivo.
+  let visor: { setProgreso: (u: number, instante?: boolean) => void } = { setProgreso: () => {} };
+  const contVisor = document.getElementById('visor')!;
+  const B = base.replace(/\/$/, '');
+  async function iniciar() {
+    const nombre = esMovil ? 'sobrevuelo-m.mp4' : 'sobrevuelo.mp4';
+    let hayVideo = false;
+    if (!new URLSearchParams(location.search).has('3d')) {
+      try {
+        const r = await fetch(`${B}/clips/${nombre}`, { headers: { Range: 'bytes=0-0' } });
+        hayVideo = r.ok && (r.headers.get('content-type') || '').startsWith('video');
+      } catch {}
+    }
+    if (hayVideo) {
+      // póster inmediato mientras baja el video
+      contVisor.style.backgroundImage = `url(${B}/clips/poster.jpg)`; contVisor.style.backgroundSize = 'cover'; contVisor.style.backgroundPosition = 'center 45%';
+      const blob = await (await fetch(`${B}/clips/${nombre}`)).blob();
+      const v = document.createElement('video');
+      v.muted = true; v.playsInline = true; v.preload = 'auto'; v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+      v.className = 'cine-video'; v.poster = `${B}/clips/poster.jpg`; v.src = URL.createObjectURL(blob);
+      contVisor.append(v);
+      let cur = 0, objetivo = 0, listo = false;
+      v.addEventListener('loadedmetadata', () => { listo = true; carga.classList.add('oculta'); leer(); });
+      v.addEventListener('loadeddata', () => { try { v.pause(); } catch {} });
+      const prime = () => { try { const p = v.play(); if (p) p.then(() => v.pause()).catch(() => {}); } catch {} };
+      addEventListener('pointerdown', prime, { once: true, passive: true });
+      addEventListener('touchstart', prime, { once: true, passive: true });
+      visor = { setProgreso: (u, instante) => { objetivo = u; if (instante) cur = u; } };
+      const raf = () => {
+        if (listo && !v.seeking) {
+          cur += (objetivo - cur) * (reduce ? 1 : 0.14);
+          const t = Math.min(cur, 0.999) * (v.duration || 1);
+          if (Math.abs(v.currentTime - t) > (esMovil ? 0.02 : 0.006)) { try { v.currentTime = t; } catch {} }
+        }
+        requestAnimationFrame(raf);
+      };
+      requestAnimationFrame(raf);
+    } else {
+      visor = iniciarVisor(contVisor, { cine: true, ruta: RUTA, onCargado: () => { carga.classList.add('oculta'); leer(); } });
+    }
+  }
+  iniciar();
+
+  const clamp = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const smooth = (x: number) => { x = clamp(x); return x * x * (3 - 2 * x); };
+  let top0 = 0, activo = -1, ticking = false;
+  function layout() { top0 = root.getBoundingClientRect().top + scrollY; leer(); }
+  function progreso() { return clamp((scrollY - top0) / (ALTO * innerHeight)); }
+  function irA(u: number) {
+    const y = top0 + u * ALTO * innerHeight;
+    const lenis = (window as any).__lenis;
+    if (lenis) lenis.scrollTo(y, { duration: reduce ? 0 : 2.2 }); else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  puntos.forEach((b) => b.addEventListener('click', () => irA(+b.dataset.u!)));
+  navs.forEach((b) => b.addEventListener('click', () => irA(+b.dataset.u!)));
+
+  function leer() {
+    const u = uDbg ? +uDbg : progreso();
+    visor.setProgreso(u, !!uDbg);
+    const fin = scrollY - top0 > (ALTO + 0.5) * innerHeight;
+    stage.classList.toggle('rc-fin', fin);
+    const N = PARADAS_CINE.length;
+    let cerca = 0, dmin = 9;
+    PARADAS_CINE.forEach((p, i) => {
+      const d = Math.abs(u - p.u); if (d < dmin) { dmin = d; cerca = i; }
+      const ventana = i === 0 ? 0.16 : i === N - 1 ? 0.14 : 0.075;
+      let op = i === 0 ? smooth(1 - u / ventana) : i === N - 1 ? smooth((u - (1 - ventana)) / ventana) : smooth(1 - d / ventana);
+      if (fin) op = 0;
+      const c = copias[i];
+      c.style.opacity = String(op);
+      c.style.transform = reduce ? 'none' : `translateY(${((p.u - u) * 30).toFixed(2)}vh)`;
+      c.style.pointerEvents = op > 0.5 ? 'auto' : 'none';
+    });
+    for (const f of fotos) {
+      const pu = +f.dataset.u!; const d = Math.abs(u - pu);
+      const op = smooth(1 - d / 0.075);
+      f.style.opacity = String(fin ? 0 : op);
+      f.style.transform = `translateY(${((pu - u) * -22).toFixed(2)}vh) scale(${(0.94 + op * 0.06).toFixed(3)})`;
+    }
+    if (cerca !== activo) {
+      activo = cerca;
+      puntos.forEach((d, k) => d.classList.toggle('activo', k === cerca));
+      navs.forEach((d, k) => d.classList.toggle('activo', k === cerca));
+    }
+    barra.style.transform = `scaleX(${u})`;
+    hint.style.opacity = String(clamp(1 - u / 0.06));
+    ticking = false;
+  }
+  addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(leer); } }, { passive: true });
+  addEventListener('resize', layout);
+  addEventListener('load', layout);
+  layout();
+  const m = location.hash.match(/parada=([a-z-]+)/);
+  if (m) { const p = PARADAS_CINE.find((x) => x.id === m[1]); if (p) setTimeout(() => irA(p.u), 400); }
+</script>
+
+<style is:global>
+  .rc.cine .visor { position: absolute; inset: 0; height: 100%; min-height: 0; background: #0e1411; }
+  .rc.cine .visor canvas { display: block; width: 100% !important; height: 100% !important; }
+  .cine-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; }
+  .rc.cine .rc-velo { background: linear-gradient(90deg, rgba(10, 14, 12, 0.72) 0%, rgba(10, 14, 12, 0.42) 28%, rgba(10, 14, 12, 0.06) 52%, transparent 100%), linear-gradient(0deg, rgba(10, 14, 12, 0.5) 0%, transparent 24%), linear-gradient(180deg, rgba(10, 14, 12, 0.5) 0%, transparent 20%); }
+  .cine-carga { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; background: radial-gradient(80% 70% at 50% 40%, #1b2a22, #0e1411); color: var(--rc-ink); text-align: center; transition: opacity 0.9s, visibility 0.9s; }
+  .cine-carga.oculta { opacity: 0; visibility: hidden; }
+  .cine-carga .rc-titulo { font-size: clamp(2rem, 5vw, 4rem); }
+  .cine-carga .rc-texto { margin-left: auto; margin-right: auto; }
+  .cine-barra { width: 220px; height: 3px; margin: 26px auto 0; background: rgba(255, 255, 255, 0.14); border-radius: 2px; overflow: hidden; }
+  .cine-barra span { display: block; height: 100%; width: 40%; background: var(--acento); animation: cine-carga 1.2s ease-in-out infinite alternate; }
+  @keyframes cine-carga { from { transform: translateX(-100%) } to { transform: translateX(260%) } }
+  .cine-fotos { position: absolute; inset: 0; z-index: 22; pointer-events: none; }
+  .cine-foto { position: absolute; right: clamp(60px, 7vw, 120px); top: 50%; transform: translateY(-50%); width: min(30vw, 420px); margin: 0; opacity: 0; will-change: opacity, transform; }
+  .cine-foto-marco { position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.12); aspect-ratio: 16 / 10; background: #222; }
+  .cine-foto-marco img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cine-foto-pill { position: absolute; left: 12px; top: 12px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: var(--acento); color: #141008; }
+  .cine-foto-pill.hoy { background: rgba(0, 0, 0, 0.55); color: #fff; }
+  .cine-foto figcaption { margin-top: 10px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rc-ink-2); }
+  @media (max-width: 860px) {
+    .cine-foto { right: 18px; left: auto; top: calc(70px + env(safe-area-inset-top)); transform: none; width: 42vw; }
+    .cine-foto figcaption { display: none; }
+  }
+</style>

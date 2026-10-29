@@ -5,3 +5,12 @@ build/escena.blend
 build/web-tour*.jpg
 *.zip
 publish/
+__pycache__/
+build/escena.blend1
+build/cine/
+build/cine_t*/
+build/*.log
+build/test_*.jpg
+build/preview_grid.jpg
+assets/pbr/
+assets/hdri/

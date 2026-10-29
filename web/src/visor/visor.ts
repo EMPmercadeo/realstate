@@ -9,30 +9,43 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { GTAOPass } from 'three/examples/jsm/postprocessing/GTAOPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { crearMundo } from './mundo';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import vistas from '../data/vistas.json';
 import fotos from '../data/fotos.json';
 
-type Modo = 'orbita' | 'recorrido';
+type Modo = 'orbita' | 'recorrido' | 'cine';
 type Vista = { edificio: string | null; piso: number };
 type Preset = { pos: number[]; target: number[]; ed: string | null; piso: number; nombre: string; detalle?: string };
 
-const $ = (sel: string) => document.querySelector(sel) as HTMLElement;
+const fantasma = document.createElement('div');
+const $ = (sel: string) => (document.querySelector(sel) as HTMLElement) || fantasma;
 const FOTOS = fotos as Record<string, { nombre: string; antes: string; despues: string | null }>;
 const MOVIL = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || window.innerWidth < 820;
+const RAPIDO = new URLSearchParams(location.search).has('rapido');   // capturas rápidas de depuración
 const NIVEL = 3.25;
 
-export function iniciarVisor(container: HTMLElement) {
+export interface OpcionesVisor { cine?: boolean; ruta?: { pos: number[]; target: number[] }[]; onCargado?: () => void; }
+
+export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const base = document.body.dataset.base || '/';
+  const CINE = !!opts.cine;
+  // ruta de cámara para el modo cine (curvas suaves por los puntos dados)
+  const rutaPos = new THREE.CatmullRomCurve3((opts.ruta || []).map((p) => new THREE.Vector3(...p.pos)), false, 'centripetal', 0.5);
+  const rutaTgt = new THREE.CatmullRomCurve3((opts.ruta || []).map((p) => new THREE.Vector3(...p.target)), false, 'centripetal', 0.5);
+  let uObjetivo = 0, uSuave = 0;
+  const setProgreso = (u: number, instante = false) => { uObjetivo = THREE.MathUtils.clamp(u, 0, 1); if (instante) uSuave = uObjetivo; };
 
   // ---------- renderer ----------
   const renderer = new THREE.WebGLRenderer({ antialias: MOVIL, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOVIL ? 1.5 : 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOVIL ? 1.25 : 1.5));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.8;
+  renderer.toneMappingExposure = 0.72;
   container.appendChild(renderer.domElement);
 
   const labels = new CSS2DRenderer();
@@ -41,34 +54,37 @@ export function iniciarVisor(container: HTMLElement) {
   container.appendChild(labels.domElement);
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 900);
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 5000);
   camera.position.set(110, 70, 30);
 
   // ---------- cielo + sol ----------
   const sky = new Sky();
   sky.scale.setScalar(2000);
   scene.add(sky);
-  const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 52), THREE.MathUtils.degToRad(215));
+  // hora dorada: sol bajo desde el este-sureste (ilumina las fachadas que dan a la calle)
+  const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 26), THREE.MathUtils.degToRad(14));
   const u = sky.material.uniforms;
   u.sunPosition.value.copy(sunDir);
-  u.turbidity.value = 4; u.rayleigh.value = 1.6; u.mieCoefficient.value = 0.006; u.mieDirectionalG.value = 0.8;
+  u.turbidity.value = 2.8; u.rayleigh.value = 1.1; u.mieCoefficient.value = 0.005; u.mieDirectionalG.value = 0.85;
   const pmrem = new THREE.PMREMGenerator(renderer);
   const skyScene = new THREE.Scene(); skyScene.add(sky.clone());
   scene.environment = pmrem.fromScene(skyScene as any, 0.02).texture;
-  scene.environmentIntensity = 0.5;
+  scene.environmentIntensity = 0.45;
+  scene.fog = new THREE.FogExp2(new THREE.Color('#d8d0c2'), MOVIL ? 0.0011 : 0.00075);
+  const mundo = crearMundo(scene, renderer, MOVIL, sunDir, (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]));
 
   const centro = new THREE.Vector3(15, 0, -42);
-  const sun = new THREE.DirectionalLight(0xfff3df, 2.3);
+  const sun = new THREE.DirectionalLight(0xffd6a0, 3.2);
   sun.position.copy(sunDir).multiplyScalar(140).add(centro);
   sun.target.position.copy(centro);
   sun.castShadow = true;
-  const sm = MOVIL ? 2048 : 4096;
+  const sm = RAPIDO ? 1024 : MOVIL ? 2048 : 4096;
   sun.shadow.mapSize.set(sm, sm);
   sun.shadow.camera.left = -70; sun.shadow.camera.right = 70; sun.shadow.camera.top = 70; sun.shadow.camera.bottom = -70;
   sun.shadow.camera.near = 20; sun.shadow.camera.far = 320;
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
   scene.add(sun, sun.target);
-  scene.add(new THREE.HemisphereLight(0xcfe3ff, 0x5a6b45, 0.4));
+  scene.add(new THREE.HemisphereLight(0xdcc8ff, 0x6a5a3a, 0.5));
   // luz de relleno que acompaña a la cámara dentro de los edificios
   const relleno = new THREE.PointLight(0xfff4e0, 0, 14, 1.6);
   scene.add(relleno);
@@ -77,18 +93,35 @@ export function iniciarVisor(container: HTMLElement) {
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
   let gtao: GTAOPass | null = null;
-  if (!MOVIL) {
+  if (!MOVIL && !RAPIDO) {
     gtao = new GTAOPass(scene, camera, container.clientWidth, container.clientHeight);
     gtao.output = GTAOPass.OUTPUT.Default;
     (gtao as any).updateGtaoMaterial({ radius: 0.6, distanceExponent: 1, thickness: 1, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
     composer.addPass(gtao);
   }
+  const bloom = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), MOVIL ? 0.1 : 0.16, 0.6, 0.9);
+  composer.addPass(bloom);
   composer.addPass(new OutputPass());
-  if (!MOVIL) composer.addPass(new SMAAPass());
+  // viñeta + grado cálido de película
+  const grado = new ShaderPass({
+    uniforms: { tDiffuse: { value: null }, uVig: { value: 0.42 } },
+    vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`,
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float uVig; varying vec2 vUv;
+      void main(){ vec4 c = texture2D(tDiffuse, vUv);
+        vec2 d = vUv - 0.5; float v = 1.0 - smoothstep(0.35, 1.05, length(d) * 1.35) * uVig;
+        c.rgb *= v;
+        // sombras ligeramente frías, altas luces cálidas
+        float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+        c.rgb = mix(c.rgb * vec3(0.96, 0.98, 1.05), c.rgb * vec3(1.04, 1.0, 0.94), smoothstep(0.2, 0.8, l));
+        gl_FragColor = c; }`,
+  });
+  composer.addPass(grado);
+  if (!MOVIL && !RAPIDO) composer.addPass(new SMAAPass());
 
   // ---------- estado ----------
   const objetos: THREE.Object3D[] = [];
   const muros: THREE.Mesh[] = [];
+  const aguas: THREE.Mesh[] = [];
   const estado = { modo: 'orbita' as Modo, vista: { edificio: null as string | null, piso: 99 }, cargado: false, etiquetas: true, tour: false };
 
   // ---------- presets de cámara ----------
@@ -112,7 +145,7 @@ export function iniciarVisor(container: HTMLElement) {
   const pantalla = $('#pantalla-carga');
   const barra = $('#carga');
   const pct = $('#carga-pct');
-  loader.load(`${base}modelo/escena.glb`, (gltf) => {
+  loader.load(`${base}modelo/${CINE ? 'exterior' : 'escena'}.glb`, (gltf) => {
     gltf.scene.traverse((o: any) => {
       if (o.isMesh) {
         o.castShadow = true; o.receiveShadow = true;
@@ -129,18 +162,31 @@ export function iniciarVisor(container: HTMLElement) {
           if (m.name.startsWith('agua')) { m.transparent = true; m.opacity = 0.75; m.roughness = 0.05; }
         }
         if (o.name.includes('_muro')) muros.push(o);
+        if (m && m.name.startsWith('agua')) aguas.push(o);
       }
+      // el entorno (césped infinito, vecinos y arboleda de la maqueta) lo reemplaza el mundo procedural
+      if (/^(entorno|vecino_|arbol_|palma_|garage_palma|calle$|acera$|acera2$)/.test(o.name)) o.visible = false;
       objetos.push(o);
     });
     scene.add(gltf.scene);
+    gltf.scene.updateMatrixWorld(true);
+    for (const a of aguas) (mundo as any).crearAgua(a);
     estado.cargado = true;
-    crearEtiquetas();
+    if (!CINE) crearEtiquetas();
     aplicarVista();
+    opts.onCargado?.();
+    if (CINE) return;
     pct.textContent = '100 %';
     $('#btn-entrar').removeAttribute('disabled');
     $('#btn-entrar').textContent = 'Entrar al recorrido';
     const h = decodeURIComponent(location.hash.slice(1));
-    if (h && presets[h]) { setTimeout(() => irA(h), 300); }
+    const camQ = new URLSearchParams(location.search).get('cam');
+    if (camQ) {
+      // depuración: ?cam=x,y,z,tx,ty,tz[,edificio:piso]
+      const v = camQ.split(',');
+      camera.position.set(+v[0], +v[1], +v[2]); orbit.target.set(+v[3], +v[4], +v[5]);
+      if (v[6]) { const [ed, pi] = v[6].split(':'); setVista({ edificio: ed === 'sitio' ? null : ed, piso: +pi }); }
+    } else if (h && presets[h]) { setTimeout(() => irA(h), 300); }
   }, (e) => {
     if (e.total) { const p = Math.round((e.loaded / e.total) * 100); barra.style.width = `${p}%`; pct.textContent = `${p} %`; }
   }, (err) => { console.error(err); pct.textContent = 'No se pudo cargar el modelo. Recarga la página.'; });
@@ -369,12 +415,20 @@ export function iniciarVisor(container: HTMLElement) {
 
   // ---------- loop ----------
   const clock = new THREE.Clock();
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const maxFrames = parseInt(new URLSearchParams(location.search).get('frames') || '0');
   let nFrames = 0;
   function frame() {
-    nFrames++;
+    if (estado.cargado) nFrames++;
     if (maxFrames && nFrames > maxFrames) { (window as any).__done = true; return; }
     const dt = Math.min(clock.getDelta(), 0.05);
+    if (estado.modo === 'cine' && opts.ruta && opts.ruta.length > 1) {
+      uSuave += (uObjetivo - uSuave) * (reduceMotion ? 1 : 0.06);
+      const p = rutaPos.getPoint(uSuave), t = rutaTgt.getPoint(uSuave);
+      const el = clock.elapsedTime;
+      p.y += Math.sin(el * 0.7) * 0.12; t.x += Math.sin(el * 0.5) * 0.25; t.y += Math.cos(el * 0.6) * 0.15;
+      camera.position.copy(p); camera.lookAt(t); orbit.target.copy(t);
+    }
     if (tween) {
       tween.t = Math.min(1, tween.t + dt / tween.dur);
       const k = tween.t < 0.5 ? 2 * tween.t * tween.t : -1 + (4 - 2 * tween.t) * tween.t;
@@ -385,7 +439,7 @@ export function iniciarVisor(container: HTMLElement) {
     if (estado.modo === 'orbita') {
       if (estado.tour && !tween) { orbit.target.y += 0; camera.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), 0); }
       orbit.update();
-    } else {
+    } else if (estado.modo === 'recorrido') {
       const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
       const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0, 1, 0));
       const dir = new THREE.Vector3();
@@ -406,10 +460,12 @@ export function iniciarVisor(container: HTMLElement) {
       camera.position.z = THREE.MathUtils.clamp(camera.position.z, -92, 8);
     }
     // relleno interior: solo dentro de un edificio
-    const dentro = !!estado.vista.edificio && (estado.modo === 'recorrido' || camera.position.y < 7);
+    const dentro = !CINE && !!estado.vista.edificio && (estado.modo === 'recorrido' || camera.position.y < 7);
     relleno.intensity += ((dentro ? 6 : 0) - relleno.intensity) * 0.1;
     relleno.position.copy(camera.position).y += 0.6;
+    mundo.update(clock.elapsedTime, dt, camera);
     composer.render();
+    renderer.autoClear = false; renderer.render(mundo.escenaNubes, camera); renderer.autoClear = true;
     labels.render(scene, camera);
     requestAnimationFrame(frame);
   }
@@ -418,10 +474,12 @@ export function iniciarVisor(container: HTMLElement) {
   window.addEventListener('resize', () => {
     const w = container.clientWidth, h = container.clientHeight;
     camera.aspect = w / h; camera.updateProjectionMatrix();
-    renderer.setSize(w, h); composer.setSize(w, h); labels.setSize(w, h); gtao?.setSize(w, h);
+    renderer.setSize(w, h); composer.setSize(w, h); labels.setSize(w, h); gtao?.setSize(w, h); bloom.setSize(w, h);
   });
 
-  setModo('orbita');
-  (window as any).__snap = () => { composer.render(); return renderer.domElement.toDataURL('image/jpeg', 0.85); };
-  return { setModo, setVista, irA };
+  if (CINE) { estado.modo = 'cine'; estado.etiquetas = false; orbit.enabled = false; container.classList.add('cine'); }
+  else setModo('orbita');
+  (window as any).__setProgreso = setProgreso;
+  (window as any).__snap = () => { composer.render(); renderer.autoClear = false; renderer.render(mundo.escenaNubes, camera); renderer.autoClear = true; return renderer.domElement.toDataURL('image/jpeg', 0.85); };
+  return { setModo, setVista, irA, setProgreso };
 }

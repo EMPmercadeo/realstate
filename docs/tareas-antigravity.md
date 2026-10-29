@@ -111,3 +111,35 @@ Fotos de origen: carpeta `docs/fotos-antes/` (ya copiadas) y la carpeta de desca
 - Prompt:
 
 > Conserva el jardín y los árboles de la foto. Añade en el centro una piscina circular de hidroterapia de 4 metros de diámetro, poco profunda, con agua tibia en movimiento, borde de piedra clara, barandales de acero inoxidable y escalera con pasamanos para entrar sin esfuerzo, bajo una pérgola de madera con techo de policarbonato traslúcido. Alrededor, piso antideslizante, dos tumbonas y plantas tropicales. Luz natural suave. Fotografía realista.
+
+## 13. Fachada principal (casa amarilla, desde la calle)
+
+- Foto origen: `web/public/fotos-reales/fachada-frontal.jpg`
+- Guardar como: `fachada.jpg`
+- Prompt:
+
+> Misma casa amarilla de dos niveles con torre del reloj, mismo portón de hierro negro, mismas palmeras y mismo encuadre. Renueva la propiedad como una residencia de retiro recién inaugurada: pintura fresca amarillo claro con molduras blancas, portón recién pintado, jardín frontal cuidado con césped verde, setos recortados y flores (ixoras, heliconias), camino de adoquines limpio, rampa de acceso con pasamanos junto a la entrada, un letrero discreto de madera sin texto legible, iluminación de jardín. Cielo azul de tarde. Sin personas. Fotografía realista de arquitectura.
+
+## 14. Edificio de hospitalización (fachada exterior)
+
+- Foto origen: `web/public/fotos-reales/edificio-gris.jpg`
+- Guardar como: `edificio-gris.jpg`
+- Prompt:
+
+> Mismo edificio gris de dos niveles con balcón corrido y techo de lámina, mismo encuadre entre los árboles. Renuévalo como el pabellón de hospitalización de una residencia de retiro: fachada pintada en blanco cálido con detalles en gris azulado, barandal del balcón nuevo en acero blanco, rampa de acceso amplia con pasamanos, puerta de entrada doble de vidrio, toldos ligeros, jardineras con plantas tropicales al pie, camino pavimentado antideslizante, bancas. Luz de tarde. Sin personas. Fotografía realista de arquitectura.
+
+## 15. Jardín central entre los dos edificios
+
+- Foto origen: `web/public/fotos-reales/casa-amarilla-patio.jpg`
+- Guardar como: `jardin-central.jpg`
+- Prompt:
+
+> Misma casa amarilla con porche y mismo encuadre. Reemplaza el patio de grava por un jardín de residencia de retiro: césped, caminos de concreto antideslizante de 1,5 m con bordes, bancas de madera a la sombra, faroles bajos, jardineras elevadas para que los residentes siembren, palmeras y árboles existentes conservados, una pérgola de madera con sillas. Luz de tarde cálida. Sin personas. Fotografía realista de paisajismo.
+
+## 16. Porche de arcos (entrada techada)
+
+- Foto origen: `web/public/fotos-reales/porche-arcos.jpg`
+- Guardar como: `porche.jpg`
+- Prompt:
+
+> Mismo porche de arcos con columnas blancas, mismo piso de adoquín y mismas lámparas colgantes. Adécualo como entrada principal de una residencia de retiro: rampa de acceso suave con pasamanos de acero en ambos lados, piso antideslizante, dos bancas de madera, jardineras con plantas tropicales entre las columnas, puerta de entrada de vidrio con marco blanco al fondo, señalización discreta, pintura fresca amarillo claro y blanco. Luz de tarde. Sin personas. Fotografía realista de arquitectura.

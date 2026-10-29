@@ -1,114 +1,103 @@
 ---
 import Base from '@/layouts/Base.astro';
+import Cine from '@/components/Cine.astro';
+const comparar = [
+  ['hospitalizacion', 'Sala de hospitalización · 10 camas'],
+  ['comedor', 'Comedor'],
+  ['salon-2', 'Salón #2 · movilidad reducida'],
+  ['refrigerios', 'Área de refrigerios'],
+  ['terraza', 'Terraza'],
+  ['cocina', 'Cocina'],
+  ['bano-accesible', 'Baño accesible'],
+  ['recepcion', 'Recepción'],
+];
 ---
-<Base title="Residencia de retiro en David, Chiriquí · Altos de San Cristóbal">
-  <div class="container">
-    <section class="hero">
-      <img src="/fotos-despues/terraza.jpg" alt="Terraza de la residencia adecuada como área recreativa" />
-      <div class="hero-texto">
-        <h1>Una residencia de retiro lista para abrir en Chiriquí.</h1>
-        <p>Dos edificios, 2.500 m² de jardines y capacidad para 27 residentes en Altos de San Cristóbal, David. Recorre el proyecto terminado antes de visitarlo.</p>
-        <div class="hero-acciones">
-          <a class="btn" href="/recorrido">Entrar al recorrido 3D</a>
-          <a class="btn claro" href="#proyecto">Ver los datos del proyecto</a>
+<Base title="Residencia de retiro en David, Chiriquí · Altos de San Cristóbal" full sinHeader>
+  <Cine />
+
+  <main class="tras-recorrido">
+    <section class="seccion" id="proyecto">
+      <div class="container cols ancha">
+        <div>
+          <h2>Qué incluye</h2>
+          <p class="lead">Un campus completo, cercado y con portones eléctricos, adaptado para el cuidado de adultos mayores: hospitalización, habitaciones privadas, terapia, comedor, huerto y áreas al aire libre.</p>
+          <ul class="lista-plana">
+            <li><span>Edificio de hospitalización (2 niveles)</span><span>24 camas en 4 salas</span></li>
+            <li><span>Casa principal</span><span>recepción, consultorio, terapia, comedor, 3 cuartos privados</span></li>
+            <li><span>Terraza y área de refrigerios</span><span>piso alto</span></li>
+            <li><span>Gazebo de juegos y terapia acuática</span><span>jardín central</span></li>
+            <li><span>Huerto cercado y estacionamiento accesible</span><span>exteriores</span></li>
+            <li><span>Seguridad certificada</span><span>alarma contra incendios, extintores, rutas de evacuación</span></li>
+          </ul>
+        </div>
+        <dl class="datos">
+          <div><dt>Terreno</dt><dd>2.500<small>m²</small></dd></div>
+          <div><dt>Capacidad</dt><dd>27<small>residentes</small></dd></div>
+          <div><dt>Edificios</dt><dd>2<small>de dos niveles</small></dd></div>
+          <div><dt>Licencia sanitaria</dt><dd>75 %<small>en trámite</small></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="seccion gris" id="antes-despues">
+      <div class="container">
+        <h2>Hoy y así quedará</h2>
+        <p class="lead">Fotos reales de los espacios tal como están, y la propuesta de adecuación sobre la misma foto. Arrastra la línea para comparar.</p>
+        <div class="antes-despues">
+          {comparar.map(([f, t]) => (
+            <div class="ad">
+              <img src={`/fotos-despues/${f}.jpg`} alt={`${t}, así quedará`} loading="lazy" />
+              <div class="ad-antes"><img src={`/fotos-antes/${f}.jpg`} alt={`${t}, hoy`} loading="lazy" /></div>
+              <span class="ad-linea"></span>
+              <input type="range" min="0" max="100" value="50" aria-label={`Comparar ${t}`} />
+              <span class="ad-l">Hoy</span><span class="ad-r">Así quedará</span>
+              <span class="ad-t">{t}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
-  </div>
+    <script>
+      document.querySelectorAll('.ad').forEach((el) => {
+        const r = el.querySelector('input'); const a = el.querySelector('.ad-antes'); const l = el.querySelector('.ad-linea');
+        r?.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; l.style.left = `${r.value}%`; });
+      });
+    </script>
 
-  <section class="seccion" id="proyecto">
-    <div class="container cols ancha">
-      <div>
-        <h2>Qué incluye</h2>
-        <p class="lead">Un campus completo, cercado y con portones eléctricos, adaptado para el cuidado de adultos mayores: hospitalización, habitaciones privadas, terapia, comedor, huerto y áreas al aire libre.</p>
-        <ul class="lista-plana">
-          <li><span>Edificio de hospitalización (2 niveles)</span><span>24 camas en 4 salas</span></li>
-          <li><span>Casa principal</span><span>recepción, consultorio, terapia, comedor, 3 cuartos privados</span></li>
-          <li><span>Terraza y área de refrigerios</span><span>piso alto</span></li>
-          <li><span>Gazebo de juegos y terapia acuática</span><span>jardín central</span></li>
-          <li><span>Huerto cercado y estacionamiento accesible</span><span>exteriores</span></li>
-          <li><span>Seguridad certificada</span><span>alarma contra incendios, extintores, rutas de evacuación</span></li>
-        </ul>
-      </div>
-      <dl class="datos">
-        <div><dt>Terreno</dt><dd>2.500<small>m²</small></dd></div>
-        <div><dt>Capacidad</dt><dd>27<small>residentes</small></dd></div>
-        <div><dt>Edificios</dt><dd>2<small>de dos niveles</small></dd></div>
-        <div><dt>Licencia sanitaria</dt><dd>75 %<small>en trámite</small></dd></div>
-      </dl>
-    </div>
-  </section>
-
-  <section class="seccion gris" id="antes-despues">
-    <div class="container">
-      <h2>Hoy y así quedará</h2>
-      <p class="lead">Fotos reales de los espacios tal como están, y la propuesta de adecuación sobre la misma foto. Arrastra la línea para comparar.</p>
-      <div class="antes-despues">
-        {[
-          ['hospitalizacion', 'Sala de hospitalización · 10 camas'],
-          ['salon-2', 'Salón #2 · movilidad reducida'],
-          ['refrigerios', 'Área de refrigerios'],
-          ['terraza', 'Terraza'],
-          ['cocina', 'Cocina'],
-          ['bano-accesible', 'Baño accesible'],
-          ['recepcion', 'Recepción'],
-        ].map(([f, t]) => (
-          <div class="ad">
-            <img src={`/fotos-despues/${f}.jpg`} alt={`${t}, así quedará`} loading="lazy" />
-            <div class="ad-antes"><img src={`/fotos-antes/${f}.jpg`} alt={`${t}, hoy`} loading="lazy" /></div>
-            <span class="ad-linea"></span>
-            <input type="range" min="0" max="100" value="50" aria-label={`Comparar ${t}`} />
-            <span class="ad-l">Hoy</span><span class="ad-r">Así quedará</span>
-            <span class="ad-t">{t}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-  <script>
-    document.querySelectorAll('.ad').forEach((el) => {
-      const r = el.querySelector('input'); const a = el.querySelector('.ad-antes'); const l = el.querySelector('.ad-linea');
-      r?.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; l.style.left = `${r.value}%`; });
-    });
-  </script>
-
-  <section class="seccion" id="espacios">
-    <div class="container">
-      <h2>Los espacios</h2>
-      <p class="lead">Así quedarán las áreas principales. Cada imagen abre el mismo espacio dentro del recorrido.</p>
-      <div class="espacios">
-        <a class="espacio" href="/recorrido#hospitalizacion@gris"><img src="/fotos-despues/hospitalizacion.jpg" alt="Sala de hospitalización con camas hospitalarias" /><div><h3>Sala de hospitalización</h3><p>10 camas con estación de enfermería</p></div></a>
-        <a class="espacio" href="/recorrido#terraza@gris"><img src="/fotos-despues/terraza.jpg" alt="Terraza del piso alto" /><div><h3>Terraza</h3><p>Área recreativa al aire libre</p></div></a>
-        <a class="espacio" href="/recorrido#recepcion@amarilla"><img src="/fotos-despues/recepcion.jpg" alt="Recepción de la casa principal" /><div><h3>Recepción</h3><p>Casa principal</p></div></a>
-        <a class="espacio" href="/recorrido#calle"><img src="/renders/calle.jpg" alt="Vista desde la calle" /><div><h3>Entrada</h3><p>Portón eléctrico y acceso circular</p></div></a>
-        <a class="espacio" href="/recorrido#gris"><img src="/renders/gris.jpg" alt="Edificio de hospitalización" /><div><h3>Edificio de hospitalización</h3><p>Dos niveles, 24 camas</p></div></a>
-        <a class="espacio" href="/recorrido#sitio"><img src="/renders/aerea.jpg" alt="Vista aérea del terreno" /><div><h3>El terreno</h3><p>2.500 m² con arboleda</p></div></a>
-      </div>
-    </div>
-  </section>
-
-  <section class="seccion">
-    <div class="container">
-      <div class="visor-cta">
-        <img src="/renders/gris.jpg" alt="" />
-        <div>
-          <h2>Camina por el proyecto</h2>
-          <p>Maqueta digital navegable: recorre las dos plantas de cada edificio, entra a cada sala y mira los jardines. Funciona en celular y computadora.</p>
-          <a class="btn" href="/recorrido">Abrir el recorrido 3D</a>
+    <section class="seccion" id="espacios">
+      <div class="container">
+        <h2>Los espacios</h2>
+        <p class="lead">Así quedarán las áreas principales. Cada imagen vuelve a esa parada del recorrido.</p>
+        <div class="espacios">
+          <a class="espacio" href="#parada=hospitalizacion"><img src="/fotos-despues/hospitalizacion.jpg" alt="Sala de hospitalización con camas hospitalarias" loading="lazy" /><div><h3>Sala de hospitalización</h3><p>10 camas con estación de enfermería</p></div></a>
+          <a class="espacio" href="#parada=comedor"><img src="/fotos-despues/comedor.jpg" alt="Comedor" loading="lazy" /><div><h3>Comedor</h3><p>Mesas para cuatro, acceso en silla de ruedas</p></div></a>
+          <a class="espacio" href="#parada=terraza"><img src="/fotos-despues/terraza.jpg" alt="Terraza del piso alto" loading="lazy" /><div><h3>Terraza</h3><p>Área recreativa al aire libre</p></div></a>
+          <a class="espacio" href="#parada=recepcion"><img src="/fotos-despues/recepcion.jpg" alt="Recepción de la casa principal" loading="lazy" /><div><h3>Recepción</h3><p>Casa principal</p></div></a>
+          <a class="espacio" href="#parada=llegada"><img src="/fotos-reales/fachada-reloj.jpg" alt="Fachada de la casa principal" loading="lazy" /><div><h3>Entrada</h3><p>Portón eléctrico y acceso circular</p></div></a>
+          <a class="espacio" href="#parada=edificio-gris"><img src="/fotos-reales/edificio-gris.jpg" alt="Edificio de hospitalización" loading="lazy" /><div><h3>Edificio de hospitalización</h3><p>Dos niveles, 24 camas</p></div></a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="seccion" id="contacto">
-    <div class="container cols">
-      <div>
-        <h2>Para inversionistas</h2>
-        <p class="lead">La propiedad se entrega adecuada y equipada según el programa de espacios. Solicita el expediente con planos, licencias y proyección de operación.</p>
+    <section class="seccion" id="inversionistas">
+      <div class="container cols">
+        <div>
+          <h2>Para inversionistas</h2>
+          <p class="lead">La propiedad se entrega adecuada y equipada según el programa de espacios. Solicita el expediente con planos, licencias y proyección de operación.</p>
+        </div>
+        <div>
+          <p class="muted">Formulario y datos de contacto pendientes de definir con la propietaria.</p>
+          <p class="small muted">¿Prefieres la maqueta técnica? <a href="/recorrido">Abrir la maqueta 3D navegable</a>.</p>
+        </div>
       </div>
-      <div>
-        <p class="muted">Formulario y datos de contacto pendientes de definir con la propietaria.</p>
-      </div>
-    </div>
-  </section>
+    </section>
+    <footer>
+      <div class="container">Residencia Altos de San Cristóbal · David, Chiriquí, Panamá. Proyecto en comercialización.</div>
+    </footer>
+  </main>
 </Base>
+
+<style is:global>
+  .tras-recorrido { position: relative; z-index: 2; background: var(--bg); }
+  .tras-recorrido .seccion:first-child { padding-top: 5rem; }
+</style>

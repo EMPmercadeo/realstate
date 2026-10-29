@@ -1,22 +1,41 @@
-# Estado del proyecto (28-10-2026, noche)
+# Estado del proyecto (29-10-2026, madrugada)
 
-## Hecho
-- Modelo 3D procedural en Blender (`blender/`): terreno 30×84 m, calle, cerca, portón, casa amarilla (2 niveles, porche de arcos, teja), edificio gris (2 niveles, lámina, terraza con baranda azul/blanca), gazebo, terapia acuática, huerto, estacionamiento, rampas, caminos, bancas, faroles, jardineras, palmas y árboles. Interiores amueblados según el programa (camas hospitalarias con rieles, mesitas y luz LED; estación de enfermería; comedor; cocina; baños; cuartos; recepción; consultorio; terapia).
-- Visor web (`web/src/visor/visor.ts`): cielo físico, sol con sombras, oclusión ambiental, recorrido guiado con subtítulos, modo maqueta (orbitar, cortar por piso) y modo caminar (teclado o joystick), etiquetas sobre cada espacio, comparador "hoy / así quedará" por sala, pantalla de carga, enlaces profundos (`/recorrido#hospitalizacion@gris`).
-- Fotos "así quedará" generadas con Nano Banana (7 de 12): hospitalización, salón #2, refrigerios, cocina, terraza, baño accesible, recepción. Pendientes por cuota: comedor, terapia, cuarto VIP, gazebo, terapia acuática (tareas 7, 8, 9, 11, 12 de `docs/tareas-antigravity.md`). El visor detecta automáticamente las nuevas en `web/public/fotos-despues/`.
-- Portada (`web/src/pages/index.astro`): hero, datos, comparadores, galería, llamada al recorrido, bloque inversionistas.
-- Renders fijos en `build/renders/`.
+## Dirección actual
+Ernesto descartó la maqueta 3D "plana" como protagonista. La portada (`/`) es ahora un **sobrevuelo 3D
+cinematográfico** estilo demos "Gemini 4 Argon builders": mundo low-poly con hora dorada, bruma, colinas y
+Volcán Barú, bosque, árboles y palmeras con viento, vecindario, nubes, pájaros y agua con reflejos; la cámara
+vuela por una ruta (`web/src/data/cine.ts`) movida por el scroll, con paradas de texto y foto "así quedará".
 
-## Pendiente
-- Planos o medidas reales → actualizar `blender/programa.py` y reconstruir (`build.py` → `export.py`).
-- Datos de la clienta: nombre comercial, contacto, precio o "solicitar expediente", dominio.
-- Repositorio GitHub + Vercel (root directory `web`).
-- Blog multipaís: estructura lista en `web/src/content/blog/`; el prompt y buyer persona los da Ernesto aparte.
+## Rutas del sitio
+- `/` — sobrevuelo 3D (Cine.astro + visor.ts modo cine + mundo.ts) y luego datos, comparadores, espacios, inversionistas.
+- `/fotos` — recorrido en fotos tipo scroll-world (fotos reales → "después"; usa clips de video si existen en `/clips`).
+- `/recorrido` — maqueta 3D libre (orbitar, caminar, pisos, etiquetas) con el mismo mundo mejorado.
+
+## Hecho en esta sesión
+- Fotos reales de fachada (26) revisadas; 15 seleccionadas a 2400 px en `web/public/fotos-reales/`.
+- Skill `scroll-world` instalada en `.agents/skills/` y `.claude/skills/` (motor, prompts, método de costuras).
+- Motor de scroll de fotos (`web/src/recorrido/motor.ts`, Lenis) y página `/fotos`.
+- Mundo procedural (`web/src/visor/mundo.ts`) + luz dorada, niebla, bloom, viñeta/grado (`visor.ts`).
+- Modo cine con ruta de cámara y `?u=` para depurar; `web/scripts/captura.mjs` para capturas sin cabeza.
+- `docs/ORQUESTACION.md` con el prompt-goal para Claude Code en PowerShell.
+- Tareas 13–16 de Antigravity (fachada, edificio gris, jardín central, porche).
+
+## Siguiente fase (PC con RTX 3080) — ver docs/PLAN-GPU.md
+- Render fotorrealista del sobrevuelo con Cycles GPU (`blender/cine_render.py`) → `web/public/clips/sobrevuelo.mp4`; la portada lo reproduce por scroll (ya implementado; `/?3d` fuerza el 3D en vivo).
+- Texturas PBR reales + HDRI (descarga de Ernesto) y, opcional, horneado de luz para el 3D en vivo.
+- `exterior.glb` (3,7 MB) para la portada 3D; `escena.glb` (8,9 MB) para /recorrido.
+
+## Pendiente inmediato
+- Afinar cada parada del sobrevuelo (encuadres, árboles que tapan, agua de la piscina, cielo visible).
+- Capturar móvil y verificar rendimiento (reducir sombras/AO en móvil ya está; medir).
+- Imágenes Antigravity 8, 9, 11, 12, 13, 14, 15, 16 → `web/public/fotos-despues/`.
+- Push a GitHub (Ernesto) → Vercel; desactivar "Vercel Authentication" en el proyecto.
+- Blog: no tocar hasta recibir prompt y buyer persona.
 
 ## Cómo regenerar
 ```
-python3 -c "import runpy; runpy.run_path('blender/build.py')"   # escena
-python3 blender/export.py                                         # GLB -> web/public/modelo
-cd web && npm run build                                           # sitio
-python3 publicar.py                                               # carpeta publish/ para el artefacto
+cd web && npm run build && npx astro preview          # sitio
+node scripts/captura.mjs "http://localhost:4321/?frames=8&u=0.4" cap.jpg 1400 800
+python3 publicar.py                                   # carpeta publish/ para el artefacto
+python3 -c "import runpy; runpy.run_path('blender/build.py')" && python3 blender/export.py   # solo si cambia el modelo
 ```

@@ -21,7 +21,13 @@ for o in bpy.data.objects:
             if o.get('techo'):
                 o['piso'] = 99
 
-# vecinos y entorno van a un grupo simple
+# texturas más ligeras para la web (máx. 512 px; el césped a 768)
+for im in bpy.data.images:
+    if im.size[0] > 0:
+        mx = 768 if 'grass' in im.name else 512
+        if im.size[0] > mx:
+            im.scale(mx, int(im.size[1] * mx / im.size[0]))
+
 kwargs = dict(
     filepath=os.path.join(out_dir, 'escena.glb'),
     export_format='GLB',
@@ -29,7 +35,7 @@ kwargs = dict(
     export_extras=True,
     export_yup=True,
     export_image_format='JPEG',
-    export_jpeg_quality=82,
+    export_jpeg_quality=74,
     export_texture_dir='',
     export_materials='EXPORT',
     export_normals=True,
@@ -38,11 +44,23 @@ kwargs = dict(
     export_lights=False,
     export_animations=False,
 )
-try:
-    bpy.ops.export_scene.gltf(**kwargs, export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)
-    print('exportado con draco')
-except Exception as e:
-    print('draco no disponible:', e)
-    bpy.ops.export_scene.gltf(**kwargs)
-    print('exportado sin draco')
-print(os.path.getsize(os.path.join(out_dir, 'escena.glb')) / 1e6, 'MB')
+import re
+def exportar(nombre, excluir=None):
+    kwargs['filepath'] = os.path.join(out_dir, nombre)
+    if excluir:
+        for o in bpy.data.objects:
+            o.hide_viewport = False
+            o.select_set(bool(excluir.search(o.name)) is False)
+        kwargs['use_selection'] = True
+    try:
+        bpy.ops.export_scene.gltf(**kwargs, export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)
+    except Exception as e:
+        print('draco no disponible:', e)
+        bpy.ops.export_scene.gltf(**kwargs)
+    print(nombre, round(os.path.getsize(kwargs['filepath']) / 1e6, 2), 'MB')
+
+# completo (maqueta libre, /recorrido)
+exportar('escena.glb')
+# solo exterior (portada): sin mobiliario, cielos rasos, vecinos ni arboleda (el mundo procedural los pone)
+EXCLUIR = re.compile(r'(^(entorno|vecino_|arbol_|palma_|garage_palma|calle$|acera$|acera2$)|_(cama|silla|mesa|mesita|estacion|closet|estufa|alacena|meson|granito|lav|wc|tanque|ger|cielo|led|cortina|sofa|tv|escritorio|camilla|cobija|almohada|s\d*|esc|planta|zoc)(\d|\.|_|$))')
+exportar('exterior.glb', EXCLUIR)

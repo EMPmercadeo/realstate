@@ -35,6 +35,10 @@ M = dict(
     ceramica_g=mat('ceramica_g', 'ceramic_grey', scale=0.4166, normal_strength=0.8),
     teja=mat('teja', 'roof_tile', scale=0.5, normal_strength=1.0),
     lamina=mat('lamina', 'metal_roof', scale=0.5, normal_strength=0.8, metal=0.6),
+    lamina_roja=mat('lamina_roja', 'metal_roof', scale=0.5, normal_strength=0.8, metal=0.4, rough=0.5, tint=(0.62, 0.1, 0.07, 1)),
+    ladrillo=mat('ladrillo', color=(0.28, 0.11, 0.07, 1), rough=0.9),
+    ac_blanco=mat('ac_blanco', color=(0.9, 0.9, 0.88, 1), rough=0.5),
+    ac_rejilla=mat('ac_rejilla', color=(0.25, 0.26, 0.27, 1), rough=0.6, metal=0.3),
     grava=mat('grava', 'gravel', scale=0.5, normal_strength=1.0),
     tierra=mat('tierra', 'soil', scale=0.5),
     granito=mat('granito', 'granite', scale=0.5),
@@ -124,7 +128,10 @@ def build_terreno():
             k = 0.0
             while k <= L + 0.01:
                 p = box(f'pilar_{i}_{k:.1f}', (0.4, 0.4, 2.2), (k - 0.2, -0.2, 0), M['amarillo'], C_EXT, 0.5, rot=a); p.location = (x0, y0, 0)
-                pil.append(p); k += 4.0
+                pil.append(p)
+                cap = box(f'pilarcap_{i}_{k:.1f}', (0.5, 0.5, 0.08), (k - 0.25, -0.25, 2.2), M['acera'], C_EXT, 0.5, rot=a); cap.location = (x0, y0, 0); pil.append(cap)
+                pil.append(sphere(f'pilarbola_{i}_{k:.1f}', 0.14, (x0 + math.cos(a) * k, y0 + math.sin(a) * k, 2.46), M['ladrillo'], C_EXT, 2))
+                k += 4.0
             join(bars + pil + [rail, rail2], f'reja_{i}')
         else:
             # cerca de malla sencilla (poste + alambre) para el resto
@@ -276,7 +283,7 @@ def build_edificio(E):
                 for k in range(nwin):
                     cpos = (k + 0.5) * L / nwin
                     ww = min(1.6, L / nwin - 1.0)
-                    cutters.append(ventana(f'{name}_v', (wall.location.x, wall.location.y), ang, cpos, ww, t, z0, pc, objs, rejas=(E['id'] == 'gris'), dentro=dentro))
+                    cutters.append(ventana(f'{name}_v', (wall.location.x, wall.location.y), ang, cpos, ww, t, z0, pc, objs, rejas=True, dentro=dentro))
             walls.append([wall, a, ang, L, ext, cutters, t])
         # puertas definidas por sala: (lado, pos_relativa, ancho)
         for r in piso['rooms']:
@@ -324,7 +331,7 @@ def build_edificio(E):
             if r.get('tipo') == 'porche':
                 u, v, w, d = r['rect']
                 roof = box(f'{name}_{r["id"]}_techo', (w + 0.4, d + 0.4, 0.2), (u - 0.2, v - 0.2, z0 + ALTO - 0.2), M['blanco'], pc, 1.0); roof['techo'] = 1
-                teja = box(f'{name}_{r["id"]}_teja', (w + 0.6, d + 0.6, 0.12), (u - 0.3, v - 0.3, z0 + ALTO), M['teja'], pc, 1.0); teja['techo'] = 1
+                teja = box(f'{name}_{r["id"]}_teja', (w + 0.6, d + 0.6, 0.12), (u - 0.3, v - 0.3, z0 + ALTO), M['lamina_roja'], pc, 1.0); teja['techo'] = 1
                 objs += [roof, teja]
                 # columnas en el borde exterior (lado este) y esquinas
                 xs = [u + w - 0.25]
@@ -364,6 +371,29 @@ def build_edificio(E):
     return root
 
 
+def canaleta(name, x0, y0, W, D, z, c, objs, bajantes=True, lados='nsew'):
+    """Canaleta perimetral (perfil blanco) y bajantes en las esquinas."""
+    g = 0.13
+    if 's' in lados: objs.append(box(name + '_s', (W + 2 * g, g, g), (x0 - g, y0 - g, z), M['baranda_b'], c))
+    if 'n' in lados: objs.append(box(name + '_n', (W + 2 * g, g, g), (x0 - g, y0 + D, z), M['baranda_b'], c))
+    if 'w' in lados: objs.append(box(name + '_w', (g, D, g), (x0 - g, y0, z), M['baranda_b'], c))
+    if 'e' in lados: objs.append(box(name + '_e', (g, D, g), (x0 + W, y0, z), M['baranda_b'], c))
+    if bajantes:
+        for (bx, by) in ((x0 - g, y0 - g), (x0 + W, y0 - g), (x0 - g, y0 + D), (x0 + W, y0 + D)):
+            objs.append(box(name + '_baj', (0.09, 0.09, z - 0.1), (bx + 0.02, by + 0.02, 0.1), M['baranda_b'], c))
+
+
+def aire_acondicionado(name, x, y, z, ang, c):
+    """Unidad condensadora en la fachada; (x, y) es el punto en el muro, ang la normal exterior."""
+    parts = []
+    b = box(name, (0.82, 0.32, 0.56), (-0.41, 0.04, 0), M['ac_blanco'], c, rot=ang); b.location = (x, y, z); parts.append(b)
+    r = box(name + '_r', (0.6, 0.02, 0.44), (-0.3, 0.355, 0.06), M['ac_rejilla'], c, rot=ang); r.location = (x, y, z); parts.append(r)
+    for k in (-0.3, 0.3):
+        s = box(name + '_s', (0.05, 0.4, 0.03), (k - 0.025, -0.02, -0.03), M['hierro'], c, rot=ang); s.location = (x, y, z); parts.append(s)
+        t = box(name + '_t', (0.05, 0.03, 0.3), (k - 0.025, -0.02, -0.33), M['hierro'], c, rot=ang); t.location = (x, y, z); parts.append(t)
+    return join(parts, name)
+
+
 def baranda(name, a, L, ang, z0, c, azul=False):
     parts = []
     top = box(name, (L, 0.06, 0.06), (0, -0.03, z0 + 1.05), M['baranda_b'], c, rot=ang); top.location = (a[0], a[1], z0 + 0.0); top.location.z = z0
@@ -398,6 +428,8 @@ def escalera(name, r, z0, c):
 
 def build_techo(E, ztop, C, objs, offset=(0, 0)):
     W, D = E['huella']
+    if E['techo'] != 'cuatro_aguas':
+        W = max([W] + [p.get('huella', (W, D))[0] for p in E['pisos']]); D = max([D] + [p.get('huella', (W, D))[1] for p in E['pisos']])
     name = E['id']
     tc = coll(f'{name}_techo', C)
     ox, oy = offset
@@ -407,8 +439,9 @@ def build_techo(E, ztop, C, objs, offset=(0, 0)):
         v = [(ox - al, oy - al, ztop), (ox + W + al, oy - al, ztop), (ox + W + al, oy + D + al, ztop), (ox - al, oy + D + al, ztop),
              (ox + W * 0.3, oy + D * 0.5, ztop + h), (ox + W * 0.7, oy + D * 0.5, ztop + h)]
         f = [(0, 1, 5, 4), (1, 2, 5), (2, 3, 4, 5), (3, 0, 4)]
-        t = mesh_obj(f'{name}_techo', v, f, M['teja'], tc, 1.0)
+        t = mesh_obj(f'{name}_techo', v, f, M['lamina_roja'], tc, 1.0)
         t['techo'] = 1
+        canaleta(f'{name}_canal', ox - al, oy - al, W + 2 * al, D + 2 * al, ztop - 0.1, tc, objs, bajantes=True)
         # cielo del alero
         s = box(f'{name}_alero', (W + 2 * al, D + 2 * al, 0.15), (ox - al, oy - al, ztop - 0.15), M['blanco'], tc, 1.0); s['techo'] = 1
         objs += [t, s]
@@ -422,6 +455,7 @@ def build_techo(E, ztop, C, objs, offset=(0, 0)):
         f = [(0, 1, 5, 4), (3, 2, 5, 4), (0, 4, 3), (1, 2, 5)]
         t = mesh_obj(f'{name}_techo', v, f, M['lamina'], tc, 1.0); t['techo'] = 1
         objs.append(t)
+        canaleta(f'{name}_canal', -al, -al, W + 2 * al, D + 2 * al, ztop + 0.1, tc, objs, bajantes=True, lados='ns')
         # estructura: pequeñas columnas en el frente
         for x in (0.5, W - 0.5):
             for y in (0.5, D - 0.5):
@@ -749,7 +783,7 @@ def build_exteriores():
         elif t == 'garage':
             # entrada circular de adoquín frente a la casa amarilla
             x, y, r = el['pos'][0], el['pos'][1], el['r']
-            cylinder('garage_circ', r, 0.06, (x, y, -0.04), M['grava'], C_EXT, 40)
+            cylinder('garage_circ', r, 0.06, (x, y, -0.04), M['ceramica'], C_EXT, 40)
             cylinder('garage_centro', r * 0.35, 0.3, (x, y, 0.0), M['cesped'], C_EXT, 24)
             arbusto('garage_arb', x, y, 0.8)
             palma('garage_palma', x + 0.3, y - 0.3, 4.5)
@@ -794,7 +828,19 @@ def build_vecinos():
         box(f'vecino_{i}', (w, d, h), (x, y, 0), mt, vc, 1.0)
         v = [(x - 0.6, y - 0.6, h), (x + w + 0.6, y - 0.6, h), (x + w + 0.6, y + d + 0.6, h), (x - 0.6, y + d + 0.6, h), (x + w * 0.5, y + d * 0.5, h + 2.0)]
         f = [(0, 1, 4), (1, 2, 4), (2, 3, 4), (3, 0, 4)]
-        r = mesh_obj(f'vecino_techo_{i}', v, f, M['teja'] if i % 2 else M['lamina'], vc, 1.0)
+        r = mesh_obj(f'vecino_techo_{i}', v, f, M['lamina_roja'] if i % 2 else M['lamina'], vc, 1.0)
+        vd = mat('vidrio_osc', color=(0.04, 0.06, 0.07, 1), rough=0.12)
+        for (lado, L) in (('s', w), ('n', w), ('e', d), ('w', d)):
+            nv = max(1, int(L // 4))
+            for k in range(nv):
+                c0 = (k + 0.5) * L / nv
+                if lado == 's': loc, ang = (x + c0, y - 0.03), 0
+                elif lado == 'n': loc, ang = (x + c0, y + d + 0.03), 0
+                elif lado == 'e': loc, ang = (x + w + 0.03, y + c0), math.pi / 2
+                else: loc, ang = (x - 0.03, y + c0), math.pi / 2
+                fr = box(f'vecino_vm_{i}', (1.4, 0.06, 1.3), (-0.7, -0.03, 1.0), M['marco'], vc, rot=ang); fr.location = (loc[0], loc[1], 0)
+                gl = box(f'vecino_vv_{i}', (1.28, 0.08, 1.18), (-0.64, -0.04, 1.06), vd, vc, rot=ang); gl.location = (loc[0], loc[1], 0)
+        pd = box(f'vecino_puerta_{i}', (0.95, 0.06, 2.1), (-0.475, -0.03, 0), M['puerta'], vc, rot=0); pd.location = (x + 1.2, y - 0.03, 0)
         for k in range(2):
             arbol(f'vecino_arbol_{i}_{k}', x + random.random() * w, y - 3 + random.random() * (d + 6), 5 + random.random() * 4, vc)
 
@@ -840,6 +886,34 @@ def render_setup(samples=96, w=1600, h=900):
     scene.render.image_settings.file_format = 'PNG'
 
 
+def balcon_gris():
+    """Balcón corrido del segundo nivel del edificio gris, sobre la fachada norte (hacia el jardín),
+    como en las fotos reales: losa volada, baranda, columnas delgadas y alero de lámina."""
+    c = coll('Balcon', C_EXT)
+    x0, y0 = GRIS['pos']; w = 18.0; y1 = y0 + 16.0; prof = 2.0; z = NIVEL
+    losa = box('balcon_losa', (w + 0.3, prof + EXT, 0.22), (x0 - 0.15, y1 - 0.05, z - 0.22), M['gris_claro'], c, 0.5)
+    losa['edificio'] = 'gris'; losa['piso'] = 2
+    piso = box('balcon_piso', (w + 0.3, prof, 0.03), (x0 - 0.15, y1 + EXT - 0.05, z), M['concreto'] if 'concreto' in M else M['acera'], c, 0.5)
+    piso['edificio'] = 'gris'; piso['piso'] = 2
+    # baranda metálica (frente y laterales)
+    b1 = baranda('balcon_bar_n', (x0 - 0.1, y1 + prof + EXT - 0.1), w + 0.2, 0.0, z, c, azul=True)
+    b2 = baranda('balcon_bar_w', (x0 - 0.1, y1 + EXT - 0.05), prof, math.pi / 2, z, c, azul=True)
+    b3 = baranda('balcon_bar_e', (x0 + w + 0.1, y1 + EXT - 0.05), prof, math.pi / 2, z, c, azul=True)
+    for b in (b1, b2, b3): b['edificio'] = 'gris'; b['piso'] = 2
+    # columnas delgadas y alero
+    k = 0.0
+    while k <= w + 0.01:
+        col = box(f'balcon_col_{k:.0f}', (0.12, 0.12, ALTO), (x0 - 0.1 + k - 0.06, y1 + prof + EXT - 0.2, z), M['baranda_b'], c)
+        col['edificio'] = 'gris'; col['piso'] = 2
+        k += 4.5
+    al = box('balcon_alero', (w + 0.6, prof + 0.8, 0.06), (x0 - 0.3, y1, z + ALTO), M['lamina'], c, 0.5)
+    al.rotation_euler = (math.radians(6), 0, 0)
+    al['edificio'] = 'gris'; al['piso'] = 99; al['techo'] = 1
+    # acceso en planta baja bajo el balcón: puerta doble y rampa corta
+    rampa = box('balcon_rampa', (3.0, prof + 1.5, 0.12), (x0 + w / 2 - 1.5, y1 + EXT, 0), M['acera'], c, 1.0)
+    rampa['edificio'] = 'gris'; rampa['piso'] = 1
+
+
 # =====================================================================
 if __name__ == '__main__' or True:
     build_terreno()
@@ -847,6 +921,15 @@ if __name__ == '__main__' or True:
     build_vecinos()
     for E in (GRIS, AMARILLA):
         build_edificio(E)
+    balcon_gris()
+    gx, gy = GRIS['pos']
+    for i, (yy, zz) in enumerate(((gy + 10.5, 2.2), (gy + 14.0, 2.2))):
+        aire_acondicionado(f'ac_gris_{i}', gx + 26 + EXT / 2, yy, zz, -math.pi / 2, C_EXT)
+    for i, xx in enumerate((gx + 7.5, gx + 15.5)):
+        aire_acondicionado(f'ac_gris_s{i}', xx, gy - EXT / 2, NIVEL + 2.2, math.pi, C_EXT)
+    ax, ay = AMARILLA['pos']
+    for i, (xx, zz) in enumerate(((ax + 7.0, 2.1), (ax + 12.5, 2.1))):
+        aire_acondicionado(f'ac_casa_{i}', xx, ay - EXT / 2, zz, math.pi, C_EXT)
     build_mundo()
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'escena.blend'))
     print('escena guardada; objetos:', len(bpy.data.objects))

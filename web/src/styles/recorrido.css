@@ -1,0 +1,74 @@
+  .rc { position: relative; --acento: #c99a3c; --rc-bg: #0e1411; --rc-ink: #f4efe6; --rc-ink-2: rgba(244, 239, 230, 0.72); color: var(--rc-ink); background: var(--rc-bg); }
+.rc-stage { position: sticky; top: 0; height: 100vh; height: 100dvh; overflow: hidden; background: var(--rc-bg); }
+.rc-escenas { position: absolute; inset: 0; }
+.rc-escena { position: absolute; inset: 0; opacity: 0; overflow: hidden; will-change: opacity; }
+.rc-escena img, .rc-escena video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 45%; }
+.rc-escena img { will-change: transform; transform-origin: 50% 55%; }
+.rc-despues { opacity: 0; }
+.rc-escena.con-clip img { opacity: 0; }
+.rc-video { z-index: 1; }
+.rc-pill { position: absolute; z-index: 3; left: clamp(18px, 5vw, 64px); top: clamp(76px, 10vh, 110px); font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; padding: 7px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); color: #fff; backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); transition: background 0.4s, border-color 0.4s; }
+.rc-pill.es-despues { background: var(--acento); border-color: transparent; color: #141008; }
+.rc-escena:not(.con-despues) .rc-pill { display: none; }
+.rc-velo { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(90deg, rgba(10, 14, 12, 0.82) 0%, rgba(10, 14, 12, 0.55) 30%, rgba(10, 14, 12, 0.12) 58%, transparent 100%), linear-gradient(0deg, rgba(10, 14, 12, 0.6) 0%, transparent 28%), linear-gradient(180deg, rgba(10, 14, 12, 0.55) 0%, transparent 22%); }
+
+.rc-barra { position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 40; background: rgba(255, 255, 255, 0.12); }
+.rc-barra span { display: block; height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: var(--acento); transition: background 0.5s; }
+
+.rc-top { position: absolute; top: 0; left: 0; right: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: clamp(14px, 2.4vw, 24px) clamp(18px, 5vw, 64px); }
+.rc-marca { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--rc-ink); font-weight: 600; font-size: 1rem; letter-spacing: -0.01em; white-space: nowrap; }
+.rc-marca i { width: 22px; height: 26px; border-radius: 6px 6px 10px 10px; background: linear-gradient(160deg, var(--acento), #1f4d3a); box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35); transition: background 0.5s; }
+.rc-nav { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.rc-nav button { font: inherit; font-size: 0.8rem; color: var(--rc-ink-2); border: 0; background: transparent; cursor: pointer; padding: 7px 13px; border-radius: 999px; transition: color 0.25s, background 0.25s; }
+.rc-nav button:hover { color: #fff; }
+.rc-nav button.activo { color: #141008; background: var(--acento); }
+.rc-cta { text-decoration: none; font-weight: 600; font-size: 0.88rem; color: #141008; background: var(--rc-ink); padding: 10px 18px; border-radius: 999px; white-space: nowrap; }
+
+.rc-copias { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
+.rc-copy { position: absolute; left: clamp(18px, 5vw, 64px); top: 50%; transform: translateY(-50%); width: min(44vw, 520px); opacity: 0; will-change: opacity, transform; }
+.rc-num { font-family: ui-monospace, Menlo, monospace; font-size: 0.72rem; letter-spacing: 0.14em; color: var(--rc-ink-2); }
+.rc-eyebrow { display: block; margin-top: 16px; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--acento); }
+.rc-titulo { font-weight: 600; color: var(--rc-ink); font-size: clamp(2rem, 4.4vw, 3.6rem); line-height: 1.02; margin: 12px 0 0; letter-spacing: -0.02em; text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45); }
+.rc-texto { margin: 18px 0 0; font-size: clamp(1rem, 1.25vw, 1.15rem); line-height: 1.55; color: var(--rc-ink-2); max-width: 42ch; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5); }
+.rc-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; }
+.rc-tags li { font-size: 0.8rem; font-weight: 500; color: var(--rc-ink); padding: 7px 13px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.16); backdrop-filter: blur(8px); }
+.rc-botones { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; pointer-events: auto; }
+.rc-btn { text-decoration: none; font-weight: 600; font-size: 0.95rem; padding: 13px 24px; border-radius: 999px; transition: transform 0.2s; }
+.rc-btn:hover { transform: translateY(-2px); }
+.rc-btn-p { color: #141008; background: var(--acento); }
+.rc-btn-g { color: var(--rc-ink); border: 1.5px solid rgba(255, 255, 255, 0.35); }
+
+.rc-ruta { position: absolute; right: clamp(14px, 2.4vw, 30px); top: 50%; z-index: 30; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; padding: 16px 10px; }
+.rc-ruta::before { content: ''; position: absolute; left: 50%; top: 20px; bottom: 20px; width: 2px; transform: translateX(-50%); background: rgba(255, 255, 255, 0.25); }
+.rc-ruta button { position: relative; border: 0; background: transparent; cursor: pointer; width: 14px; height: 14px; display: grid; place-items: center; padding: 0; }
+.rc-ruta button i { width: 9px; height: 9px; border-radius: 50%; background: rgba(255, 255, 255, 0.45); transition: transform 0.3s, background 0.3s, box-shadow 0.3s; }
+.rc-ruta button:hover i { transform: scale(1.25); background: #fff; }
+.rc-ruta button.activo i { background: var(--acento); transform: scale(1.4); box-shadow: 0 0 0 5px color-mix(in srgb, var(--acento) 30%, transparent); }
+.rc-ruta button span { position: absolute; right: 24px; top: 50%; transform: translateY(-50%) translateX(6px); white-space: nowrap; font-size: 0.76rem; font-weight: 600; color: var(--rc-ink); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(6px); padding: 5px 11px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; }
+.rc-ruta button:hover span, .rc-ruta button.activo span { opacity: 1; transform: translateY(-50%) translateX(0); }
+
+.rc-hint { position: absolute; left: 50%; bottom: 26px; z-index: 30; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rc-ink-2); transition: opacity 0.3s; pointer-events: none; }
+.rc-hint i { width: 22px; height: 34px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, 0.35); position: relative; }
+.rc-hint i::after { content: ''; position: absolute; left: 50%; top: 7px; width: 4px; height: 7px; border-radius: 2px; background: var(--acento); transform: translateX(-50%); animation: rc-wheel 1.7s ease-in-out infinite; }
+@keyframes rc-wheel { 0% { opacity: 0; top: 6px } 40% { opacity: 1 } 100% { opacity: 0; top: 17px } }
+.rc-stage.rc-fin .rc-top, .rc-stage.rc-fin .rc-ruta { opacity: 0; pointer-events: none; transition: opacity 0.4s; }
+
+@media (max-width: 860px) {
+  .rc-nav, .rc-cta { display: none; }
+  .rc-velo { background: linear-gradient(0deg, rgba(10, 14, 12, 0.92) 0%, rgba(10, 14, 12, 0.7) 34%, rgba(10, 14, 12, 0.15) 62%, transparent 100%), linear-gradient(180deg, rgba(10, 14, 12, 0.6) 0%, transparent 25%); }
+  .rc-copy { left: 18px; right: 18px; top: auto; bottom: calc(clamp(56px, 11dvh, 100px) + env(safe-area-inset-bottom)); transform: none; width: auto; max-width: 560px; }
+  .rc-titulo { font-size: clamp(1.8rem, 7.4vw, 2.6rem); }
+  .rc-texto { max-width: none; font-size: clamp(0.95rem, 3.6vw, 1.05rem); }
+  .rc-escena img, .rc-escena video { object-position: center 46%; }
+  .rc-pill { top: 70px; left: 18px; }
+  .rc-hint { bottom: calc(16px + env(safe-area-inset-bottom)); }
+  .rc-ruta { gap: 14px; right: 4px; }
+  .rc-ruta button span { display: none; }
+  .rc-marca span { font-size: 0.9rem; }
+}
+@media (hover: none) and (pointer: coarse) {
+  .rc-ruta { padding: 14px 6px; }
+  .rc-ruta button { width: 26px; height: 26px; }
+  .rc-btn { padding: 15px 26px; }
+}
+@media (prefers-reduced-motion: reduce) { .rc-hint i::after { animation: none; } }
