@@ -70,4 +70,7 @@ cd web; npm run build; npx astro preview
 - Verificación local con `astro preview` (Playwright): escritorio 1400×800 y móvil 390×844 cargan el video (30 s),
   7/7 paradas con texto, 5/5 fotos, 7/7 seeks exactos, 0 errores de consola en `/`, `/fotos` y `/recorrido`.
   Lighthouse móvil: performance 97 (FCP 1,6 s · LCP 1,6 s · TBT 0 ms · CLS 0 · SI 4,2 s).
-- Deploy: ver commit siguiente (verificación en producción).
+- Deploy verificado (commit 2b9ffd8 → Vercel Production Ready en 12 s): `https://residencia-altos.vercel.app`
+  responde 200 sin "Vercel Authentication"; `/clips/sobrevuelo.mp4` 23,3 MB y `/clips/sobrevuelo-m.mp4` 7,4 MB
+  se sirven como video/mp4. Playwright contra producción: escritorio y móvil 7/7 paradas, 5/5 fotos, 7/7 seeks,
+  0 errores de consola en `/`, `/fotos` y `/recorrido`.
