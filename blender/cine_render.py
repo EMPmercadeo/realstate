@@ -33,7 +33,8 @@ ap.add_argument('--hdri', type=str, default='', help='archivo .hdr en assets/hdr
 ap.add_argument('--sun-elev', type=float, default=14.0)
 ap.add_argument('--sun-az', type=float, default=66.0, help='sun_rotation del cielo Nishita (66 = sol al este-sureste, mañana)')
 ap.add_argument('--exposure', type=float, default=0.55)
-ap.add_argument('--crf', type=int, default=20)
+ap.add_argument('--crf', type=int, default=26)
+ap.add_argument('--gop', type=int, default=16, help='cuadros entre keyframes (menor = scrub más rápido, archivo más grande)')
 ap.add_argument('--video', action='store_true', help='no renderiza: solo arma el video con los cuadros existentes')
 ap.add_argument('--solo-escena', action='store_true', help='solo prepara la escena y la guarda (build/cine.blend)')
 args = ap.parse_args(argv)
@@ -64,10 +65,10 @@ def armar_video(fps):
     # escritorio 16:9 (1080p máx.) — GOP corto para que el scrub por scroll sea instantáneo
     subprocess.run([ff, '-y', '-loglevel', 'error', '-framerate', str(fps), '-i', os.path.join(OUT, 'f%04d.png'),
                     '-vf', 'scale=min(1920\\,iw):-2', '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-pix_fmt', 'yuv420p',
-                    '-crf', str(args.crf), '-g', '6', '-keyint_min', '6', '-sc_threshold', '0', '-movflags', '+faststart', '-an', salida], check=False)
+                    '-crf', str(args.crf), '-g', str(args.gop), '-keyint_min', str(args.gop), '-sc_threshold', '0', '-movflags', '+faststart', '-an', salida], check=False)
     # móvil 9:16: recorte central y 720 px de ancho
     subprocess.run([ff, '-y', '-loglevel', 'error', '-i', salida, '-vf', 'crop=ih*9/16:ih,scale=720:-2', '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow',
-                    '-pix_fmt', 'yuv420p', '-crf', str(args.crf + 2), '-g', '6', '-keyint_min', '6', '-sc_threshold', '0', '-movflags', '+faststart', '-an',
+                    '-pix_fmt', 'yuv420p', '-crf', str(args.crf + 1), '-g', str(args.gop), '-keyint_min', str(args.gop), '-sc_threshold', '0', '-movflags', '+faststart', '-an',
                     os.path.join(clips, 'sobrevuelo-m.mp4')], check=False)
     # póster (primer cuadro) para que la portada muestre algo antes de que cargue el video
     subprocess.run([ff, '-y', '-loglevel', 'error', '-i', os.path.join(OUT, 'f0000.png'), '-vf', 'scale=1600:-2', '-q:v', '4', os.path.join(clips, 'poster.jpg')], check=False)
