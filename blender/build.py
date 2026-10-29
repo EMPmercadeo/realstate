@@ -55,6 +55,13 @@ M = dict(
     palma=mat('palma', color=(0.09, 0.3, 0.08, 1), rough=0.75),
     agua=mat('agua', color=(0.35, 0.7, 0.85, 1), rough=0.05, transmission=0.8, alpha=0.7, ior=1.33),
     colchon=mat('colchon', color=(0.9, 0.9, 0.88, 1), rough=0.9),
+    cobija=mat('cobija', color=(0.36, 0.45, 0.6, 1), rough=1.0),
+    mesita_top=mat('mesita_top', color=(0.92, 0.9, 0.86, 1), rough=0.4),
+    cortina=mat('cortina', color=(0.93, 0.9, 0.84, 1), rough=0.95),
+    zocalo=mat('zocalo', color=(0.35, 0.33, 0.3, 1), rough=0.6),
+    flor_r=mat('flor_r', color=(0.8, 0.12, 0.15, 1), rough=0.8),
+    flor_a=mat('flor_a', color=(0.9, 0.55, 0.1, 1), rough=0.8),
+    banca=mat('banca', 'wood_dark', scale=0.5, tint=(1.4, 1.3, 1.2, 1)),
     sabana=mat('sabana', color=(0.25, 0.5, 0.7, 1), rough=0.95),
     almohada=mat('almohada', color=(1, 1, 1, 1), rough=1.0),
     cama_metal=mat('cama_metal', color=(0.45, 0.47, 0.5, 1), rough=0.35, metal=0.85),
@@ -179,7 +186,7 @@ def lbox(name, size, loff, wall_loc, ang, m, pc, rot_extra=0.0):
     return box(name, size, (x, y, loff[2]), m, pc, 1.0, rot=ang + rot_extra)
 
 
-def ventana(pfx, wall_loc, ang, cpos, ww, t, z0, pc, objs, rejas=True):
+def ventana(pfx, wall_loc, ang, cpos, ww, t, z0, pc, objs, rejas=True, dentro=1):
     """Ventana (marco + vidrio + rejas) en coordenadas locales del muro; devuelve el cortador."""
     cu = lbox(pfx + '_vcut', (ww, t + 0.6, 1.3), (cpos - ww / 2, -t / 2 - 0.3, z0 + 1.0), wall_loc, ang, None, pc)
     fr = lbox(pfx + '_vmarco', (ww + 0.06, t * 0.6, 1.36), (cpos - ww / 2 - 0.03, -t * 0.3, z0 + 0.97), wall_loc, ang, M['marco'], pc)
@@ -187,13 +194,16 @@ def ventana(pfx, wall_loc, ang, cpos, ww, t, z0, pc, objs, rejas=True):
     fr = cut(fr, [fr2])
     gl = lbox(pfx + '_vidrio', (ww - 0.06, 0.012, 1.24), (cpos - ww / 2 + 0.03, -0.006, z0 + 1.03), wall_loc, ang, M['vidrio'], pc)
     objs += [fr, gl]
+    for k in (-1, 1):
+        ct = lbox(pfx + '_cortina', (0.35, 0.08, 2.3), (cpos + k * (ww / 2 + 0.12) - 0.175, dentro * (t / 2 + 0.03) - (0.08 if dentro < 0 else 0), z0 + 0.25), wall_loc, ang, M['cortina'], pc)
+        smooth(ct, 30); objs.append(ct)
     if rejas:
         rb = []
         k = 0.12
         while k < ww - 0.06:
-            rb.append(lbox(pfx + '_reja', (0.015, 0.015, 1.3), (cpos - ww / 2 + k, -t / 2 - 0.05, z0 + 1.0), wall_loc, ang, M['hierro'], pc))
+            rb.append(lbox(pfx + '_reja', (0.015, 0.015, 1.3), (cpos - ww / 2 + k, -dentro * (t / 2 + 0.05), z0 + 1.0), wall_loc, ang, M['hierro'], pc))
             k += 0.14
-        h1 = lbox(pfx + '_rejah', (ww - 0.06, 0.015, 0.015), (cpos - ww / 2 + 0.03, -t / 2 - 0.05, z0 + 1.6), wall_loc, ang, M['hierro'], pc)
+        h1 = lbox(pfx + '_rejah', (ww - 0.06, 0.015, 0.015), (cpos - ww / 2 + 0.03, -dentro * (t / 2 + 0.05), z0 + 1.6), wall_loc, ang, M['hierro'], pc)
         objs.append(join(rb + [h1], pfx + '_rejas'))
     return cu
 
@@ -237,6 +247,14 @@ def build_edificio(E):
                     lp = box(f'{name}_{r["id"]}_led{k}', (1.2, 0.6, 0.03), (px - 0.6, py - 0.3, z0 + ALTO - 0.06), M['led_panel'], pc, 1.0)
                     lp['cielo'] = 1
                     objs.append(lp)
+        # zócalo oscuro al pie de los muros de cada sala (interior)
+        for r in piso['rooms']:
+            if r.get('abierto'):
+                continue
+            u, v, w, d = r['rect']
+            zs = [box(f'{name}_zoc', (w, 0.02, 0.1), (u, v + INT / 2, z0), M['zocalo'], pc), box(f'{name}_zoc', (w, 0.02, 0.1), (u, v + d - INT / 2 - 0.02, z0), M['zocalo'], pc),
+                  box(f'{name}_zoc', (0.02, d, 0.1), (u + INT / 2, v, z0), M['zocalo'], pc), box(f'{name}_zoc', (0.02, d, 0.1), (u + w - INT / 2 - 0.02, v, z0), M['zocalo'], pc)]
+            objs.append(join(zs, f'{name}_{r["id"]}_zocalo'))
         # muros centrados en la línea del segmento
         segs = segs_from_rooms(piso['rooms'], pu, pv, pw, pd)
         walls = []   # (wall, a, ang, L, ext, cutters)
@@ -250,11 +268,15 @@ def build_edificio(E):
             wall['uv_scale'] = 1.0
             cutters = []
             if ext and L >= 2.4:
+                # lado interior: hacia el centro de la planta
+                mid = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
+                nrm = (-math.sin(ang), math.cos(ang))  # +y local
+                dentro = 1 if (nrm[0] * (pu + pw / 2 - mid[0]) + nrm[1] * (pv + pd / 2 - mid[1])) > 0 else -1
                 nwin = max(1, int(L // 3.4))
                 for k in range(nwin):
                     cpos = (k + 0.5) * L / nwin
                     ww = min(1.6, L / nwin - 1.0)
-                    cutters.append(ventana(f'{name}_v', (wall.location.x, wall.location.y), ang, cpos, ww, t, z0, pc, objs, rejas=(E['id'] == 'gris')))
+                    cutters.append(ventana(f'{name}_v', (wall.location.x, wall.location.y), ang, cpos, ww, t, z0, pc, objs, rejas=(E['id'] == 'gris'), dentro=dentro))
             walls.append([wall, a, ang, L, ext, cutters, t])
         # puertas definidas por sala: (lado, pos_relativa, ancho)
         for r in piso['rooms']:
@@ -411,37 +433,37 @@ def build_techo(E, ztop, C, objs, offset=(0, 0)):
 #  MOBILIARIO
 # =====================================================================
 def cama_hospital(pfx, u, v, z0, rot, c):
-    """Cama hospitalaria con barandales, mesita y luz LED. Origen: centro de la cama; cabecera hacia -y local."""
+    """Cama hospitalaria: base, colchón redondeado, sábana, cobija, almohada, cabecera, rieles tubulares, mesita y luz."""
     parts = []
     def B(nm, size, center, m):
-        o = cbox(nm, size, (0, 0, 0), m, c)
-        o.location = (center[0], center[1], z0 + center[2])
-        return o
-    parts.append(B(f'{pfx}_base', (0.95, 2.05, 0.3), (0, 0, 0.35), M['cama_metal']))
-    for sx in (-0.4, 0.4):
-        for sy in (-0.85, 0.85):
-            parts.append(B(f'{pfx}_pata', (0.06, 0.06, 0.22), (sx, sy, 0.11), M['cama_metal']))
-    parts.append(B(f'{pfx}_colchon', (0.9, 2.0, 0.18), (0, 0, 0.59), M['colchon']))
-    parts.append(B(f'{pfx}_sabana', (0.96, 1.4, 0.09), (0, 0.32, 0.72), M['sabana']))
-    parts.append(B(f'{pfx}_almohada', (0.62, 0.42, 0.14), (0, -0.75, 0.76), M['almohada']))
-    parts.append(B(f'{pfx}_cabecera', (0.98, 0.05, 0.9), (0, -1.05, 0.75), M['cama_cabecera']))
-    parts.append(B(f'{pfx}_piecera', (0.98, 0.05, 0.6), (0, 1.05, 0.6), M['cama_cabecera']))
-    for sx in (-0.5, 0.5):
-        parts.append(B(f'{pfx}_rail', (0.03, 1.1, 0.03), (sx, 0.1, 0.98), M['cama_metal']))
-        parts.append(B(f'{pfx}_rail2', (0.03, 1.1, 0.03), (sx, 0.1, 0.82), M['cama_metal']))
-        for k in (-0.4, 0.0, 0.4):
-            parts.append(B(f'{pfx}_railp', (0.03, 0.03, 0.3), (sx, 0.1 + k, 0.85), M['cama_metal']))
-    # mesita de noche
-    parts.append(B(f'{pfx}_mesita', (0.45, 0.45, 0.7), (0.78, -0.7, 0.35), M['mesita']))
-    # luz LED en la pared sobre la cabecera
+        o = cbox(nm, size, (0, 0, 0), m, c); o.location = (center[0], center[1], z0 + center[2]); return o
+    def T(nm, r, h, center, m, rot=(0, 0, 0)):
+        o = cylinder(nm, r, h, (0, 0, 0), m, c, 10); o.location = (center[0], center[1], z0 + center[2]); o.rotation_euler = rot; return o
+    parts.append(B(f'{pfx}_base', (0.9, 2.0, 0.12), (0, 0, 0.42), M['cama_metal']))
+    parts.append(B(f'{pfx}_chasis', (0.6, 1.4, 0.16), (0, 0, 0.26), M['cama_metal']))
+    for sx in (-0.38, 0.38):
+        for sy in (-0.8, 0.8):
+            parts.append(T(f'{pfx}_rueda', 0.06, 0.05, (sx, sy, 0.06), M['hierro'], (math.pi / 2, 0, 0)))
+            parts.append(B(f'{pfx}_pata', (0.04, 0.04, 0.3), (sx, sy, 0.22), M['cama_metal']))
+    col = B(f'{pfx}_colchon', (0.88, 1.98, 0.2), (0, 0, 0.58), M['colchon']); smooth(col, 30); col.modifiers['bevel'].width = 0.05; parts.append(col)
+    sab = B(f'{pfx}_sabana', (0.94, 1.25, 0.1), (0, 0.38, 0.7), M['sabana']); smooth(sab, 30); sab.modifiers['bevel'].width = 0.04; parts.append(sab)
+    cob = B(f'{pfx}_cobija', (0.96, 0.5, 0.12), (0, 0.72, 0.73), M['cobija']); smooth(cob, 30); cob.modifiers['bevel'].width = 0.05; parts.append(cob)
+    alm = B(f'{pfx}_almohada', (0.6, 0.42, 0.14), (0, -0.74, 0.76), M['almohada']); smooth(alm, 30); alm.modifiers['bevel'].width = 0.05; parts.append(alm)
+    cab = B(f'{pfx}_cabecera', (0.96, 0.05, 0.75), (0, -1.03, 0.78), M['cama_cabecera']); smooth(cab, 30); parts.append(cab)
+    pie = B(f'{pfx}_piecera', (0.96, 0.05, 0.5), (0, 1.03, 0.62), M['cama_cabecera']); smooth(pie, 30); parts.append(pie)
+    for sx in (-0.47, 0.47):
+        parts.append(T(f'{pfx}_rail', 0.015, 1.05, (sx, 0.05, 0.98), M['cama_metal'], (math.pi / 2, 0, 0)))
+        parts.append(T(f'{pfx}_rail2', 0.015, 1.05, (sx, 0.05, 0.86), M['cama_metal'], (math.pi / 2, 0, 0)))
+        for k in (-0.45, -0.15, 0.15, 0.45):
+            parts.append(T(f'{pfx}_railp', 0.012, 0.32, (sx, 0.05 + k, 0.82), M['cama_metal']))
+    # mesita de noche con cajón
+    mes = B(f'{pfx}_mesita', (0.45, 0.45, 0.68), (0.76, -0.72, 0.34), M['mesita']); smooth(mes, 30); parts.append(mes)
+    parts.append(B(f'{pfx}_mesita_top', (0.48, 0.48, 0.03), (0.76, -0.72, 0.695), M['mesita_top']))
+    parts.append(B(f'{pfx}_tirador', (0.12, 0.02, 0.02), (0.76, -0.49, 0.5), M['cama_metal']))
+    # luz LED sobre la cabecera
     parts.append(B(f'{pfx}_led', (0.7, 0.05, 0.05), (0, -1.1, 2.0), M['led']))
     ob = join(parts, pfx)
-    ob.location = (0, 0, 0)
-    # girar y colocar
-    for o in [ob]:
-        o.rotation_euler = (0, 0, rot)
-        # mover: calcular posición final sumando (u,v)
-        o.location = (u, v, 0)
+    ob.rotation_euler = (0, 0, rot); ob.location = (u, v, 0)
     return ob
 
 
@@ -465,11 +487,12 @@ def silla(pfx, u, v, z0, rot, c, m=None):
     parts = []
     def B(nm, size, center, mm):
         o = cbox(nm, size, (0, 0, 0), mm, c); o.location = (center[0], center[1], z0 + center[2]); return o
-    parts.append(B(f'{pfx}_as', (0.45, 0.45, 0.06), (0, 0, 0.45), m))
-    parts.append(B(f'{pfx}_re', (0.45, 0.05, 0.45), (0, 0.2, 0.7), m))
+    a = B(f'{pfx}_as', (0.46, 0.46, 0.08), (0, 0, 0.46), m); smooth(a, 30); a.modifiers['bevel'].width = 0.03; parts.append(a)
+    r = B(f'{pfx}_re', (0.46, 0.06, 0.44), (0, 0.2, 0.72), m); smooth(r, 30); r.modifiers['bevel'].width = 0.025; parts.append(r)
+    parts.append(B(f'{pfx}_marco', (0.44, 0.44, 0.03), (0, 0, 0.41), M['madera']))
     for sx in (-0.19, 0.19):
         for sy in (-0.19, 0.19):
-            parts.append(B(f'{pfx}_p', (0.03, 0.03, 0.42), (sx, sy, 0.21), M['madera']))
+            parts.append(B(f'{pfx}_p', (0.035, 0.035, 0.42), (sx, sy, 0.21), M['madera']))
     ob = join(parts, pfx); ob.rotation_euler = (0, 0, rot); ob.location = (u, v, 0)
     return ob
 
@@ -512,6 +535,7 @@ def build_mobiliario(name, r, z0, c):
         out.append(cama_simple(f'{pf}_cama', u + w / 2, v + 1.1, z0, 0, c))
         ar = cbox(f'{pf}_closet', (0.6, 1.6, 2.1), (0, 0, 0), M['madera'], c); ar.location = (u + 0.3, v + d - 0.9, z0 + 1.05); out.append(ar)
     elif tipo == 'comedor':
+        out.append(arbusto(f'{pf}_planta', u + 0.6, v + d - 0.6, 0.45, c))
         nm = max(1, int((w * d) // 9))
         k = 0
         for i in range(nm):
@@ -558,6 +582,7 @@ def build_mobiliario(name, r, z0, c):
             out.append(cama_hospital(f'{pf}_cam{i}', u + 1.2 + i * 2.2, v + 1.2, z0, 0, c))
         out.append(mesa(f'{pf}_mesa', u + w - 1.5, v + d - 1.0, z0, 1.4, 0.7, c, M['madera']))
     elif tipo == 'recepcion':
+        out.append(arbusto(f'{pf}_planta', u + w - 0.6, v + d - 0.6, 0.45, c))
         out.append(mesa(f'{pf}_mostrador', u + w / 2, v + 1.0, z0, min(2.2, w - 1), 0.7, c, M['madera'], 1.0))
         out.append(silla(f'{pf}_s', u + w / 2, v + 1.7, z0, math.pi, c, M['tela_gris']))
     elif tipo == 'deposito':
@@ -728,6 +753,25 @@ def build_exteriores():
             cylinder('garage_centro', r * 0.35, 0.3, (x, y, 0.0), M['cesped'], C_EXT, 24)
             arbusto('garage_arb', x, y, 0.8)
             palma('garage_palma', x + 0.3, y - 0.3, 4.5)
+    # bancas y faroles junto a los caminos
+    for i, (x, y, a) in enumerate(((24, 52, 0.3), (18, 42, 1.2), (28, 38, 0.0), (12, 40, -0.3))):
+        b1 = box(f'banca{i}_as', (1.6, 0.45, 0.06), (-0.8, -0.22, 0.42), M['banca'], C_EXT, rot=a); b1.location = (x, y, 0)
+        b2 = box(f'banca{i}_re', (1.6, 0.06, 0.4), (-0.8, 0.2, 0.48), M['banca'], C_EXT, rot=a); b2.location = (x, y, 0)
+        p1 = box(f'banca{i}_p1', (0.06, 0.45, 0.42), (-0.75, -0.22, 0), M['hierro'], C_EXT, rot=a); p1.location = (x, y, 0)
+        p2 = box(f'banca{i}_p2', (0.06, 0.45, 0.42), (0.7, -0.22, 0), M['hierro'], C_EXT, rot=a); p2.location = (x, y, 0)
+        join([b1, b2, p1, p2], f'banca{i}')
+    for i, (x, y) in enumerate(((26, 58), (23, 46), (21, 34), (28, 24), (8, 44), (14, 50))):
+        cylinder(f'farol{i}_poste', 0.04, 2.6, (x, y, 0), M['hierro'], C_EXT, 8)
+        box(f'farol{i}_luz', (0.3, 0.3, 0.35), (x - 0.15, y - 0.15, 2.6), mat('farol_vidrio', color=(1, 0.95, 0.8, 1), rough=0.2, alpha=0.6), C_EXT)
+    # jardineras con flores al pie de la casa amarilla y del edificio gris
+    random.seed(21)
+    for (x0, y0, L, ang) in ((AMARILLA['pos'][0] + 16 + 3.2, AMARILLA['pos'][1] + 0.5, 8, math.pi / 2), (GRIS['pos'][0] + 26.3, GRIS['pos'][1] + 0.5, 11, math.pi / 2), (AMARILLA['pos'][0] - 0.8, AMARILLA['pos'][1] + 1, 12, math.pi / 2)):
+        jb = box('jardinera', (L, 0.6, 0.3), (0, -0.3, 0), M['acera'], C_EXT, rot=ang); jb.location = (x0, y0, 0)
+        for k in range(int(L / 0.5)):
+            px = x0 + math.cos(ang) * (k * 0.5 + 0.25); py = y0 + math.sin(ang) * (k * 0.5 + 0.25)
+            arbusto(f'jflor_{x0}_{k}', px, py, 0.28, C_EXT)
+            for j in range(3):
+                sphere(f'flor_{x0}_{k}_{j}', 0.05, (px + random.uniform(-0.2, 0.2), py + random.uniform(-0.2, 0.2), 0.5 + random.uniform(0, 0.15)), M['flor_r'] if (k + j) % 2 else M['flor_a'], C_EXT, 1)
     for i, (x, y, h) in enumerate(ARBOLES):
         arbol(f'arbol_{i}', x, y, h)
     for i, (x, y, h) in enumerate(PALMAS):

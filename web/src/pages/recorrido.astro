@@ -3,30 +3,48 @@ import Base from '@/layouts/Base.astro';
 ---
 <Base title="Recorrido 3D · Residencia Altos de San Cristóbal" full>
   <div class="visor" id="visor">
-    <div class="carga-wrap"><div id="carga" class="carga"></div></div>
+    <div id="pantalla-carga" class="pantalla-carga">
+      <div class="pc-caja">
+        <p class="pc-sup">Residencia Altos de San Cristóbal · David, Chiriquí</p>
+        <h1>Recorre la residencia terminada</h1>
+        <p>Maqueta digital navegable del terreno y sus dos edificios, con las fotos reales de cada espacio y la propuesta de cómo quedará.</p>
+        <div class="pc-barra"><div id="carga"></div></div>
+        <p class="pc-pct"><span id="carga-pct">Cargando el modelo…</span></p>
+        <button id="btn-entrar" class="btn" disabled>Cargando…</button>
+        <p class="pc-nota">Al entrar comienza un recorrido guiado. Puedes detenerlo en cualquier momento y moverte libremente.</p>
+      </div>
+    </div>
+
     <div class="visor-ui">
       <div class="grupo">
+        <button id="btn-tour">Recorrido guiado</button>
         <button data-modo="orbita" class="on">Maqueta</button>
         <button data-modo="recorrido">Caminar</button>
+        <button id="btn-etiquetas" class="on">Etiquetas</button>
+        <button id="btn-panel" class="solo-movil">Espacios</button>
       </div>
-      <div class="grupo">
+      <div class="grupo pisos">
         <button data-vista="sitio:99" class="on">Todo</button>
         <button data-vista="gris:1">Gris · PB</button>
         <button data-vista="gris:2">Gris · PA</button>
         <button data-vista="amarilla:1">Amarilla · PB</button>
         <button data-vista="amarilla:2">Amarilla · PA</button>
       </div>
-      <div id="hint" class="hint">Arrastra para girar · rueda para acercar · elige un espacio en el panel</div>
+      <div id="hint" class="hint">Arrastra para girar · rueda para acercar · toca una etiqueta o elige un espacio en el panel</div>
     </div>
-    <aside class="panel">
+
+    <aside class="panel" id="panel">
       <div class="panel-cab">
         <h2>Residencia Altos de San Cristóbal</h2>
-        <p class="muted">Terreno de 2.500 m² · dos edificios · 27 residentes</p>
+        <p class="muted">2.500 m² · dos edificios · 27 residentes</p>
       </div>
       <div id="panel-lista" class="panel-lista"></div>
-      <p class="muted small">Maqueta digital preliminar. Medidas estimadas, pendientes de planos.</p>
+      <p class="muted small">Maqueta digital: medidas estimadas, pendientes de planos. Las fotos "así quedará" son propuestas sobre la foto real.</p>
     </aside>
+
+    <div id="subtitulo" class="subtitulo"></div>
     <div id="joy" class="joy"><span></span></div>
+    <div id="comparador" class="comparador"></div>
   </div>
   <script>
     import { iniciarVisor } from '@/visor/visor';

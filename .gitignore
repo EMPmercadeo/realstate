@@ -3,3 +3,5 @@ dist/
 .astro/
 build/escena.blend
 build/web-tour*.jpg
+*.zip
+publish/

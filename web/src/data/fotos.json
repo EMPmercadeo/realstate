@@ -1,0 +1,14 @@
+{
+  "hospitalizacion@gris": { "nombre": "Sala de hospitalización", "antes": "hospitalizacion", "despues": "hospitalizacion" },
+  "salon_2@gris": { "nombre": "Salón #2 · movilidad reducida", "antes": "salon-2", "despues": "salon-2" },
+  "refrigerios@gris": { "nombre": "Área de refrigerios", "antes": "refrigerios", "despues": "refrigerios" },
+  "cocina@gris": { "nombre": "Cocina", "antes": "cocina", "despues": "cocina" },
+  "terraza@gris": { "nombre": "Terraza", "antes": "terraza", "despues": "terraza" },
+  "bano_acc@gris": { "nombre": "Baño accesible", "antes": "bano-accesible", "despues": "bano-accesible" },
+  "recepcion@amarilla": { "nombre": "Recepción", "antes": "recepcion", "despues": "recepcion" },
+  "comedor@amarilla": { "nombre": "Comedor y sala de familiares", "antes": "comedor", "despues": null },
+  "terapia@amarilla": { "nombre": "Sala de terapia", "antes": "terapia", "despues": null },
+  "cto1@amarilla": { "nombre": "Cuarto privado VIP", "antes": "cuarto-vip", "despues": null },
+  "gazebo": { "nombre": "Gazebo · área de juegos", "antes": "gazebo", "despues": null },
+  "piscina": { "nombre": "Terapia acuática", "antes": "terapia-acuatica", "despues": null }
+}

@@ -4,7 +4,7 @@ import Base from '@/layouts/Base.astro';
 <Base title="Residencia de retiro en David, Chiriquí · Altos de San Cristóbal">
   <div class="container">
     <section class="hero">
-      <img src="/renders/casa.jpg" alt="Casa principal de la residencia con su porche de arcos y jardines" />
+      <img src="/fotos-despues/terraza.jpg" alt="Terraza de la residencia adecuada como área recreativa" />
       <div class="hero-texto">
         <h1>Una residencia de retiro lista para abrir en Chiriquí.</h1>
         <p>Dos edificios, 2.500 m² de jardines y capacidad para 27 residentes en Altos de San Cristóbal, David. Recorre el proyecto terminado antes de visitarlo.</p>
@@ -39,14 +39,47 @@ import Base from '@/layouts/Base.astro';
     </div>
   </section>
 
-  <section class="seccion gris" id="espacios">
+  <section class="seccion gris" id="antes-despues">
+    <div class="container">
+      <h2>Hoy y así quedará</h2>
+      <p class="lead">Fotos reales de los espacios tal como están, y la propuesta de adecuación sobre la misma foto. Arrastra la línea para comparar.</p>
+      <div class="antes-despues">
+        {[
+          ['hospitalizacion', 'Sala de hospitalización · 10 camas'],
+          ['salon-2', 'Salón #2 · movilidad reducida'],
+          ['refrigerios', 'Área de refrigerios'],
+          ['terraza', 'Terraza'],
+          ['cocina', 'Cocina'],
+          ['bano-accesible', 'Baño accesible'],
+          ['recepcion', 'Recepción'],
+        ].map(([f, t]) => (
+          <div class="ad">
+            <img src={`/fotos-despues/${f}.jpg`} alt={`${t}, así quedará`} loading="lazy" />
+            <div class="ad-antes"><img src={`/fotos-antes/${f}.jpg`} alt={`${t}, hoy`} loading="lazy" /></div>
+            <span class="ad-linea"></span>
+            <input type="range" min="0" max="100" value="50" aria-label={`Comparar ${t}`} />
+            <span class="ad-l">Hoy</span><span class="ad-r">Así quedará</span>
+            <span class="ad-t">{t}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <script>
+    document.querySelectorAll('.ad').forEach((el) => {
+      const r = el.querySelector('input'); const a = el.querySelector('.ad-antes'); const l = el.querySelector('.ad-linea');
+      r?.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; l.style.left = `${r.value}%`; });
+    });
+  </script>
+
+  <section class="seccion" id="espacios">
     <div class="container">
       <h2>Los espacios</h2>
       <p class="lead">Así quedarán las áreas principales. Cada imagen abre el mismo espacio dentro del recorrido.</p>
       <div class="espacios">
-        <a class="espacio" href="/recorrido#hospitalizacion@gris"><img src="/renders/hospital.jpg" alt="Sala de hospitalización con camas hospitalarias" /><div><h3>Sala de hospitalización</h3><p>10 camas con estación de enfermería</p></div></a>
-        <a class="espacio" href="/recorrido#terraza@gris"><img src="/renders/terraza.jpg" alt="Terraza del piso alto" /><div><h3>Terraza</h3><p>Área recreativa al aire libre</p></div></a>
-        <a class="espacio" href="/recorrido#comedor@amarilla"><img src="/renders/comedor.jpg" alt="Comedor y sala de familiares" /><div><h3>Comedor y sala de familiares</h3><p>Casa principal</p></div></a>
+        <a class="espacio" href="/recorrido#hospitalizacion@gris"><img src="/fotos-despues/hospitalizacion.jpg" alt="Sala de hospitalización con camas hospitalarias" /><div><h3>Sala de hospitalización</h3><p>10 camas con estación de enfermería</p></div></a>
+        <a class="espacio" href="/recorrido#terraza@gris"><img src="/fotos-despues/terraza.jpg" alt="Terraza del piso alto" /><div><h3>Terraza</h3><p>Área recreativa al aire libre</p></div></a>
+        <a class="espacio" href="/recorrido#recepcion@amarilla"><img src="/fotos-despues/recepcion.jpg" alt="Recepción de la casa principal" /><div><h3>Recepción</h3><p>Casa principal</p></div></a>
         <a class="espacio" href="/recorrido#calle"><img src="/renders/calle.jpg" alt="Vista desde la calle" /><div><h3>Entrada</h3><p>Portón eléctrico y acceso circular</p></div></a>
         <a class="espacio" href="/recorrido#gris"><img src="/renders/gris.jpg" alt="Edificio de hospitalización" /><div><h3>Edificio de hospitalización</h3><p>Dos niveles, 24 camas</p></div></a>
         <a class="espacio" href="/recorrido#sitio"><img src="/renders/aerea.jpg" alt="Vista aérea del terreno" /><div><h3>El terreno</h3><p>2.500 m² con arboleda</p></div></a>
