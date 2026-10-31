@@ -10,6 +10,12 @@ y las comparten el render (Blender) y la web.
 - `/` — video `clips/sobrevuelo.mp4` (escritorio) o `sobrevuelo-m.mp4` (9:16 móvil) por scroll + póster `clips/poster.jpg`; luego datos, comparadores, espacios, inversionistas.
 - `/fotos` — recorrido en fotos tipo scroll-world (fotos reales → "después"; usa clips de video si existen en `/clips/<id>.mp4`).
 - `/recorrido` — maqueta 3D libre (orbitar, caminar, pisos, etiquetas).
+  Desde el 31-10-2026 tiene diseño propio para celular: pantalla completa sin el menú del sitio, pestañas abajo
+  (Guiado · Maqueta · Caminar · Espacios), riel de niveles a la derecha (Nombres · Todo · Casa PB/PA · Gris PB/PA,
+  cada uno vuela a la planta sin techo), lista de espacios como hoja inferior que se cierra al elegir, etiquetas que
+  no se enciman ni quedan cortadas (máx. 9 en celular, primero las que tienen foto), lente más abierto en pantalla
+  vertical y sin bloom ni sombras suaves en celular. Código: `web/src/pages/recorrido.astro`, `web/src/visor/visor.ts`
+  y la sección "visor 3D" de `web/src/styles/global.css`.
 
 ## Hecho en esta sesión (Claude Code, PC con RTX 3080)
 - **Pipeline de render** `blender/cine_render.py` (Blender 5.2, OptiX): luz de hora dorada (cielo Nishita, sol al

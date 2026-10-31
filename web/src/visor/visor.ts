@@ -63,7 +63,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, MOVIL ? 1.25 : 1.5));
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = MOVIL ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.72;
   container.appendChild(renderer.domElement);
@@ -75,6 +75,15 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 5000);
+  // Celular vertical: con 45° de campo vertical solo se ven ~20° de ancho y los edificios quedaban cortados.
+  // Se abre el lente según lo angosta que sea la pantalla (68° en un teléfono, 45° en pantallas horizontales).
+  function ajustarLente() {
+    const a = container.clientWidth / Math.max(1, container.clientHeight);
+    camera.aspect = a;
+    camera.fov = CINE || a >= 1 ? 45 : THREE.MathUtils.lerp(68, 45, THREE.MathUtils.clamp((a - 0.45) / 0.55, 0, 1));
+    camera.updateProjectionMatrix();
+  }
+  ajustarLente();
   camera.position.set(110, 70, 30);
 
   // ---------- cielo + sol ----------
@@ -120,8 +129,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     (gtao as any).updateGtaoMaterial({ radius: 0.6, distanceExponent: 1, thickness: 1, scale: 1, samples: 12, distanceFallOff: 1, screenSpaceRadius: false });
     composer.addPass(gtao);
   }
-  const bloom = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), MOVIL ? 0.1 : 0.16, 0.6, 0.9);
-  composer.addPass(bloom);
+  const bloom = MOVIL ? null : new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 0.16, 0.6, 0.9);
+  if (bloom) composer.addPass(bloom);
   composer.addPass(new OutputPass());
   // viñeta + grado cálido de película
   const grado = new ShaderPass({
@@ -144,6 +153,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const muros: THREE.Mesh[] = [];
   const aguas: THREE.Mesh[] = [];
   const estado = { modo: 'orbita' as Modo, vista: { edificio: null as string | null, piso: 99 }, cargado: false, etiquetas: true, tour: false };
+  // misma condición que el CSS del diseño para celular
+  const esMovil = () => matchMedia('(max-width: 820px), (pointer: coarse) and (max-height: 500px)').matches;
 
   // ---------- presets de cámara ----------
   const presets: Record<string, Preset> = {};
@@ -278,6 +289,44 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     }
     mk('calle', 'Entrada principal', RES ? (residencia as any).etiquetaCalle : [30, 1, -60], null, 99, false);
   }
+  // Cada 3 cuadros: se ubican en pantalla, se ordenan (las que tienen foto primero, luego las más cercanas) y se
+  // esconden las que chocan con otra, se salen del borde o caen debajo de los botones. En celular, máximo 9.
+  const _p = new THREE.Vector3();
+  const tamEtq = new WeakMap<HTMLElement, [number, number]>();
+  let cuentaDespeje = 0;
+  const ZONAS_UI = '.v-top a, .dock, .rail, .panel, .comparador.on, .subtitulo.on, .hint, .joy';
+  function despejarEtiquetas() {
+    if (++cuentaDespeje % 3) return;
+    const W = container.clientWidth, H = container.clientHeight;
+    const cr = container.getBoundingClientRect();
+    const ocupado: number[][] = [];
+    container.querySelectorAll(ZONAS_UI).forEach((z) => {
+      const r = z.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) ocupado.push([r.left - cr.left, r.top - cr.top, r.right - cr.left, r.bottom - cr.top]);
+    });
+    const cands: { el: HTMLElement; r: number[]; prio: number }[] = [];
+    for (const e of etiquetaObjs) {
+      const el = e.obj.element as HTMLElement;
+      if (!e.obj.visible || el.style.display === 'none') { el.classList.remove('tapada'); continue; }
+      _p.setFromMatrixPosition(e.obj.matrixWorld).project(camera);
+      if (_p.z > 1) continue;
+      let t = tamEtq.get(el);
+      if (!t) { t = [el.offsetWidth, el.offsetHeight]; if (t[0]) tamEtq.set(el, t); }
+      const x = (_p.x * 0.5 + 0.5) * W, y = (-_p.y * 0.5 + 0.5) * H;
+      cands.push({ el, r: [x - t[0] / 2 - 3, y - t[1] / 2 - 3, x + t[0] / 2 + 3, y + t[1] / 2 + 3], prio: (el.classList.contains('foto') ? 0 : 1) + _p.z });
+    }
+    cands.sort((a, b) => a.prio - b.prio);
+    const max = W < 820 ? 9 : 26;
+    let puestas = 0;
+    for (const c of cands) {
+      const [x0, y0, x1, y1] = c.r;
+      const fuera = x0 < 4 || x1 > W - 4 || y0 < 4 || y1 > H - 4;
+      const choca = puestas >= max || ocupado.some((o) => x0 < o[2] && x1 > o[0] && y0 < o[3] && y1 > o[1]);
+      const ocultar = fuera || choca;
+      c.el.classList.toggle('tapada', ocultar);
+      if (!ocultar) { ocupado.push(c.r); puestas++; }
+    }
+  }
   function actualizarEtiquetas() {
     const { edificio, piso } = estado.vista;
     for (const e of etiquetaObjs) {
@@ -315,6 +364,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     orbit.enabled = m === 'orbita';
     container.classList.toggle('caminando', m === 'recorrido');
     if (m === 'recorrido') {
+      if (esMovil()) comp.classList.remove('on');     // la foto tapaba el joystick
       const t = orbit.target.clone();
       const dir = camera.position.clone().sub(t).setY(0).normalize();
       const nivel = estado.vista.edificio && estado.vista.piso === 2 ? nivelDe(estado.vista.edificio) : 0;
@@ -342,7 +392,13 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     const pr = presets[id]; if (!pr) return;
     if (!desdeTour && estado.tour) detenerTour();
     setVista({ edificio: pr.ed, piso: pr.piso });
-    volar(pr.pos, pr.target, desdeTour ? 3.2 : 1.6);
+    let pos = pr.pos;
+    // vistas generales y plantas sin techo: en pantalla vertical la cámara se aleja un poco para que quepa todo
+    if (camera.aspect < 1 && (id === 'sitio' || /-p\d$/.test(id))) {
+      const k = THREE.MathUtils.lerp(1.35, 1, THREE.MathUtils.clamp((camera.aspect - 0.45) / 0.55, 0, 1));
+      pos = pr.pos.map((v, i) => pr.target[i] + (v - pr.target[i]) * k);
+    }
+    volar(pos, pr.target, desdeTour ? 3.2 : 1.6);
     panel.querySelectorAll('li').forEach((x) => x.classList.toggle('on', (x as HTMLElement).dataset.id === id));
     mostrarFoto(id);
     history.replaceState(null, '', `#${id}`);
@@ -390,15 +446,37 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     html += `</ul>`;
   }
   panel.innerHTML = html;
-  panel.addEventListener('click', (e) => { const el = (e.target as HTMLElement).closest('li'); if (el) irA((el as HTMLElement).dataset.id!); });
+  function abrirPanel(abrir: boolean) {
+    $('#panel').classList.toggle('abierto', abrir);
+    $('#btn-panel').setAttribute('aria-expanded', String(abrir));
+    $('#btn-panel').classList.toggle('on', abrir);
+  }
+  panel.addEventListener('click', (e) => {
+    const el = (e.target as HTMLElement).closest('li');
+    if (!el) return;
+    irA((el as HTMLElement).dataset.id!);
+    if (esMovil()) abrirPanel(false);              // en el celular la hoja tapa el modelo: se cierra al elegir
+  });
   document.querySelectorAll('[data-modo]').forEach((b) => b.addEventListener('click', () => setModo((b as HTMLElement).dataset.modo as Modo)));
   document.querySelectorAll('[data-vista]').forEach((b) => b.addEventListener('click', () => {
     const [ed, p] = (b as HTMLElement).dataset.vista!.split(':');
     if (estado.tour) detenerTour();
-    setVista({ edificio: ed === 'sitio' ? null : ed, piso: parseInt(p) });
+    // en la maqueta, elegir un nivel lleva a verlo desde arriba sin techo (antes solo cambiaba lo visible y,
+    // si la cámara estaba lejos o adentro de otro cuarto, parecía que el botón no hacía nada)
+    const id = ed === 'sitio' ? 'sitio' : `${ed}-p${p}`;
+    if (estado.modo === 'orbita' && presets[id]) irA(id);
+    else setVista({ edificio: ed === 'sitio' ? null : ed, piso: parseInt(p) });
   }));
-  $('#btn-etiquetas').addEventListener('click', () => { estado.etiquetas = !estado.etiquetas; $('#btn-etiquetas').classList.toggle('on', estado.etiquetas); actualizarEtiquetas(); });
-  $('#btn-panel').addEventListener('click', () => $('#panel').classList.toggle('abierto'));
+  $('#btn-etiquetas').addEventListener('click', () => {
+    estado.etiquetas = !estado.etiquetas;
+    $('#btn-etiquetas').classList.toggle('on', estado.etiquetas);
+    $('#btn-etiquetas').setAttribute('aria-pressed', String(estado.etiquetas));
+    actualizarEtiquetas();
+  });
+  $('#btn-panel').addEventListener('click', () => abrirPanel(!$('#panel').classList.contains('abierto')));
+  $('#panel-cerrar').addEventListener('click', () => abrirPanel(false));
+  window.addEventListener('keydown', (e) => { if (e.code === 'Escape' && $('#panel').classList.contains('abierto')) abrirPanel(false); });
+  $('#btn-etiquetas').setAttribute('aria-pressed', String(estado.etiquetas));
 
   // ---------- recorrido guiado ----------
   const TOUR_RES: { id: string; texto: string; espera: number }[] = [
@@ -433,6 +511,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const TOUR = RES ? TOUR_RES : TOUR_MAQUETA;
   let tourIdx = 0; let tourTimer: number | null = null;
   const subt = $('#subtitulo');
+  const tourTxt = $('#btn-tour').querySelector('.tab-t') as HTMLElement | null;
+  const tourTxtOriginal = tourTxt?.innerHTML ?? 'Recorrido guiado';
   function pasoTour() {
     if (!estado.tour) return;
     const paso = TOUR[tourIdx % TOUR.length];
@@ -444,7 +524,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   function iniciarTour() {
     if (estado.modo !== 'orbita') setModo('orbita');
     estado.tour = true; tourIdx = 0;
-    $('#btn-tour').classList.add('on'); $('#btn-tour').textContent = 'Detener';
+    $('#btn-tour').classList.add('on'); if (tourTxt) tourTxt.textContent = 'Detener';
+    abrirPanel(false);
     comp.classList.remove('on');
     actualizarEtiquetas();
     pasoTour();
@@ -453,7 +534,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     estado.tour = false;
     if (tourTimer) clearTimeout(tourTimer);
     subt.classList.remove('on');
-    $('#btn-tour').classList.remove('on'); $('#btn-tour').textContent = 'Recorrido guiado';
+    $('#btn-tour').classList.remove('on'); if (tourTxt) tourTxt.innerHTML = tourTxtOriginal;
     actualizarEtiquetas();
   }
   $('#btn-tour').addEventListener('click', () => (estado.tour ? detenerTour() : iniciarTour()));
@@ -512,14 +593,15 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     composer.render();
     renderer.autoClear = false; renderer.render(mundo.escenaNubes, camera); renderer.autoClear = true;
     labels.render(scene, camera);
+    if (!CINE) despejarEtiquetas();
     requestAnimationFrame(frame);
   }
   frame();
 
   window.addEventListener('resize', () => {
     const w = container.clientWidth, h = container.clientHeight;
-    camera.aspect = w / h; camera.updateProjectionMatrix();
-    renderer.setSize(w, h); composer.setSize(w, h); labels.setSize(w, h); gtao?.setSize(w, h); bloom.setSize(w, h);
+    ajustarLente();
+    renderer.setSize(w, h); composer.setSize(w, h); labels.setSize(w, h); gtao?.setSize(w, h); bloom?.setSize(w, h);
   });
 
   if (CINE) { estado.modo = 'cine'; estado.etiquetas = false; orbit.enabled = false; container.classList.add('cine'); }
