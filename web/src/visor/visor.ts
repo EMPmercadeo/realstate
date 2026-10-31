@@ -40,13 +40,14 @@ const MOVIL = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || window.
 const RAPIDO = new URLSearchParams(location.search).has('rapido');   // capturas rápidas de depuración
 const NIVEL = 3.25;
 
-export interface OpcionesVisor { cine?: boolean; ruta?: { pos: number[]; target: number[] }[]; onCargado?: () => void; }
+export interface OpcionesVisor { cine?: boolean; ruta?: { pos: number[]; target: number[] }[]; onCargado?: () => void; maqueta?: boolean; }
 
 export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const base = document.body.dataset.base || '/';
   const CINE = !!opts.cine;
-  // El recorrido usa el modelo amueblado (residencia.glb); la portada cinematográfica sigue con la maqueta anterior.
-  const RES = !CINE;
+  // Recorrido y portada usan el modelo amueblado (residencia.glb / residencia-exterior.glb);
+  // { maqueta: true } vuelve a la maqueta anterior (escena.glb / exterior.glb).
+  const RES = !opts.maqueta;
   const vistas: any = RES ? residencia : vistasMaqueta;
   const FOTOS: Record<string, Foto> = RES ? FOTOS_RES : F;
   const nivelDe = (ed: string | null) => (RES ? (vistas.edificios.find((e: any) => e.id === ed)?.nivel2 ?? 3.2) : NIVEL);
@@ -172,7 +173,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const pantalla = $('#pantalla-carga');
   const barra = $('#carga');
   const pct = $('#carga-pct');
-  loader.load(`${base}modelo/${CINE ? 'exterior' : 'residencia'}.glb`, (gltf) => {
+  const archivo = RES ? (CINE ? 'residencia-exterior' : 'residencia') : (CINE ? 'exterior' : 'escena');
+  loader.load(`${base}modelo/${archivo}.glb`, (gltf) => {
     gltf.scene.traverse((o: any) => {
       if (o.isMesh) {
         o.castShadow = true; o.receiveShadow = true;

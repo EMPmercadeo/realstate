@@ -244,8 +244,8 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
   const PAL = [[27, 72, 7], [27, 50, 6.5], [16, 75, 7], [4, 72, 6], [27, 40, 5.5], [15, 47, 6], [28, 34, 6], [1, 42, 6], [1, 54, 7], [2, 64, 6.5], [26.8, 60.2, 3.4]];
   const libre = (x: number, z: number) => !evitar.some(([ex, ez]) => Math.hypot(ex - x, ez - z) < 9);
   if (cfg) {
-    for (const [x, z, h] of cfg.arboles) posArboles.push([x, z, h * 0.85]);
-    for (const [x, z, h] of cfg.palmas) posPalmas.push([x, z, h * 0.9]);
+    for (const [x, z, h] of cfg.arboles) if (libre(x, z)) posArboles.push([x, z, h * 0.85]);
+    for (const [x, z, h] of cfg.palmas) if (libre(x, z)) posPalmas.push([x, z, h * 0.9]);
   } else {
     for (const [x, y, h] of ARB) if (libre(x, -y)) posArboles.push([x, -y, h * 0.72]);
     for (const [x, y, h] of PAL) if (libre(x, -y)) posPalmas.push([x, -y, h * 0.85]);

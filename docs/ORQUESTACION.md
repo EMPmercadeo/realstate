@@ -9,7 +9,7 @@ Repositorio: `EMPmercadeo/realstate` (GitHub) → Vercel `residencia-altos` (roo
 | Carpeta | Qué es |
 |---|---|
 | `web/` | Sitio Astro 7. `npm run dev` para verlo. Tres rutas: `/` (sobrevuelo 3D cinematográfico), `/fotos` (recorrido en fotos tipo scroll-world), `/recorrido` (maqueta 3D libre). |
-| `web/src/visor/visor.ts` | Visor Three.js: carga `public/modelo/escena.glb`, cielo, sol, post-proceso (AO, bloom, viñeta), modo cine (cámara por ruta), orbitar, caminar. |
+| `web/src/visor/visor.ts` | Visor Three.js: carga el modelo amueblado (`public/modelo/residencia.glb` en `/recorrido`, `residencia-exterior.glb` en la portada; datos en `src/data/residencia.json`), cielo, sol, post-proceso (AO, bloom, viñeta), modo cine (cámara por ruta), orbitar, caminar. La maqueta anterior (`escena.glb`/`exterior.glb`) solo se usa con `{ maqueta: true }`. |
 | `web/src/visor/mundo.ts` | Mundo procedural: terreno, colinas, Volcán Barú, bosque, árboles/palmeras low-poly con viento, calles, vecindario, nubes, pájaros, agua con reflejos. |
 | `web/src/data/cine.ts` | **Ruta de la cámara y paradas** del sobrevuelo. Editar aquí para cambiar el recorrido. |
 | `web/src/data/recorrido.ts` | Paradas del recorrido en fotos (`/fotos`). |
@@ -17,7 +17,7 @@ Repositorio: `EMPmercadeo/realstate` (GitHub) → Vercel `residencia-altos` (roo
 | `web/src/components/Recorrido.astro` + `web/src/recorrido/motor.ts` | Scroll-world de fotos (hoy → así quedará; usa `/clips/<id>.mp4` si existen). |
 | `web/public/fotos-reales/` | Fotos reales de fachada (2400 px). |
 | `web/public/fotos-antes/`, `fotos-despues/` | Fotos actuales y renders "así quedará" (Nano Banana). El sitio detecta solo las que existen. |
-| `blender/` | Modelo procedural (`build.py` → `build/escena.blend`; `export.py` → GLB). Solo si cambian medidas. |
+| `blender/` | Modelo actual: `bloqueo.py` → `build/bloqueo/bloqueo.blend`; para la web `web_muestras.py` + `export_web.py` (ver `docs/etapa4-amueblado.md`). La maqueta anterior (`build.py`/`export.py`) ya no se usa en el sitio. |
 | `docs/tareas-antigravity.md` | Tareas de imágenes para Antigravity (prompt + foto fuente). |
 | `.agents/skills/scroll-world/` y `.claude/skills/scroll-world/` | Skill de referencia (motor scrub, prompts, método de costuras de video). |
 | `web/scripts/captura.mjs` | Captura sin cabeza del visor: `node scripts/captura.mjs "http://localhost:4321/?frames=8&u=0.4" salida.jpg 1400 800`. En `/recorrido` también `?cam=x,y,z,tx,ty,tz`. |
@@ -55,6 +55,9 @@ Para `/fotos`: con Higgsfield/Kling/Veo "primer y último fotograma", generar po
 5–8 s desde la foto real hacia la imagen "después" (cámara avanzando lento) y guardarlo como
 `web/public/clips/<id>.mp4` (16:9, sin audio, `-g 8 +faststart`) y `<id>-m.mp4` (9:16). El motor los
 usa automáticamente.
+
+## Siguiente fase
+Ver `docs/siguiente-fase.md` (estado, preguntas para la propietaria, cambios pedidos y plan).
 
 ## Pendiente de la clienta
 Planos o medidas reales, nombre comercial, contacto, precio o "solicitar expediente", dominio.

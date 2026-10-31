@@ -40,11 +40,11 @@ def neutro(nombre, gris, rough=0.8, metal=0.0):
     return mat('n_' + nombre, color=(c[0], c[1], c[2], 1), rough=rough, metal=metal)
 
 M = dict(
-    amarillo=neutro('muro_casa', (0.66, 0.62, 0.54)),
+    amarillo=neutro('muro_casa', (0.76, 0.53, 0.19)),          # amarillo ocre de las fotos de la fachada
     gris_claro=neutro('muro_gris', (0.56, 0.58, 0.61)),
     blanco=neutro('blanco', 0.80, 0.6),
     marco=neutro('marco', 0.82, 0.5),
-    teja=neutro('cubierta_casa', (0.36, 0.32, 0.31), 0.7),
+    teja=neutro('cubierta_casa', (0.43, 0.10, 0.05), 0.7),     # teja terracota de las fotos
     lamina=neutro('remate_lamina', (0.70, 0.71, 0.72), 0.45, 0.3),
     lamina_techo=neutro('cubierta_gris', (0.50, 0.51, 0.52), 0.5),
     concreto=neutro('concreto', 0.66),

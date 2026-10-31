@@ -210,74 +210,101 @@ def clase(o):
     return None, None, 'obj'
 
 
-grupos = {}
-for o in list(bpy.data.objects):
-    if o.type != 'MESH' or not o.data.polygons:
-        continue
-    ed, piso, fl = clase(o)
-    nombre = (f'{ed}_p{piso}_{fl}' if ed else f'sitio_{fl}')
-    grupos.setdefault(nombre, []).append(o)
+# piezas que solo se ven por dentro: no van en el modelo de la portada (sobrevuelo exterior)
+INTERIOR = ('_mueble_', 'lampara', 'abanico', 'cuadro', 'lienzo', 'cortina')
 
-col_web = bpy.data.collections.new('web'); bpy.context.scene.collection.children.link(col_web)
-unidos = []
+
+def agrupar(excluir=()):
+    g = {}
+    for o in list(bpy.data.objects):
+        if o.type != 'MESH' or not o.data.polygons or o.get('_web'):
+            continue
+        if excluir and any(k in o.name for k in excluir):
+            continue
+        ed, piso, fl = clase(o)
+        g.setdefault(f'{ed}_p{piso}_{fl}' if ed else f'sitio_{fl}', []).append(o)
+    return g
+
+
 dg = bpy.context.evaluated_depsgraph_get()
-for nombre, obs in sorted(grupos.items()):
-    me = bpy.data.meshes.new(nombre)
-    bm = bmesh.new()
-    mats = []
-    for o in obs:
-        tmp = o.evaluated_get(dg).to_mesh().copy()
-        tmp.transform(o.matrix_world)
-        if o.matrix_world.determinant() < 0:
-            tmp.flip_normals()
-        remap = []
-        for s in o.material_slots:
-            mm = s.material
-            if mm not in mats:
-                mats.append(mm)
-            remap.append(mats.index(mm))
-        for p in tmp.polygons:
-            if remap:
-                p.material_index = remap[min(p.material_index, len(remap) - 1)]
-        if not tmp.uv_layers:
-            tmp.uv_layers.new(name='UVMap')
-        else:
-            tmp.uv_layers[0].name = 'UVMap'
-            while len(tmp.uv_layers) > 1:
-                tmp.uv_layers.remove(tmp.uv_layers[-1])
-        bm.from_mesh(tmp)
-        bpy.data.meshes.remove(tmp)
-    bm.to_mesh(me); bm.free()
-    for mm in mats:
-        me.materials.append(mm)
-    nuevo = bpy.data.objects.new(nombre, me)
-    col_web.objects.link(nuevo)
-    partes = nombre.split('_')
-    if partes[0] in ('gris', 'amarilla'):
-        nuevo['edificio'] = partes[0]
-        nuevo['piso'] = int(partes[1][1:])
-        if partes[2] == 'cielo':
-            nuevo['cielo'] = 1
-        if partes[2] == 'techo':
-            nuevo['techo'] = 1
-    unidos.append(nuevo)
-    print(nombre, len(obs), 'objetos', sum(len(p.vertices) - 2 for p in me.polygons), 'tri', len(mats), 'mat', flush=True)
 
-# solo queda la colección web
+
+def unir(grupos, coleccion):
+    col = bpy.data.collections.new(coleccion); bpy.context.scene.collection.children.link(col)
+    res = []
+    for nombre, obs in sorted(grupos.items()):
+        me = bpy.data.meshes.new(nombre)
+        bm = bmesh.new()
+        mats = []
+        for o in obs:
+            tmp = o.evaluated_get(dg).to_mesh().copy()
+            tmp.transform(o.matrix_world)
+            if o.matrix_world.determinant() < 0:
+                tmp.flip_normals()
+            remap = []
+            for s in o.material_slots:
+                mm = s.material
+                if mm not in mats:
+                    mats.append(mm)
+                remap.append(mats.index(mm))
+            for p in tmp.polygons:
+                if remap:
+                    p.material_index = remap[min(p.material_index, len(remap) - 1)]
+            if not tmp.uv_layers:
+                tmp.uv_layers.new(name='UVMap')
+            else:
+                tmp.uv_layers[0].name = 'UVMap'
+                while len(tmp.uv_layers) > 1:
+                    tmp.uv_layers.remove(tmp.uv_layers[-1])
+            bm.from_mesh(tmp)
+            bpy.data.meshes.remove(tmp)
+        bm.to_mesh(me); bm.free()
+        for mm in mats:
+            me.materials.append(mm)
+        nuevo = bpy.data.objects.new(nombre, me)
+        nuevo['_web'] = 1
+        col.objects.link(nuevo)
+        partes = nombre.split('_')
+        if partes[0] in ('gris', 'amarilla'):
+            nuevo['edificio'] = partes[0]
+            nuevo['piso'] = int(partes[1][1:])
+            if partes[2] == 'cielo':
+                nuevo['cielo'] = 1
+            if partes[2] == 'techo':
+                nuevo['techo'] = 1
+        res.append(nuevo)
+        print(coleccion, nombre, len(obs), 'objetos', sum(len(p.vertices) - 2 for p in me.polygons), 'tri', len(mats), 'mat', flush=True)
+    return res
+
+
+completo = unir(agrupar(), 'web')
+exterior = unir(agrupar(INTERIOR), 'web_exterior')
+
+# solo quedan los modelos unidos
 for o in list(bpy.data.objects):
-    if o not in unidos:
+    if not o.get('_web'):
         bpy.data.objects.remove(o, do_unlink=True)
+for o in completo + exterior:
+    del o['_web']
 
-os.makedirs(os.path.dirname(OUT_GLB), exist_ok=True)
-kw = dict(filepath=OUT_GLB, export_format='GLB', export_apply=True, export_extras=True, export_yup=True,
-          export_image_format='AUTO', export_materials='EXPORT', export_normals=True, export_tangents=False,
-          export_cameras=False, export_lights=False, export_animations=False, use_selection=False)
-try:
-    bpy.ops.export_scene.gltf(**kw, export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)
-except Exception as e:
-    print('sin draco:', e)
-    bpy.ops.export_scene.gltf(**kw)
-print('GLB', round(os.path.getsize(OUT_GLB) / 1e6, 2), 'MB', flush=True)
+
+def exportar(objs, ruta):
+    for o in bpy.data.objects:
+        o.select_set(o in objs)
+    os.makedirs(os.path.dirname(ruta), exist_ok=True)
+    kw = dict(filepath=ruta, export_format='GLB', export_apply=True, export_extras=True, export_yup=True,
+              export_image_format='AUTO', export_materials='EXPORT', export_normals=True, export_tangents=False,
+              export_cameras=False, export_lights=False, export_animations=False, use_selection=True)
+    try:
+        bpy.ops.export_scene.gltf(**kw, export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=6)
+    except Exception as e:
+        print('sin draco:', e)
+        bpy.ops.export_scene.gltf(**kw)
+    print('GLB', ruta, round(os.path.getsize(ruta) / 1e6, 2), 'MB', flush=True)
+
+
+exportar(completo, OUT_GLB)
+exportar(exterior, OUT_GLB.replace('residencia.glb', 'residencia-exterior.glb'))
 
 # ---------------------------------------------------------------- datos del visor
 def L(E, x, y, z):

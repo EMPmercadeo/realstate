@@ -113,7 +113,8 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
   const contVisor = document.getElementById('visor')!;
   const B = base.replace(/\/$/, '');
   async function iniciar() {
-    const nombre = esMovil ? 'sobrevuelo-m.mp4' : 'sobrevuelo.mp4';
+    // v2 = sobrevuelo renderizado con el modelo amueblado; mientras no exista se usa el 3D en vivo
+    const nombre = esMovil ? 'sobrevuelo-v2-m.mp4' : 'sobrevuelo-v2.mp4';
     let hayVideo = false;
     if (!new URLSearchParams(location.search).has('3d')) {
       try {
@@ -123,11 +124,11 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
     }
     if (hayVideo) {
       // póster inmediato mientras baja el video
-      contVisor.style.backgroundImage = `url(${B}/clips/poster.jpg)`; contVisor.style.backgroundSize = 'cover'; contVisor.style.backgroundPosition = 'center 45%';
+      contVisor.style.backgroundImage = `url(${B}/clips/poster-v2.jpg)`; contVisor.style.backgroundSize = 'cover'; contVisor.style.backgroundPosition = 'center 45%';
       const blob = await (await fetch(`${B}/clips/${nombre}`)).blob();
       const v = document.createElement('video');
       v.muted = true; v.playsInline = true; v.preload = 'auto'; v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
-      v.className = 'cine-video'; v.poster = `${B}/clips/poster.jpg`; v.src = URL.createObjectURL(blob);
+      v.className = 'cine-video'; v.poster = `${B}/clips/poster-v2.jpg`; v.src = URL.createObjectURL(blob);
       contVisor.append(v);
       let cur = 0, objetivo = 0, listo = false;
       v.addEventListener('loadedmetadata', () => { listo = true; carga.classList.add('oculta'); leer(); });

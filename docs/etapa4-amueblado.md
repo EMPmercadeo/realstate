@@ -92,9 +92,12 @@ El recorrido (`/recorrido`) ya carga este modelo en lugar de la maqueta anterior
   que el visor muestre "Gris · PB", "Amarilla · PA", etc., y escribe los cuartos con sus cámaras (las mismas de las
   vistas interiores cuando existen).
 - El visor y el mundo procedural (`web/src/visor/visor.ts`, `mundo.ts`) usan el lote real, las dos calles del
-  satélite (C.A asfaltada y calle de tierra) y el sol de la mañana desde el este. La portada cinematográfica sigue
-  con la maqueta anterior (`exterior.glb`).
+  satélite (C.A asfaltada y calle de tierra) y el sol de la mañana desde el este.
+- La portada (`/`) también vuela sobre este modelo: `residencia-exterior.glb` (sin muebles, 0,55 MB) con la ruta y
+  los textos de `web/src/data/cine.ts`. El video viejo ya no se usa; uno nuevo iría en `clips/sobrevuelo-v2.mp4`.
+- Fachada de la casa con los colores de las fotos: amarillo ocre y teja terracota (`blender/bloqueo.py`).
 - Aún no están en 3D el gazebo, la tina de hidroterapia ni el huerto (van en la etapa de exteriores).
+- Siguiente fase: `docs/siguiente-fase.md`.
 
 Regenerar en la PC después de cambiar el modelo (PowerShell dentro de `realstate`):
 ```
