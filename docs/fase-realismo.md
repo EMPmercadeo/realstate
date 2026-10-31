@@ -24,7 +24,8 @@ Todo es aditivo: `realismo.py` abre `build/bloqueo/bloqueo.blend` (el modelo de 
 | `blender/arboles_satelite.py` | Árboles fuera del lote donde el satélite muestra copa, y casas vecinas donde muestra techos. |
 | `blender/video_muestra.py` | Video caminando a 1,60 m (24 mm) de la calle a la recepción; la exposición cambia al entrar. |
 | `blender/hornear_web.py` | Prueba web: une el frente, le hace UV de luz, hornea con Cycles (color + sol + cielo + rebotes) y exporta GLB. |
-| `blender/plantas_web.py` | Plantas del frente con color en los vértices (livianas) y JSON con el sol y las vistas para la página. |
+| `blender/plantas_web.py` | Plantas del frente aclaradas para celular, con color en los vértices; casa sin normales; JSON con el sol y las vistas. |
+| `blender/empaquetar_web.py` | Cuantiza con gltfpack y deja los archivos de la prueba web listos para celular. |
 
 ## Luz (medida, no a ojo)
 Con el cielo físico a fuerza 1, el sol equivale a una lámpara de 135 (medido en una escena de prueba).
@@ -47,7 +48,15 @@ Si en `assets\pbr` están las texturas de ambientCG (ver `docs/PLAN-GPU.md`) los
 & $b -b -P blender\video_muestra.py -- --gpu --ancho 1920 --muestras 128
 & $b -b -P blender\hornear_web.py -- --zona frente --atlas 8192 --muestras 256 --gpu
 & $b -b -P blender\plantas_web.py -- --zona frente
+python blender\empaquetar_web.py
 ```
+Versión para celular (31-10): el visor iba lento en el teléfono. Causas medidas: 12 MB de modelo en texto,
+108 mil triángulos de plantas y dibujar a 2x con antialias en pantallas de 3x. Arreglo: plantas aclaradas
+(menos hojas pero más grandes, `plantas_web.py`), casa sin normales y geometría cuantizada con gltfpack
+(`empaquetar_web.py`), mapa de luz como JPG aparte, la casa carga primero y las plantas después, dibujo a
+1,5x sin antialias en pantallas densas y solo cuando algo se mueve. En un celular emulado (4G, CPU 4x):
+13,5 MB → 4,2 MB, la casa aparece en 4 s (antes 15 s) y camina unas 11 veces más fluido.
+El sitio no usa React (Astro + Three.js), así que React Doctor no aplica.
 El video queda en `build\video_muestra\recorrido_muestra.mp4` (se puede cortar y reanudar). La prueba web en
 `build\web_horneado\` (`frente.glb`, `frente_plantas.glb`, `frente.json`). Vista previa publicada como artifact
 "Recorrido horneado Altos" (atlas de 2048 por falta de memoria en la nube).

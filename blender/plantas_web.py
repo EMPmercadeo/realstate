@@ -44,6 +44,40 @@ def color_por_cara(o):
         cols.append((c0, c1, usa_tinte))
     return cols
 
+def aclarar(o, conservar=0.3, crecer=1.7, seed=7):
+    """Para el celular: cada hoja, pinna o flor es una isla de pocas caras. Se conserva una fracción de las
+    islas chicas y se agrandan sobre su propio centro, así la planta conserva su volumen con muchos menos
+    triángulos. Las islas grandes (troncos, ramas, capitel) quedan intactas. Decimar no sirve aquí: deforma
+    las hojas sueltas."""
+    import bmesh, random
+    rnd = random.Random(seed)
+    bm = bmesh.new(); bm.from_mesh(o.data)
+    bm.faces.ensure_lookup_table()
+    vistas, borrar = set(), []
+    for f in bm.faces:
+        if f.index in vistas:
+            continue
+        isla, pila = [], [f]
+        vistas.add(f.index)
+        while pila:
+            g = pila.pop(); isla.append(g)
+            for e in g.edges:
+                for h in e.link_faces:
+                    if h.index not in vistas:
+                        vistas.add(h.index); pila.append(h)
+        if len(isla) > 12:                              # tronco, rama o capitel
+            continue
+        if rnd.random() > conservar:
+            borrar.extend(isla)
+            continue
+        vs = {v for g in isla for v in g.verts}
+        c = sum((v.co for v in vs), Vector()) / len(vs)
+        for v in vs:
+            v.co = c + (v.co - c) * crecer
+    bmesh.ops.delete(bm, geom=borrar, context='FACES')
+    bm.to_mesh(o.data); bm.free()
+
+
 plantas = [o for o in bpy.data.objects if o.type == 'MESH' and o.name.startswith(PLANTAS)
            and o.users_collection and o.users_collection[0].name == 'Vegetacion']
 copias = []
@@ -68,8 +102,12 @@ for o in plantas:
     me.materials.clear()
     while me.uv_layers:
         me.uv_layers.remove(me.uv_layers[0])
-    if len(me.polygons) > 4000:                       # hojas más simples para el celular
-        d = c.modifiers.new('dec', 'DECIMATE'); d.ratio = 0.3
+    if len(me.polygons) > 2500:                       # menos hojas pero más grandes: misma silueta, mucho menos peso
+        if c.name.startswith(('palma', 'areca')):
+            aclarar(c, conservar=0.3, crecer=1.45)
+            d = c.modifiers.new('dec', 'DECIMATE'); d.ratio = 0.5    # raquis y tronco: tubos con menos anillos
+        else:
+            aclarar(c, conservar=0.14, crecer=2.1)
     copias.append(c)
 for o in bpy.context.view_layer.objects:
     o.select_set(o in copias)
@@ -77,7 +115,9 @@ ruta_p = os.path.join(OUT, f'{ZONA}_plantas.glb')
 bpy.ops.export_scene.gltf(filepath=ruta_p, export_format='GLB', use_selection=True, export_apply=True, export_yup=True,
                           export_materials='NONE', export_vertex_color='ACTIVE', export_cameras=False, export_lights=False,
                           export_animations=False)       # sin Draco: el visor de prueba no puede bajar el decodificador
-print('plantas', ruta_p, round(os.path.getsize(ruta_p) / 1e6, 2), 'MB', flush=True)
+print('plantas', ruta_p, round(os.path.getsize(ruta_p) / 1e6, 2), 'MB',
+      sum(sum(len(p.vertices) - 2 for p in o.data.polygons) for o in copias), 'triángulos', flush=True)
+
 
 # datos para la página: sol y puntos de vista (coordenadas de three.js: x, z, -y)
 sol = bpy.data.objects['sol']
@@ -94,3 +134,13 @@ datos = dict(sol=T(d.x, d.y, d.z), exposicion=sc.view_settings.exposure,
                      dict(nombre='Cochera', pos=L(1.4, -6.5, 1.6), mira=L(1.6, 2.0, 1.8))])
 json.dump(datos, open(os.path.join(OUT, f'{ZONA}.json'), 'w'), indent=1)
 print('datos', os.path.join(OUT, f'{ZONA}.json'), flush=True)
+
+# el edificio horneado se dibuja sin luces: no necesita normales (sin ellas los vértices se comparten y pesa menos)
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.import_scene.gltf(filepath=os.path.join(OUT, f'{ZONA}.glb'))
+for o in bpy.context.view_layer.objects:
+    o.select_set(o.type == 'MESH')
+bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, f'{ZONA}_sn.gltf'), export_format='GLTF_SEPARATE', use_selection=True,
+                          export_yup=True, export_normals=False, export_materials='EXPORT', export_image_format='JPEG',
+                          export_cameras=False, export_lights=False, export_animations=False)
+print('casa sin normales', os.path.join(OUT, f'{ZONA}_sn.gltf'), flush=True)
