@@ -1,5 +1,7 @@
 # Programa de espacios — Residencia de retiro, Altos de San Cristóbal (David, Chiriquí)
 
+> **Actualizado 30-10-2026:** la versión vigente está en [`contexto-proyecto.md`](contexto-proyecto.md) (capacidad 26, 4 cuartos privados, personal mínimo, pendientes). Donde este archivo difiera, manda aquel. Este se conserva por los datos de croquis y fotos.
+
 Fuente: nota de voz de la clienta (28-10-2026, 39 min), croquis a mano, fotos del campus ISPE y presentación "Adecuación de espacios". Ubicación: antiguo Instituto Superior Publies Educa, Calle Altos de San Cristóbal, David Sur. Terreno 2.500 m² con cerca perimetral y portones eléctricos.
 
 ## Qué se vende y a quién

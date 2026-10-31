@@ -2,6 +2,8 @@
 
 Proyecto de comercialización de la propiedad (antiguo campus ISPE, David, Chiriquí) como residencia de retiro llave en mano.
 
+**Contexto del proyecto: [`docs/contexto-proyecto.md`](docs/contexto-proyecto.md).** Léelo antes de tocar el modelo, los renders o los textos del sitio.
+
 ## Estructura
 
 ```
@@ -10,7 +12,8 @@ blender/      modelo 3D procedural (bpy). programa.py = programa arquitectónico
 assets/       texturas PBR generadas y HDRIs.
 build/        escena.blend y renders (se regenera).
 web/          sitio Astro + visor Three.js (src/visor/visor.ts). Se despliega en Vercel tal cual.
-docs/         programa de espacios, transcripción de la nota de voz, referencias.
+docs/         contexto-proyecto.md (FUENTE DE VERDAD: negocio, capacidad, espacios, personal, pendientes),
+              programa de espacios, transcripciones de las notas de voz, referencias.
 ```
 
 ## Comandos
