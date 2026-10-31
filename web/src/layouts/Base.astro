@@ -1,12 +1,13 @@
 ---
 import '@/styles/global.css';
-interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; }
+interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; noindex?: boolean; }
 const {
   title,
   description = 'Residencia de retiro y cuidado para adultos mayores en Altos de San Cristóbal, David, Chiriquí. Recorrido cinematográfico del proyecto terminado.',
   lang = 'es',
   full = false,
   sinHeader = false,
+  noindex = false,
 } = Astro.props;
 ---
 <!doctype html>
@@ -16,6 +17,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -28,6 +30,7 @@ const {
           <ul>
             <li><a href="/#proyecto">El proyecto</a></li>
             <li><a href="/#espacios">Espacios</a></li>
+            <li><a href="/avances">Avances</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a class="btn" href="/#recorrido">Recorrido</a></li>
           </ul>

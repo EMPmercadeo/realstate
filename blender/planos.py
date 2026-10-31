@@ -38,13 +38,42 @@ EXTRAS = {   # elementos exteriores de referencia (marco local), solo contorno p
                      ((1.2, 13.8, 4.4, 15.4), 'Porche en arco')],
     ('casa', 'pa'): [((4.4, -0.7, 10.0, 1.4), 'Balcón')],
     ('gris', 'pb'): [((14.45, 5.4, 15.55, 11.6), 'Esc. metálica'), ((1.0, -1.8, 6.3, 3.6), 'Estacionamientos')],
-    ('gris', 'pa'): [((0.15, 4.8, 2.5, 13.0), 'Galería cerrada'), ((4.6, 11.0, 13.9, 13.4), 'Terraza · cerrada con verjas'),
+    ('gris', 'pa'): [((0.15, 4.8, 2.5, 13.0), 'Galería cerrada'), ((4.6, 11.0, 13.9, 13.4), 'Terraza con verjas · área de coffee break'),
                      ((14.45, 5.4, 15.55, 11.6), 'Esc. metálica')],
 }
 ORIENT = {
     'casa': dict(abajo='Frente · calle C.A', arriba='Fondo · patio de grava y jardín', izq='', der='Garaje'),
     'gris': dict(abajo='Calle de tierra (oeste)', arriba='Jardín (este)', izq='Norte · hacia la casa amarilla', der='Sur'),
 }
+
+
+def dibujar_puerta(d, P, p):
+    """Puerta interior con su bisagra y lado de giro reales (o corrediza)."""
+    col = (150, 120, 90)
+    a = p['u1'] - p['u0']
+    if p.get('tipo') == 'corrediza':
+        for off, s in ((0.0, -1), (a / 2, 1)):
+            if p['eje'] == 'x':
+                d.line([P(p['u0'] + off, p['c'] + s * 0.03), P(p['u0'] + off + a / 2, p['c'] + s * 0.03)], fill=col, width=3)
+            else:
+                d.line([P(p['c'] + s * 0.03, p['u0'] + off), P(p['c'] + s * 0.03, p['u0'] + off + a / 2)], fill=col, width=3)
+        return
+    u = p['u0'] if p['bisagra'] == 'lo' else p['u1']
+    u_otro = p['u1'] if p['bisagra'] == 'lo' else p['u0']
+    s = p['lado']
+    import math as _m
+    if p['eje'] == 'x':
+        h = (u, p['c']); punta = (u, p['c'] + s * a); cierre = (u_otro, p['c'])
+    else:
+        h = (p['c'], u); punta = (p['c'] + s * a, u); cierre = (p['c'], u_otro)
+    d.line([P(*h), P(*punta)], fill=col, width=2)
+    pts = []
+    for k in range(13):
+        t = k / 12 * _m.pi / 2
+        vx, vy = punta[0] - h[0], punta[1] - h[1]
+        wx, wy = cierre[0] - h[0], cierre[1] - h[1]
+        pts.append(P(h[0] + vx * _m.cos(t) + wx * _m.sin(t), h[1] + vy * _m.cos(t) + wy * _m.sin(t)))
+    d.line(pts, fill=col, width=1)
 
 
 def dibujar(clave, ed, nv, rutas):
@@ -87,12 +116,34 @@ def dibujar(clave, ed, nv, rutas):
         col = C_ESC if c['escalera'] else (C_ABIER if c['tipo'] == 'abierto' else C_CERR)
         for rr in c['rects']:
             d.rectangle(R(*rr), fill=col)
-    # mobiliario de referencia (camas, mesas, estación)
-    for (niv, tipo, a, b, c, e) in ed.get('muebles', []):
-        if niv != nv['id']:
+    # mobiliario (huellas de amueblado.py)
+    for mu in ed.get('muebles', []):
+        if mu['nivel'] != nv['id']:
             continue
-        col = {'cama': (255, 255, 255), 'mesa': (225, 214, 196), 'estacion': (205, 196, 182)}.get(tipo, (230, 230, 230))
-        d.rectangle(R(a, b, c, e), fill=col, outline=(160, 150, 138), width=1)
+        t = mu['t']
+        pts = [P(*p) for p in mu['pts']]
+        if t.startswith('cama'):
+            col, lin = (255, 255, 255), (120, 130, 150)
+        elif t in ('inodoro', 'lavamanos', 'tocador', 'ducha', 'batea', 'lavadora', 'secadora'):
+            col, lin = (214, 232, 242), (110, 140, 160)
+        elif t.startswith(('planta',)):
+            col, lin = (196, 222, 186), (110, 150, 100)
+        elif t in ('mesa_puente',):
+            continue
+        else:
+            col, lin = (230, 220, 204), (150, 138, 120)
+        d.polygon(pts, fill=col, outline=lin)
+        if t.startswith('cama'):
+            # almohada en la cabecera (lado del respaldo: primer tramo del polígono)
+            (ax, ay), (bx, by), _, (dx, dy) = mu['pts'][:4]
+            fx, fy = (dx - ax), (dy - ay)
+            Lf = math.hypot(fx, fy) or 1
+            k = 0.32 / Lf
+            q = [(ax + (bx - ax) * 0.15 + fx * 0.06 / Lf * Lf * 0 + fx * 0.03, ay + (by - ay) * 0.15 + fy * 0.03),
+                 (ax + (bx - ax) * 0.85 + fx * 0.03, ay + (by - ay) * 0.85 + fy * 0.03),
+                 (ax + (bx - ax) * 0.85 + fx * k, ay + (by - ay) * 0.85 + fy * k),
+                 (ax + (bx - ax) * 0.15 + fx * k, ay + (by - ay) * 0.15 + fy * k)]
+            d.polygon([P(*p) for p in q], fill=(236, 240, 246), outline=(150, 160, 175))
     # escaleras: huellas
     for esc in ed['escaleras']:
         if not (esc['z0'] - 0.1 <= z0 <= esc['z1'] + 0.1):
@@ -128,16 +179,20 @@ def dibujar(clave, ed, nv, rutas):
                 else:
                     r = R(c0, a, c1, b)
                 if es_puerta:
-                    # arco de giro
-                    rad = (b - a) * S
-                    if m['eje'] == 'x':
-                        hx, hy = P(a, (c0 + c1) / 2)
-                        d.arc((hx - rad, hy - rad, hx + rad, hy + rad), 270, 360, fill=(150, 120, 90), width=1)
-                        d.line([(hx, hy), (hx, hy - rad)], fill=(150, 120, 90), width=2)
-                    else:
-                        hx, hy = P((c0 + c1) / 2, a)
-                        d.arc((hx - rad, hy - rad, hx + rad, hy + rad), 0, 90, fill=(150, 120, 90), width=1)
-                        d.line([(hx, hy), (hx + rad, hy)], fill=(150, 120, 90), width=2)
+                    pi = [p for p in nv['puertas'] if p['eje'] == m['eje'] and abs(p['c'] - (c0 + c1) / 2) < 0.08
+                          and abs(p['u0'] - a) < 0.05]
+                    if pi:
+                        dibujar_puerta(d, P, pi[0])
+                    else:   # puerta exterior: abre hacia adentro desde a
+                        rad = (b - a) * S
+                        if m['eje'] == 'x':
+                            hx, hy = P(a, (c0 + c1) / 2)
+                            d.arc((hx - rad, hy - rad, hx + rad, hy + rad), 270, 360, fill=(150, 120, 90), width=1)
+                            d.line([(hx, hy), (hx, hy - rad)], fill=(150, 120, 90), width=2)
+                        else:
+                            hx, hy = P((c0 + c1) / 2, a)
+                            d.arc((hx - rad, hy - rad, hx + rad, hy + rad), 0, 90, fill=(150, 120, 90), width=1)
+                            d.line([(hx, hy), (hx + rad, hy)], fill=(150, 120, 90), width=2)
                 else:
                     d.rectangle(r, fill=(255, 255, 255))
                     if m['eje'] == 'x':
@@ -164,6 +219,10 @@ def dibujar(clave, ed, nv, rutas):
         wpx = (big[2] - big[0]) * S - 8
         hpx = (big[3] - big[1]) * S
         nombre = c['nombre']
+        ncam = sum(1 for mu in ed.get('muebles', []) if mu['nivel'] == nv['id'] and mu['cuarto'] == c['id']
+                   and mu['t'].startswith('cama'))
+        if ncam:
+            nombre += f' · {ncam} cama' + ('s' if ncam > 1 else '')
         for sz in (15, 13, 11, 10):
             f = F(sz, True)
             palabras = nombre.split(' ')
@@ -223,7 +282,8 @@ def leyenda(w):
     d = ImageDraw.Draw(im)
     items = [(C_CERR, 'Cuarto (cerrado)'), (C_ABIER, 'Circulación abierta'), (C_ESC, 'Escalera'),
              (C_MURO, 'Muro cortado a 1,2 m'), (C_VENT, 'Ventana'), ((150, 120, 90), 'Puerta'),
-             ((255, 255, 255), 'Cama 0,95 × 2,0 m (las que caben)'), (C_RUTA, 'Recorrido de prueba')]
+             ((255, 255, 255), 'Cama'), ((230, 220, 204), 'Mueble'), ((214, 232, 242), 'Sanitario / lavado'),
+             (C_RUTA, 'Recorrido de prueba')]
     x = 20
     for col, t in items:
         d.rectangle((x, 30, x + 26, 48), fill=col)
@@ -298,7 +358,7 @@ if __name__ == '__main__':
     Ht = 90 + ley.height + max(i.height for i in fila1) + max(i.height for i in fila2) + sup.height + 40
     L = Image.new('RGB', (W, Ht), C_FONDO)
     d = ImageDraw.Draw(L)
-    d.text((24, 24), 'Etapa 3 · Distribución interior y conexión vertical · Altos de San Cristóbal', font=F(34, True), fill=C_TXT)
+    d.text((24, 24), 'Etapa 4 · Interiores amueblados según el programa · Altos de San Cristóbal', font=F(34, True), fill=C_TXT)
     y = 90
     L.paste(ley, (0, y)); y += ley.height
     x = 20
@@ -310,5 +370,5 @@ if __name__ == '__main__':
         L.paste(i, (x, y)); x += i.width + 40
     y += max(i.height for i in fila2) + 20
     L.paste(sup, (0, y))
-    L.save(os.path.join(OUT, 'planos_etapa3.jpg'), quality=90)
-    print('planos_etapa3.jpg', L.size)
+    L.save(os.path.join(OUT, 'planos_etapa4.jpg'), quality=90)
+    print('planos_etapa4.jpg', L.size)

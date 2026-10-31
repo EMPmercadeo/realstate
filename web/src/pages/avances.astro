@@ -1,0 +1,146 @@
+---
+import Base from '@/layouts/Base.astro';
+import { FECHA, GRIS, CASA, PARES, PLANOS, CAMAS } from '@/data/avances';
+const galerias = [
+  { id: 'edificio-gris', titulo: 'Edificio gris', texto: 'Personas encamadas y salón amarillo en la planta alta, con el área de coffee break en la terraza. Abajo, los salones de las personas que deambulan, oficinas y servicios.', vistas: GRIS },
+  { id: 'casa-amarilla', titulo: 'Casa amarilla', texto: 'Recepción 24 h, comedor, terapia con familiares, talleres, consultorio y los cuatro cuartos privados.', vistas: CASA },
+];
+---
+<Base title="Avance del modelo 3D · Residencia Altos de San Cristóbal"
+      description="Avance del modelo 3D de la Residencia Altos de San Cristóbal: interiores amueblados y planos."
+      noindex>
+  <section class="seccion av-intro">
+    <div class="container">
+      <p class="av-sup">Avance del proyecto · {FECHA}</p>
+      <h1>Así va el modelo 3D por dentro</h1>
+      <p class="lead">Los dos edificios ya tienen sus cuartos amueblados según el programa: dónde va cada cama, la estación de enfermería, los baños, la cocina, el área de coffee break y las áreas comunes. Las imágenes salen del modelo 3D, con las medidas del terreno y de los edificios.</p>
+      <div class="av-acciones">
+        <a class="btn" href="#edificio-gris">Ver los interiores</a>
+        <a class="btn claro" href="#planos">Ver los planos</a>
+        <a class="btn claro" href="/recorrido">Abrir el recorrido 3D</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion gris">
+    <div class="container cols ancha">
+      <div>
+        <h2>26 camas en total</h2>
+        <p class="lead">Así quedan repartidas en el modelo.</p>
+        <ul class="lista-plana">
+          {CAMAS.map(([a, b]) => <li><span>{a}</span><span>{b}</span></li>)}
+        </ul>
+      </div>
+      <p class="muted av-nota">Las medidas se tomaron del terreno y de las fotos; antes de ofrecer la capacidad final hay que medir en sitio. Los muebles y equipos son de referencia para mostrar el uso de cada espacio.</p>
+    </div>
+  </section>
+
+  {galerias.map((g) => (
+    <section class="seccion" id={g.id}>
+      <div class="container">
+        <h2>{g.titulo}</h2>
+        <p class="lead">{g.texto}</p>
+        <div class="av-galeria">
+          {g.vistas.map((v) => (
+            <figure class="av-fig">
+              <a href={`/avances/${v.f}.jpg`} data-lb data-t={v.t} data-d={v.d}>
+                <img src={`/avances/${v.f}.jpg`} alt={`${v.t}: ${v.d}`} loading="lazy" width="1280" height="720" />
+              </a>
+              <figcaption><strong>{v.t}</strong><span>{v.d}</span></figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="seccion gris" id="idea-y-modelo">
+    <div class="container">
+      <h2>La idea y el modelo</h2>
+      <p class="lead">A la izquierda, la propuesta sobre la foto real; a la derecha, el mismo espacio en el modelo 3D. Arrastra la línea para comparar.</p>
+      <div class="antes-despues">
+        {PARES.map(([idea, vista, t]) => (
+          <div class="ad">
+            <img src={`/avances/${vista}.jpg`} alt={`${t}, modelo 3D`} loading="lazy" />
+            <div class="ad-antes"><img src={`/fotos-despues/${idea}.jpg`} alt={`${t}, propuesta`} loading="lazy" /></div>
+            <span class="ad-linea"></span>
+            <input type="range" min="0" max="100" value="50" aria-label={`Comparar ${t}`} />
+            <span class="ad-l">Idea</span><span class="ad-r">Modelo 3D</span>
+            <span class="ad-t">{t}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion" id="planos">
+    <div class="container">
+      <h2>Planos amueblados</h2>
+      <p class="lead">Distribución de cada nivel con los muebles y las camas. Toca un plano para verlo grande.</p>
+      <div class="av-planos">
+        {PLANOS.map(([f, t]) => (
+          <figure class="av-fig plano">
+            <a href={`/avances/${f}.png`} data-lb data-t={t} data-d="">
+              <img src={`/avances/${f}.png`} alt={`Plano amueblado: ${t}`} loading="lazy" />
+            </a>
+            <figcaption><strong>{t}</strong></figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <dialog id="lb" class="av-lb" aria-label="Imagen ampliada">
+    <button class="av-cerrar" type="button" aria-label="Cerrar">×</button>
+    <img alt="" />
+    <p></p>
+  </dialog>
+
+  <script>
+    document.querySelectorAll<HTMLElement>('#idea-y-modelo .ad').forEach((el) => {
+      const r = el.querySelector('input')!; const a = el.querySelector<HTMLElement>('.ad-antes')!; const l = el.querySelector<HTMLElement>('.ad-linea')!;
+      r.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - Number(r.value)}% 0 0)`; l.style.left = `${r.value}%`; });
+    });
+    const lb = document.getElementById('lb') as HTMLDialogElement;
+    const img = lb.querySelector('img')!; const txt = lb.querySelector('p')!;
+    document.querySelectorAll<HTMLAnchorElement>('a[data-lb]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (!lb.showModal) return;
+        e.preventDefault();
+        img.src = a.href; img.alt = a.dataset.t || '';
+        txt.textContent = [a.dataset.t, a.dataset.d].filter(Boolean).join(' · ');
+        lb.showModal();
+      });
+    });
+    lb.querySelector('.av-cerrar')!.addEventListener('click', () => lb.close());
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+  </script>
+</Base>
+
+<style>
+  .av-intro { padding-bottom: 2.5rem; }
+  .av-sup { color: var(--verde-2); font-weight: 500; margin-bottom: 0.6rem; }
+  .av-intro h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); max-width: 16ch; }
+  .av-acciones { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.6rem; }
+  .av-nota { align-self: end; }
+  .lista-plana li span:last-child { white-space: nowrap; }
+  .av-galeria { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1.2rem; margin-top: 2rem; }
+  .av-fig { margin: 0; }
+  .av-fig a { display: block; border-radius: var(--radius); overflow: hidden; background: var(--bg-2); }
+  .av-fig img { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; transition: transform 0.4s; }
+  .av-fig a:hover img { transform: scale(1.02); }
+  .av-fig figcaption { padding: 0.7rem 0.1rem 0; display: grid; gap: 0.15rem; }
+  .av-fig figcaption strong { font-weight: 600; }
+  .av-fig figcaption span { color: var(--muted); font-size: 0.92rem; }
+  .av-planos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem 1.2rem; margin-top: 2rem; align-items: start; }
+  .av-fig.plano a { background: #faf9f6; border: 1px solid var(--line); }
+  .av-fig.plano img { aspect-ratio: auto; object-fit: contain; max-height: 640px; }
+  .av-lb { border: 0; padding: 0; max-width: min(1400px, 96vw); background: #111; color: #fff; border-radius: 12px; overflow: hidden; }
+  .av-lb::backdrop { background: rgba(10, 20, 15, 0.82); }
+  .av-lb img { display: block; max-width: 100%; max-height: 82vh; margin: 0 auto; background: #faf9f6; }
+  .av-lb p { margin: 0; padding: 0.7rem 1rem; font-size: 0.95rem; }
+  .av-cerrar { position: absolute; top: 0.5rem; right: 0.5rem; width: 38px; height: 38px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.9); font-size: 1.4rem; line-height: 1; cursor: pointer; }
+  @media (max-width: 760px) {
+    .av-galeria, .av-planos { grid-template-columns: 1fr; }
+  }
+</style>

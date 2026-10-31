@@ -12,6 +12,7 @@ import Base from '@/layouts/Base.astro';
         <p class="pc-pct"><span id="carga-pct">Cargando el modelo…</span></p>
         <button id="btn-entrar" class="btn" disabled>Cargando…</button>
         <p class="pc-nota">Al entrar comienza un recorrido guiado. Puedes detenerlo en cualquier momento y moverte libremente.</p>
+        <p class="pc-nota"><a href="/avances" style="color:#fff">Nuevo: ver los interiores amueblados (avance del {'30-10-2026'})</a></p>
       </div>
     </div>
 
@@ -22,6 +23,7 @@ import Base from '@/layouts/Base.astro';
         <button data-modo="recorrido">Caminar</button>
         <button id="btn-etiquetas" class="on">Etiquetas</button>
         <button id="btn-panel" class="solo-movil">Espacios</button>
+        <a class="btn-avance" href="/avances">Interiores amueblados</a>
       </div>
       <div class="grupo pisos">
         <button data-vista="sitio:99" class="on">Todo</button>
@@ -51,3 +53,7 @@ import Base from '@/layouts/Base.astro';
     iniciarVisor(document.getElementById('visor')!);
   </script>
 </Base>
+<style is:global>
+  .grupo .btn-avance { display: inline-block; padding: 0.5rem 0.95rem; border-radius: 999px; background: var(--ocre); color: var(--ink); text-decoration: none; font-size: 0.86rem; font-weight: 500; }
+  .grupo .btn-avance:hover { background: #d8ab4f; }
+</style>

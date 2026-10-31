@@ -50,7 +50,7 @@ class Kit:
         return o
 
 
-def hip(K, t, x0, y0, x1, y1, z, pitch, ov, m, chamfer=0.0, chamfer_side='y0', fascia=0.18, soffit='alero'):
+def hip(K, t, x0, y0, x1, y1, z, pitch, ov, m, chamfer=0.0, chamfer_side='y0', fascia=0.18, soffit='alero', excluir=None):
     """Techo a cuatro aguas sobre el rectángulo de muros, con alero `ov`, pendiente `pitch` (grados),
     canto (fascia) y cielo de alero. `chamfer` recorta las dos esquinas del lado indicado."""
     ex0, ey0, ex1, ey1 = x0 - ov, y0 - ov, x1 + ov, y1 + ov
@@ -85,9 +85,35 @@ def hip(K, t, x0, y0, x1, y1, z, pitch, ov, m, chamfer=0.0, chamfer_side='y0', f
         faces.append((n + 2 + j, n + 2 + i, i, j)[::-1])      # fascia
     roof = K.poly(t, verts, faces, m)
     roof['techo'] = 1
-    # cielo del alero (cara inferior)
-    sv = [(p[0], p[1], z - fascia) for p in P]
-    so = K.poly(t + '_alero', sv, [tuple(range(n))[::-1]], soffit)
+    # cielo del alero: solo el anillo del vuelo (no tapa los cuartos: debajo van el cielo raso y las luces)
+    if excluir and not c:
+        # alero recortado: no entra en la planta de la casa (debajo van cielos rasos y luces)
+        from shapely.geometry import box as _bx
+        from shapely.ops import unary_union as _uu
+        import interiores as _I
+        anillo = _bx(ex0, ey0, ex1, ey1).difference(_bx(x0, y0, x1, y1)).difference(_uu([_bx(*r) for r in excluir]))
+        vs, fs = [], []
+        for (a_, b_, c_, d_) in _I.celdas(anillo):
+            k = len(vs)
+            vs += [(a_, b_, z - fascia), (c_, b_, z - fascia), (c_, d_, z - fascia), (a_, d_, z - fascia)]
+            fs.append((k + 3, k + 2, k + 1, k))
+        if vs:
+            so = K.poly(t + '_alero', vs, fs, soffit)
+            so['techo'] = 1
+        return roof
+    I_ = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    sv = [(p[0], p[1], z - fascia) for p in P] + [(p[0], p[1], z - fascia) for p in I_]
+    o = lambda i: i
+    ii = lambda i: n + i
+    if n == 4:
+        caras = [(o(i), o((i + 1) % 4), ii((i + 1) % 4), ii(i)) for i in range(4)]
+    elif chamfer_side == 'y0':
+        caras = [(o(0), o(1), ii(1), ii(0)), (o(1), o(2), ii(1)), (o(2), o(3), ii(2), ii(1)), (o(3), o(4), ii(3), ii(2)),
+                 (o(4), o(5), ii(0), ii(3)), (o(5), o(0), ii(0))]
+    else:
+        caras = [(o(0), o(1), ii(1), ii(0)), (o(1), o(2), ii(2), ii(1)), (o(2), o(3), ii(2)), (o(3), o(4), ii(3), ii(2)),
+                 (o(4), o(5), ii(3)), (o(5), o(0), ii(0), ii(3))]
+    so = K.poly(t + '_alero', sv, [tuple(f[::-1]) for f in caras], soffit)
     so['techo'] = 1
     return roof
 
@@ -156,22 +182,23 @@ def ventana(K, cara, a0, a1, z0, z1, plano, sale, rejas=True, arco=False, marco=
         bx('rejah', a0, a1, (z0 + z1) / 2 - 0.012, (z0 + z1) / 2 + 0.012, 0.07, 0.1, 'hierro')
 
 
-def puerta(K, cara, a0, a1, z0, z1, plano, sale, m='puerta'):
+def puerta(K, cara, a0, a1, z0, z1, plano, sale, m='puerta', bisagra='a0'):
     """Puerta exterior: registra el hueco, pone el marco y deja la hoja abierta hacia adentro."""
     s = sale
     K.aberturas.append((cara, plano, a0, a1, z0, z1))
     f = 0.08
     W = a1 - a0
+    h0 = a0 if bisagra == 'a0' else a1 - 0.045
     if cara == 'x':
         K.B('pmarco', a0 - f, plano, z0, a0, plano + s * 0.05, z1 + f, 'marco')
         K.B('pmarco', a1, plano, z0, a1 + f, plano + s * 0.05, z1 + f, 'marco')
         K.B('pmarco', a0, plano, z1, a1, plano + s * 0.05, z1 + f, 'marco')
-        K.B('puerta', a0, plano - s * 0.12, z0, a0 + 0.045, plano - s * (0.12 + W), z1, m)
+        K.B('puerta', h0, plano - s * 0.12, z0 + 0.02, h0 + 0.045, plano - s * (0.12 + W), z1, m)
     else:
         K.B('pmarco', plano, a0 - f, z0, plano + s * 0.05, a0, z1 + f, 'marco')
         K.B('pmarco', plano, a1, z0, plano + s * 0.05, a1 + f, z1 + f, 'marco')
         K.B('pmarco', plano, a0, z1, plano + s * 0.05, a1, z1 + f, 'marco')
-        K.B('puerta', plano - s * 0.12, a0, z0, plano - s * (0.12 + W), a0 + 0.045, z1, m)
+        K.B('puerta', plano - s * 0.12, h0, z0 + 0.02, plano - s * (0.12 + W), h0 + 0.045, z1, m)
 
 
 def obox(nm, size, off, org, ang, m, c):
@@ -261,8 +288,9 @@ def casa_amarilla(M, c, origen, ang):
     tx0, tx1 = 4.4, 10.0                                    # torre
     # (muros, pisos, losas y escalera: interiores.CASA, al final)
     K.B('zocalo', tx1, 0.86, 0, W, 0.9, 0.45, 'piedra')
-    hip(K, 'techo_izq', 0.0, 0.0, tx0, D, H, 20, 0.8, 'teja')
-    hip(K, 'techo_der', tx1, 0.9, W, D, H, 20, 0.8, 'teja')
+    PLANTA = [(0, 0, 4.4, 13.8), (4.4, 0, 10.0, 13.8), (10.0, 0.9, 12.6, 13.8), (5.3, -0.6, 9.1, 0)]   # planta baja
+    hip(K, 'techo_izq', 0.0, 0.0, tx0, D, H, 20, 0.8, 'teja', excluir=PLANTA)
+    hip(K, 'techo_der', tx1, 0.9, W, D, H, 20, 0.8, 'teja', excluir=PLANTA)
 
     # ---- cochera adelantada: arco al frente, medallón, arcos laterales (pasa el carro)
     cx0, cx1, cy0, cy1 = -1.0, 3.9, -5.6, 0.0
@@ -276,7 +304,7 @@ def casa_amarilla(M, c, origen, ang):
     med = K.cyl('medallon', 0, 0, 0, 0.5, 0.1, 'blanco', segs=32)
     med.rotation_euler = (math.pi / 2, 0, 0); med.location = ((cx0 + cx1) / 2, cy0 - 0.05, 3.45)
     K.B('coch_piso', cx0, cy0, 0, cx1, cy1, 0.04, 'ceramica')
-    hip(K, 'coch_techo', cx0, cy0, cx1, cy1, HC, 24, 0.6, 'teja')
+    hip(K, 'coch_techo', cx0, cy0, cx1, cy1, HC, 24, 0.6, 'teja', excluir=PLANTA)
     # porche entre la cochera y la torre (el arco lateral que se ve a la derecha de la cochera)
     K.B('porche_losa', cx1, -2.4, H - 0.25, tx0, 0.0, H, 'blanco')
     K.B('porche_col', tx0 - 0.4, -2.4, 0, tx0, -2.0, H - 0.25, 'blanco')
@@ -285,7 +313,8 @@ def casa_amarilla(M, c, origen, ang):
     ventana(K, 'x', 5.9, 8.5, 0.9, 2.3, -0.6, -1, rejas=True)          # saliente con ventanal
     ventana(K, 'x', 4.6, 5.1, 1.0, 2.3, 0.0, -1, rejas=False)
     puerta(K, 'x', 9.2, 9.95, 0.0, 2.2, 0.0, -1)                        # entrada principal (recepción)
-    K.B('balcon_losa', tx0, -0.7, H - 0.1, tx1, 1.4, H + 0.15, 'blanco')
+    K.B('balcon_losa', tx0, -0.7, H - 0.1, tx1, 0.0, H + 0.15, 'blanco')
+    K.B('balcon_losa', tx0, 0.0, H + 0.002, tx1, 1.4, H + 0.15, 'blanco')      # sobre los cuartos: no baja del cielo raso
     K.B('balcon_canto', tx0, -0.75, H - 0.3, tx1, -0.6, H + 0.15, 'blanco')
     baranda(K, tx0 + 0.05, -0.65, tx1 - 0.05, -0.65, H + 0.15, h=1.05, tipo='cruces')
     baranda(K, tx0 + 0.05, -0.65, tx0 + 0.05, 1.4, H + 0.15, h=1.05, tipo='cruces')
@@ -301,7 +330,7 @@ def casa_amarilla(M, c, origen, ang):
     ventana(K, 'x', 7.4, 9.2, H + 1.0, H + 2.2, D, 1, rejas=False)
     ventana(K, 'x', 6.1, 6.7, H + 1.0, H + 2.2, D, 1, rejas=False)
     ventana(K, 'x', 5.0, 5.6, H + 1.0, H + 2.2, D, 1, rejas=False)
-    ventana(K, 'y', 9.6, 10.4, H + 1.4, H + 2.2, tx0 + 0.3, -1, rejas=False)   # baño de la gerencia
+    ventana(K, 'y', 9.6, 10.4, H + 1.4, H + 2.2, tx0 + 0.3, -1, rejas=False)   # baño de la recámara alta
     K.B('balcon_tras', tx1 - 0.3, D - 2.2, H - 0.1, tx1 + 1.1, D, H + 0.12, 'blanco')
     baranda(K, tx1 + 1.1, D - 2.2, tx1 + 1.1, D, H + 0.12, h=1.0)
     baranda(K, tx1 - 0.3, D, tx1 + 1.1, D, H + 0.12, h=1.0)
@@ -319,12 +348,12 @@ def casa_amarilla(M, c, origen, ang):
     for xx in (px0 + 0.15, px1 - 0.43):
         K.B('porche_tras_col', xx, D + 1.4, 0.25, xx + 0.28, D + 1.68, H - 0.2, 'blanco')
     baranda(K, px0 + 0.5, D + 1.55, px1 - 0.45, D + 1.55, 0.25, h=0.85, paso=0.18, m='blanco')
-    hip(K, 'porche_tras_techo', px0, D, px1, D + 1.7, H - 0.2, 18, 0.4, 'teja')
+    hip(K, 'porche_tras_techo', px0, D, px1, D + 1.7, H - 0.2, 18, 0.4, 'teja', excluir=PLANTA)
     puerta(K, 'x', 10.0, 11.0, 0.25, 2.35, D, 1)
     arco_muro(K, 'arco_tras', 1.2, 4.4, D + 1.6, 0.3, 0, H, 2.4, 1.9, Y, eje='x')
     K.B('arco_tras_l', 1.2, D, 0, 1.5, D + 1.6, H, Y)
     K.B('arco_tras_r', 4.1, D, 0, 4.4, D + 1.6, H, Y)
-    hip(K, 'arco_tras_techo', 1.2, D, 4.4, D + 1.75, H, 18, 0.4, 'teja')
+    hip(K, 'arco_tras_techo', 1.2, D, 4.4, D + 1.75, H, 18, 0.4, 'teja', excluir=PLANTA)
     ventana(K, 'x', 5.9, 7.1, 0.9, 2.3, D, 1)
     ventana(K, 'x', 3.2, 4.4, 0.9, 2.3, D, 1)
     ventana(K, 'x', 0.6, 1.8, 0.9, 2.3, D, 1)
@@ -359,8 +388,9 @@ def casa_amarilla(M, c, origen, ang):
         porton(K, p0 + 0.05, p1 - 0.05, YF, alto=1.85, arco=0.35 if p1 - p0 > 4 else 0.2)
 
     import interiores
-    K.interior = interiores.construir(K, interiores.CASA, Y)
-    K.camas = interiores.muebles(K, interiores.CASA)
+    K.interior = interiores.construir(K, interiores.CASA, Y, mat_int='pintura_casa', mat_piso='piso_casa')
+    import muebles3d
+    K.camas = muebles3d.amueblar(K, interiores.CASA, 'casa')
     K.root = root
     colocar(K, root)
     return K
@@ -439,7 +469,7 @@ def edificio_gris(M, c, origen, ang):
         K.B('porche_n_poste', xx, YE - 0.4, 0, xx + 0.15, YE - 0.25, Z2 - 0.2, 'metal_gris')
     K.B('ac_e', 2.2, YN, Z1 + 1.4, 3.0, YN + 0.35, Z1 + 1.95, 'blanco')
     puerta(K, 'x', 7.0, 8.0, Z1, Z1 + 2.2, yE, 1)
-    puerta(K, 'x', 10.5, 11.5, Z1, Z1 + 2.2, yE, 1)
+    puerta(K, 'x', 10.5, 11.5, Z1, Z1 + 2.2, yE, 1, bisagra='a1')     # hoja hacia el pasillo central
     for xx in (9.0, 12.2):
         ventana(K, 'x', xx, xx + 1.2, Z1 + 0.9, Z1 + 2.3, yE, 1, rejas=False)
     for (a, b, zz) in ((2.0, 3.2, 0.9), (8.0, 9.2, 0.9), (10.4, 11.6, 0.9),
@@ -462,8 +492,9 @@ def edificio_gris(M, c, origen, ang):
     baranda(K, XL + 1.15, y_ini + 1.5, XL + 1.15, YE - 0.1, Z1, h=1.0)
 
     import interiores
-    K.interior = interiores.construir(K, interiores.GRIS, G)
-    K.camas = interiores.muebles(K, interiores.GRIS)
+    K.interior = interiores.construir(K, interiores.GRIS, G, mat_int='pintura_gris', mat_piso='piso_gris')
+    import muebles3d
+    K.camas = muebles3d.amueblar(K, interiores.GRIS, 'gris')
     K.root = root
     colocar(K, root)
     return K

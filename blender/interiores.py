@@ -27,40 +27,64 @@ def R(*r):
 
 
 CASA = dict(
-    nombre='Casa amarilla',
+    nombre='Casa amarilla', marco_int='madera_media',
     niveles=[
         dict(id='pb', nombre='Planta baja', z0=0.0, z1=3.0,
              masas=[R(0, 0, 4.4, 13.8), R(4.4, 0, 10.0, 13.8), R(10.0, 0.9, 12.6, 13.8), R(5.3, -0.6, 9.1, 0)],
+             # usos según docs/contexto-proyecto.md (29-10-2026); las medidas de la etapa 3 no cambian
              cuartos=[
                  dict(id='consultorio', nombre='Consultorio de salud', rects=[R(0, 0, 3.4, 3.6)], conecta=['comedor']),
                  dict(id='cocina', nombre='Cocina', rects=[R(0, 3.6, 3.4, 7.0)], conecta=['comedor', 'pasillo']),
-                 dict(id='comedor', nombre='Comedor y sala de familiares', tipo='abierto',
+                 dict(id='comedor', nombre='Comedor y TV', tipo='abierto',
                       rects=[R(3.4, 0, 6.6, 7.0), R(5.3, -0.6, 6.6, 0)]),
-                 dict(id='recepcion', nombre='Recepción', tipo='abierto',
+                 dict(id='recepcion', nombre='Recepción 24 h', tipo='abierto',
                       rects=[R(6.6, -0.6, 9.1, 0), R(6.6, 0, 10.0, 0.9), R(6.6, 0.9, 9.4, 3.6)]),
-                 dict(id='cuarto3', nombre='Cuarto 3', rects=[R(6.6, 3.6, 9.4, 7.0)], conecta=['pasillo']),
-                 dict(id='terapia', nombre='Sala de terapia', rects=[R(9.4, 0.9, 12.6, 4.2)], conecta=['recepcion']),
-                 dict(id='talleres', nombre='Talleres', rects=[R(9.4, 4.2, 12.6, 7.0)], conecta=['pasillo']),
+                 # el cuarto de las puertas corredizas de vidrio con arcos (foto "recepcion" de Antigravity):
+                 # tenía cama; es un cuarto privado tipo VIP que da al comedor
+                 dict(id='vip', nombre='Cuarto semiprivado 2', rects=[R(6.6, 3.6, 9.4, 7.0)], conecta=['comedor']),
+                 dict(id='terapia', nombre='Terapia con familiares', rects=[R(9.4, 0.9, 12.6, 4.2)],
+                      conecta=['recepcion']),
+                 dict(id='talleres', nombre='Talleres (pintura, acuarela, costura)', rects=[R(9.4, 4.2, 12.6, 7.0)],
+                      conecta=['pasillo', 'terapia']),
                  dict(id='pasillo', nombre='Pasillo', tipo='abierto', rects=[R(0, 7.0, 12.6, 8.4)]),
-                 dict(id='lavanderia', nombre='Lavandería', rects=[R(0, 8.4, 2.4, 13.8)], conecta=['pasillo']),
-                 dict(id='cuarto1', nombre='Cuarto privado 1', rects=[R(2.4, 8.4, 5.4, 13.8)], conecta=['pasillo']),
-                 dict(id='bano1', nombre='Baño', rects=[R(5.4, 8.4, 7.5, 13.8)], conecta=['pasillo']),
+                 dict(id='lavanderia', nombre='Lavandería', rects=[R(0, 8.4, 2.4, 11.0)], conecta=['pasillo']),
+                 dict(id='psicologia', nombre='Atención psicológica', rects=[R(0, 11.0, 2.4, 13.8)],
+                      conecta=['lavanderia']),
+                 dict(id='semipriv', nombre='Cuarto semiprivado 1', rects=[R(2.4, 8.4, 5.4, 13.8)],
+                      conecta=['pasillo']),
+                 dict(id='bano1', nombre='Baño compartido de huéspedes', rects=[R(5.4, 8.4, 7.5, 13.8)], conecta=['pasillo']),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(7.5, 8.4, 9.5, 12.0)]),
-                 dict(id='bano2', nombre='Baño compartido', rects=[R(7.5, 12.0, 9.5, 13.8)], conecta=['recamara2']),
-                 dict(id='recamara2', nombre='Recámara 2', rects=[R(9.5, 8.4, 12.6, 13.8)], conecta=['pasillo']),
-             ]),
+                 dict(id='bano2', nombre='Baño de la suite', rects=[R(7.5, 12.0, 9.5, 13.8)], conecta=['suite']),
+                 dict(id='suite', nombre='Suite', rects=[R(9.5, 8.4, 12.6, 13.8)], conecta=['pasillo']),
+             ],
+             puertas=[dict(entre=('vip', 'comedor'), u=5.3, ancho=1.8, tipo='corrediza'),
+                      dict(entre=('semipriv', 'pasillo'), u=4.75, abre='semipriv', bisagra='hi'),
+                      dict(entre=('bano1', 'pasillo'), u=6.0, abre='bano1', bisagra='lo'),
+                      dict(entre=('suite', 'pasillo'), u=10.1, abre='suite', bisagra='lo'),
+                      dict(entre=('bano2', 'suite'), u=12.9, abre='bano2', bisagra='hi'),
+                      dict(entre=('lavanderia', 'pasillo'), u=1.75, abre='lavanderia', bisagra='hi'),
+                      dict(entre=('psicologia', 'lavanderia'), u=1.85, abre='psicologia', bisagra='hi'),
+                      dict(entre=('consultorio', 'comedor'), u=3.0, abre='consultorio', bisagra='hi'),
+                      dict(entre=('cocina', 'comedor'), u=4.4, abre='cocina', bisagra='lo'),
+                      dict(entre=('cocina', 'pasillo'), u=2.6, abre='cocina', bisagra='hi'),
+                      dict(entre=('terapia', 'recepcion'), u=2.7, ancho=1.2, abre='terapia', bisagra='hi'),
+                      dict(entre=('talleres', 'pasillo'), u=11.7, abre='talleres', bisagra='hi'),
+                      dict(entre=('talleres', 'terapia'), u=11.85, abre='talleres', bisagra='hi')]),
         dict(id='pa', nombre='Planta alta (torre)', z0=3.15, z1=6.1, losa=(3.0, 3.15),
              losa_rects=[R(4.4, 1.4, 10.0, 13.8)],
              masas=[R(4.7, 1.4, 9.7, 13.8)],
              cuartos=[
-                 dict(id='gerencia', nombre='Oficina del gerente', rects=[R(4.7, 1.4, 9.7, 7.0)], conecta=['hall']),
+                 dict(id='recamara', nombre='Recámara alta (4.º cuarto privado)', rects=[R(4.7, 1.4, 9.7, 7.0)], conecta=['hall']),
                  dict(id='hall', nombre='Vestíbulo', tipo='abierto', rects=[R(4.7, 7.0, 9.7, 8.4)]),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(7.5, 8.4, 9.5, 12.0)]),
                  dict(id='pasillo_alto', nombre='Pasillo', tipo='abierto', rects=[R(6.4, 8.4, 7.5, 12.0)]),
-                 dict(id='bano_ger', nombre='Baño', rects=[R(4.7, 8.4, 6.4, 12.0)], conecta=['pasillo_alto']),
-                 dict(id='sala_alta', nombre='Recámara alta (uso por definir)', rects=[R(4.7, 12.0, 9.7, 13.8)],
+                 dict(id='bano_rec', nombre='Baño de la recámara alta', rects=[R(4.7, 8.4, 6.4, 12.0)], conecta=['pasillo_alto']),
+                 dict(id='oficina_ger', nombre='Oficina del gerente (por confirmar)', rects=[R(4.7, 12.0, 9.7, 13.8)],
                       conecta=['pasillo_alto']),
-             ]),
+             ],
+             puertas=[dict(entre=('recamara', 'hall'), u=6.0, ancho=1.0, abre='recamara', bisagra='lo'),
+                      dict(entre=('bano_rec', 'pasillo_alto'), u=11.3, abre='bano_rec', bisagra='hi'),
+                      dict(entre=('oficina_ger', 'pasillo_alto'), u=7.0, abre='oficina_ger', bisagra='lo')]),
     ],
     escaleras=[dict(caja=R(7.5, 8.4, 9.5, 12.0), eje='y', inicio='min', mitad1='hi', descanso=1.0,
                     z0=0.0, z1=3.15, barandas_sup=[((8.5, 8.4), (9.5, 8.4)), ((7.5, 8.4), (7.5, 12.0))])],
@@ -68,22 +92,32 @@ CASA = dict(
 )
 
 GRIS = dict(
-    nombre='Edificio gris',
+    nombre='Edificio gris', marco_int='metal_cafe',
     niveles=[
         dict(id='pb', nombre='Planta baja', z0=0.0, z1=2.95,
              masas=[R(1.1, 4.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 12.7), R(6.7, 0.5, 13.9, 12.7)],
              cuartos=[
-                 dict(id='recepcion', nombre='Acceso y recepción', tipo='abierto', rects=[R(6.7, 0.5, 9.1, 4.8)]),
-                 dict(id='bano_acc', nombre='Baño accesible', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
-                 dict(id='oficina1', nombre='Oficina 1 · administración', rects=[R(9.1, 0.5, 11.5, 4.8)], conecta=['pasillo']),
-                 dict(id='oficina2', nombre='Oficina 2 · supervisor', rects=[R(11.5, 0.5, 13.9, 4.8)], conecta=['pasillo']),
+                 dict(id='acceso', nombre='Acceso', tipo='abierto', rects=[R(6.7, 0.5, 9.1, 4.8)]),
+                 dict(id='bano_acc', nombre='Baño accesible para usuarios', rects=[R(4.6, 2.4, 6.7, 4.8)],
+                      conecta=['pasillo']),
+                 dict(id='oficina1', nombre='Oficina 1 · supervisor', rects=[R(9.1, 0.5, 11.5, 4.8)], conecta=['pasillo']),
+                 dict(id='oficina2', nombre='Oficina 2 · administrativa', rects=[R(11.5, 0.5, 13.9, 4.8)],
+                      conecta=['pasillo']),
                  dict(id='pasillo', nombre='Pasillo', tipo='abierto', rects=[R(1.1, 4.8, 9.1, 7.4), R(9.1, 4.8, 13.9, 6.2)]),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(2.7, 7.4, 6.7, 9.8)]),
                  dict(id='estar', nombre='Estar y espera', tipo='abierto', rects=[R(6.7, 7.4, 9.1, 9.8)]),
-                 dict(id='salonA', nombre='Salón A · 4 camas', rects=[R(4.6, 9.8, 9.1, 12.7)], conecta=['estar']),
-                 dict(id='salonB', nombre='Salón B · 6 camas', rects=[R(9.1, 6.2, 13.9, 12.7)], conecta=['pasillo']),
-                 dict(id='deposito', nombre='Depósito', rects=[R(1.1, 7.4, 2.7, 10.2), R(2.7, 9.8, 4.6, 10.2)], conecta=['pasillo']),
-             ]),
+                 dict(id='salonA', nombre='Salón grande 1 · personas que deambulan', rects=[R(4.6, 9.8, 9.1, 12.7)], conecta=['estar']),
+                 dict(id='salonB', nombre='Salón grande 2 · personas que deambulan', rects=[R(9.1, 6.2, 13.9, 12.7)],
+                      conecta=['pasillo']),
+                 dict(id='huerto', nombre='Oficina del huerto y bodega', rects=[R(1.1, 7.4, 2.7, 10.2), R(2.7, 9.8, 4.6, 10.2)],
+                      conecta=['pasillo']),
+             ],
+             puertas=[dict(entre=('salonA', 'estar'), u=8.5, ancho=1.0, abre='salonA', bisagra='hi'),
+                      dict(entre=('salonB', 'pasillo'), u=9.75, ancho=1.0, abre='salonB', bisagra='lo'),
+                      dict(entre=('bano_acc', 'pasillo'), u=5.65, ancho=1.0, abre='pasillo', bisagra='hi'),
+                      dict(entre=('oficina1', 'pasillo'), u=10.0, abre='oficina1', bisagra='lo'),
+                      dict(entre=('oficina2', 'pasillo'), u=12.3, abre='oficina2', bisagra='lo'),
+                      dict(entre=('huerto', 'pasillo'), u=1.95, abre='huerto', bisagra='lo')]),
         dict(id='pa', nombre='Planta alta', z0=3.2, z1=6.15, losa=(2.95, 3.2),
              # la losa cubre la planta alta; las franjas de planta baja fuera de ella quedan bajo las
              # losas de las galerías (fachadas.py), sin caras coplanares
@@ -91,42 +125,51 @@ GRIS = dict(
              masas=[R(2.5, 4.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 11.0), R(6.7, 0.5, 13.9, 11.0)],
              cuartos=[
                  dict(id='pasillo', nombre='Pasillo y estar', tipo='abierto', rects=[R(6.7, 0.5, 8.4, 11.0)]),
-                 dict(id='bano', nombre='Baño con regadera', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
-                 dict(id='cocina', nombre='Cocina', rects=[R(4.6, 4.8, 6.7, 7.4)], conecta=['pasillo']),
-                 dict(id='biblioteca', nombre='Biblioteca → insumos', rects=[R(2.5, 4.8, 4.6, 7.4)], conecta=['cocina']),
+                 dict(id='bano', nombre='Baño para usuarios (con regadera)', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
+                 dict(id='cocina', nombre='Cocineta del área de coffee break', rects=[R(4.6, 4.8, 6.7, 7.4)], conecta=['pasillo']),
+                 dict(id='deposito', nombre='Depósito y ropería (antes biblioteca)', rects=[R(2.5, 4.8, 4.6, 7.4)],
+                      conecta=['cocina']),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(2.7, 7.4, 6.7, 9.8)]),
-                 dict(id='closet', nombre='Clóset', rects=[R(4.6, 9.8, 6.7, 11.0)], conecta=['pasillo']),
-                 dict(id='salon2', nombre='Salón 2 · 4 camas', rects=[R(8.4, 0.5, 13.9, 4.2)], conecta=['pasillo']),
-                 dict(id='hosp', nombre='Hospitalización · 10 camas + estación', rects=[R(8.4, 4.2, 13.9, 11.0)],
+                 dict(id='closet', nombre='Clóset de limpieza', rects=[R(4.6, 9.8, 6.7, 11.0)], conecta=['pasillo']),
+                 dict(id='salon2', nombre='Salón amarillo · personas con movilidad reducida', rects=[R(8.4, 0.5, 13.9, 4.2)],
                       conecta=['pasillo']),
-             ]),
+                 dict(id='hosp', nombre='Personas encamadas', rects=[R(8.4, 4.2, 13.9, 11.0)], conecta=['pasillo']),
+             ],
+             puertas=[dict(entre=('hosp', 'pasillo'), u=6.945, ancho=0.95, abre='hosp', bisagra='hi'),
+                      dict(entre=('salon2', 'pasillo'), u=1.2, ancho=0.95, abre='salon2', bisagra='lo'),
+                      dict(entre=('bano', 'pasillo'), u=3.4, abre='bano', bisagra='lo'),
+                      dict(entre=('cocina', 'pasillo'), u=6.7, abre='cocina', bisagra='hi'),
+                      dict(entre=('deposito', 'cocina'), u=5.8, abre='deposito', bisagra='lo'),
+                      dict(entre=('closet', 'pasillo'), u=10.3, ancho=0.8, abre='closet', bisagra='hi')]),
     ],
     escaleras=[dict(caja=R(2.7, 7.4, 6.7, 9.8), eje='x', inicio='max', mitad1='lo', descanso=1.2,
                     z0=0.0, z1=3.2, barandas_sup=[((6.7, 7.4), (6.7, 8.6))])],
 )
 
 SUPUESTOS = [
-    'Distribución interpretada de los croquis manuscritos; no es un levantamiento ni fija muros reales.',
-    'Casa amarilla: el croquis se leyó con el frente (cochera) abajo y el jardín arriba, sin espejar.',
-    'Casa amarilla: recepción y comedor quedaron abiertos entre sí; la puerta principal entra por la torre.',
-    'Casa amarilla: la escalera interior (en U, como en la foto de paredes verdes) se ubicó en la torre, '
-    'junto al pasillo; su posición exacta no aparece en el croquis.',
-    'Casa amarilla: el croquis pone la terraza atrás a la derecha; la foto del patio muestra el porche en '
-    'arco atrás a la izquierda. Se dejó el porche como en la foto.',
-    'Casa amarilla, planta alta: oficina del gerente al frente (balcón), baño y una recámara alta atrás.',
-    'Edificio gris: escalera interior en U al norte, junto a la salida; la escalera metálica exterior sigue al sur.',
-    'Edificio gris: se respetó la terraza al este (hoy cerrada con verjas). Salones y hospitalización quedan '
-    'hacia el jardín; baños, cocina y oficinas hacia la calle (ventanas de bloque de vidrio).',
-    'Capacidad: Salón A 4 + Salón B 6 + Salón 2 4 + Hospitalización 10 = 24 camas en el gris; la casa '
-    'suma 3–4 cuartos. Pendiente de confirmar (28 vs 26). Al colocar camas de 0,95 × 2,0 m con paso libre en '
-    'puertas y un pasillo de ~0,9 m entre camas enfrentadas, con estas medidas estimadas caben: Salón A 2 de 4, '
-    'Salón B 4 de 6, Salón 2 3 de 4 y Hospitalización 7 de 10 (16 de 24). Hay que medir en sitio antes de '
-    'ofrecer una capacidad.',
-    'Biblioteca: se dejó como insumos (croquis), con puerta a la cocina y a la galería norte; el uso como '
-    'lectura queda pendiente.',
-    'Edificio gris, planta alta: un eje de circulación de la calle a la terraza reparte cocina, baño, '
-    'Salón 2 y Hospitalización; la escalera llega a ese eje.',
-    'No hay ascensor ni rampa entre niveles: la conexión accesible para encamados sigue sin definir.',
+    'Distribución interpretada de los croquis manuscritos y fotos; medidas proporcionales al satélite, no un '
+    'levantamiento. Usos y nombres según docs/contexto-proyecto.md (información de la propietaria, 30-10-2026).',
+    'Casa amarilla: la recepción 24 h queda en la entrada principal (torre). La foto que se usó para "recepción" '
+    'muestra un cuarto con cama: se ubicó como el cuarto de puertas corredizas de vidrio con arcos que da al comedor.',
+    'Casa amarilla, 4 cuartos privados: 2 semiprivados que comparten baño (uno al pasillo y el de puertas de vidrio), '
+    'la suite con su baño y la recámara alta con su baño. Atención psicológica dentro de la lavandería; talleres '
+    'detrás de la terapia.',
+    'Casa amarilla, planta alta: la recámara pasó a ser el 4.º cuarto privado; el gerente se propone en el cuarto '
+    'pequeño del fondo (por confirmar). Escalera interior en U en la torre, junto al pasillo.',
+    'Edificio gris: escalera interior en U al norte; la metálica exterior sigue al sur. Acceso sin recepción '
+    '(la recepción está en la casa). Oficina 1 = supervisor, Oficina 2 = administrativa.',
+    'Programa colocado: 26 camas. Gris: personas encamadas 10, salón amarillo 4, salones grandes de abajo 2 + 6 '
+    '(el salón 1 solo admite 2 con mesita y paso libre; el 2 admite 6). Casa: 4.',
+    'Personas encamadas: caben las 10 camas de hospital y la estación de enfermería a la cabeza del pasillo '
+    'central (donde estaba el podio), pero justas: pasillo central de ~1,0 m y, del lado de la puerta, 25 cm '
+    'entre camas, con mesa puente en vez de mesita. Con 8 camas quedaría holgada. Luz sobre cada cama.',
+    'Biblioteca → depósito y ropería (lo último que dijo la propietaria). El baño nuevo junto a la biblioteca '
+    'sigue por confirmar y no se dibujó.',
+    'Terraza de arriba del gris (hoy cerrada con verjas): área de coffee break o del té, y estar.',
+    'Baño accesible de abajo: puerta que abre hacia el pasillo para dejar libre el giro de la silla de ruedas; '
+    'regadera a ras de piso con asiento abatible y barras de apoyo.',
+    'Muebles, equipos y acabados son modelos procedurales de referencia (no son productos cotizados).',
+    'No hay ascensor ni rampa entre niveles: el traslado de personas encamadas a la planta alta sigue sin resolver.',
 ]
 
 
@@ -208,10 +251,13 @@ def muros_interiores(nivel):
     cuartos = nivel['cuartos']
     polys = {c['id']: poly_cuarto(c) for c in cuartos}
     tipos = {c['id']: c.get('tipo', 'cerrado') for c in cuartos}
-    enlaces = set()
+    enlaces = {}
     for c in cuartos:
         for o in c.get('conecta', []):
-            enlaces.add(frozenset((c['id'], o)))
+            enlaces.setdefault(frozenset((c['id'], o)), dict(abre=c['id']))
+    for p in nivel.get('puertas', []):          # puertas con posición, ancho, giro o tipo explícitos
+        k = frozenset(p['entre'])
+        enlaces[k] = dict(enlaces.get(k, {}), **p)
     out, puertas = [], []
     ids = [c['id'] for c in cuartos]
     for i, A in enumerate(ids):
@@ -223,18 +269,40 @@ def muros_interiores(nivel):
             if not segs:
                 continue
             huecos_por_seg = {k: [] for k in range(len(segs))}
-            if frozenset((A, B)) in enlaces:
-                k = max(range(len(segs)), key=lambda j: math.hypot(segs[j][1][0] - segs[j][0][0], segs[j][1][1] - segs[j][0][1]))
+            spec = enlaces.get(frozenset((A, B)))
+            if spec is not None:
+                def largo(j):
+                    return math.hypot(segs[j][1][0] - segs[j][0][0], segs[j][1][1] - segs[j][0][1])
+
+                def rango(j):
+                    a, b = segs[j]
+                    h = abs(a[1] - b[1]) < 1e-6
+                    return sorted((a[0], b[0])) if h else sorted((a[1], b[1]))
+                k = max(range(len(segs)), key=largo)
+                if 'u' in spec:
+                    dentro = [j for j in range(len(segs)) if rango(j)[0] - 1e-6 <= spec['u'] <= rango(j)[1] + 1e-6]
+                    k = dentro[0] if dentro else k
                 (a, b) = segs[k]
                 horiz = abs(a[1] - b[1]) < 1e-6
-                lo, hi = (sorted((a[0], b[0])) if horiz else sorted((a[1], b[1])))
-                ancho = 1.2 if any(t in (A + B) for t in ('salon', 'hosp', 'comedor', 'recepcion', 'terapia')) else 0.9
-                ancho = min(ancho, hi - lo - 0.3)
+                lo, hi = rango(k)
+                ancho = min(spec.get('ancho', 0.9), hi - lo - 0.3)
                 if ancho > 0.6:
-                    m = (lo + hi) / 2
+                    m = spec.get('u', (lo + hi) / 2)
+                    m = min(max(m, lo + 0.15 + ancho / 2), hi - 0.15 - ancho / 2)
                     huecos_por_seg[k].append((m - ancho / 2, m + ancho / 2, nivel['z0'], nivel['z0'] + PUERTA_ALTO))
-                    puertas.append(dict(eje='x' if horiz else 'y', c=a[1] if horiz else a[0], u0=m - ancho / 2,
-                                        u1=m + ancho / 2, entre=(A, B)))
+                    c_ = a[1] if horiz else a[0]
+                    # lado hacia el que abre la hoja: el cuarto `abre` (por defecto el cerrado / el que conecta)
+                    abre = spec.get('abre')
+                    if abre not in (A, B):
+                        abre = B if tipos[A] == 'abierto' else A
+                    px, py = ((m, c_ + 0.3) if horiz else (c_ + 0.3, m))
+                    lado = 1 if polys[abre].contains(Point(px, py)) else -1
+                    bis = spec.get('bisagra')
+                    if bis not in ('lo', 'hi'):
+                        bis = 'lo' if (m - lo) <= (hi - m) else 'hi'
+                    puertas.append(dict(eje='x' if horiz else 'y', c=c_, u0=m - ancho / 2, u1=m + ancho / 2,
+                                        entre=(A, B), abre=abre, lado=lado, bisagra=bis,
+                                        tipo=spec.get('tipo', 'batiente')))
             for k, (a, b) in enumerate(segs):
                 horiz = abs(a[1] - b[1]) < 1e-6
                 if horiz:
@@ -385,14 +453,17 @@ def construir(K, E, mat_ext, mat_int='muro_int', mat_piso='piso_int', mat_losa='
             K.B(f'losa_{nv["id"]}', a, b, nv['losa'][0], c, d, nv['losa'][1], mat_losa)
         mext = muros_exteriores(nv, K.aberturas)
         mint, puertas = muros_interiores(nv)
+        borde = exterior(nv).exterior
         for m in mext + mint:
             mm = mat_ext if m['ext'] else mat_int
             for (u0, u1, za, zb) in piezas_muro(m, z0, z1 - 0.004):     # sin tocar la losa (caras coplanares)
                 c0, c1 = sorted((m['c0'], m['c1']))
                 if m['eje'] == 'x':
-                    K.B('muro', u0, c0, za, u1, c1, zb, mm)
+                    ob = K.B('muro', u0, c0, za, u1, c1, zb, mm)
                 else:
-                    K.B('muro', c0, u0, za, c1, u1, zb, mm)
+                    ob = K.B('muro', c0, u0, za, c1, u1, zb, mm)
+                if m['ext'] and mat_int in K.M:
+                    _caras_interiores(ob, K.M[mat_int], borde)
         for p in puertas:   # marcos de puertas interiores
             c0, c1 = p['c'] - T_INT / 2 - 0.02, p['c'] + T_INT / 2 + 0.02
             # el marco entra 3-4 cm en el vano para no compartir caras con el muro (evita manchas negras)
@@ -400,9 +471,9 @@ def construir(K, E, mat_ext, mat_int='muro_int', mat_piso='piso_int', mat_losa='
                                      (p['u1'] - 0.03, p['u1'] + 0.03, z0 + 0.021, z0 + PUERTA_ALTO - 0.01),
                                      (p['u0'] - 0.03, p['u1'] + 0.03, z0 + PUERTA_ALTO - 0.04, z0 + PUERTA_ALTO - 0.01)):
                 if p['eje'] == 'x':
-                    K.B('pmarco_int', u0, c0, za, u1, c1, zb, 'marco')
+                    K.B('pmarco_int', u0, c0, za, u1, c1, zb, E.get('marco_int', 'marco'))
                 else:
-                    K.B('pmarco_int', c0, u0, za, c1, u1, zb, 'marco')
+                    K.B('pmarco_int', c0, u0, za, c1, u1, zb, E.get('marco_int', 'marco'))
         res['muros'].append(dict(nivel=nv['id'], ext=mext, int=mint, puertas=puertas))
     # escaleras
     for esc in E['escaleras']:
@@ -415,6 +486,15 @@ def construir(K, E, mat_ext, mat_int='muro_int', mat_piso='piso_int', mat_losa='
             baranda(K, p[0], p[1], q[0], q[1], esc['z1'], h=1.0, paso=0.12)
         res['escalera'] = t
     return res
+
+
+def _caras_interiores(ob, mat_int, borde):
+    """Muro exterior: la cara de fachada conserva el material de fuera; las demás llevan la pintura interior."""
+    me = ob.data
+    me.materials.append(mat_int)
+    for p in me.polygons:
+        c = ob.location + p.center
+        p.material_index = 0 if Point(c.x, c.y).distance(borde) < 0.003 else 1
 
 
 def baranda_inclinada(K, p, q, h=0.95, paso=0.3):

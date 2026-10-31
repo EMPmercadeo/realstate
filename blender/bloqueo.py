@@ -32,6 +32,7 @@ os.makedirs(OUT, exist_ok=True)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
+scene.cycles.max_bounces = 4
 
 # ---------------- materiales neutros (bloqueo) ----------------
 def neutro(nombre, gris, rough=0.8, metal=0.0):
@@ -70,6 +71,14 @@ M = dict(
     colchon=neutro('colchon', (0.86, 0.86, 0.84), 0.9),
     loza=neutro('loza', 0.92, 0.3),
 )
+
+# ---------------- etapa 4a: materiales realistas de interior (los neutros de fachada se conservan)
+import materiales
+MR = materiales.crear()
+M.update(MR)
+M.update(puerta=MR['madera_media'], puerta_roja=MR['madera_rojiza'], marco=MR['metal_blanco'],
+         escalon=MR['piso_terraza'], bloque=MR['bloque_vidrio'], hierro=MR['metal_negro'],
+         muro_int=MR['pintura_gris'], piso_int=MR['piso_gris'])
 
 C_SITIO = coll('Sitio')
 C_CASA = coll('Casa_amarilla')
@@ -226,7 +235,6 @@ def render(nombre, cam, w, h, muestras, ortho=False, transparente=False):
     scene.cycles.device = 'CPU'
     scene.cycles.samples = muestras
     scene.cycles.use_denoising = True
-    scene.cycles.max_bounces = 4
     scene.render.resolution_x = w; scene.render.resolution_y = h
     scene.render.film_transparent = transparente
     scene.render.image_settings.file_format = 'PNG'
@@ -255,17 +263,30 @@ mundo()
 
 import json
 import interiores as INT
+import amueblado as A
+import acabados, muebles3d
+from fachadas import colocar
 from lib import set_parent
 C_LUZ = coll('Luces_interior')
-for K, E in ((K_CASA, INT.CASA), (K_GRIS, INT.GRIS)):
-    for o in INT.luces(K, E, C_LUZ, potencia_m2=7.0):
+for K, E, clave in ((K_CASA, INT.CASA, 'casa'), (K_GRIS, INT.GRIS, 'gris')):
+    acabados.construir(K, E, clave, C_LUZ)
+    colocar(K, K.root)
+    for o in K.luces_techo:
         set_parent(o, K.root)
-        o.hide_render = True
+    K.luces_muebles = getattr(K, 'luces_muebles', []) + getattr(K, 'luces_acabados', [])
+    muebles3d.luces_de_muebles(K, C_LUZ)
+for o in C_LUZ.all_objects:
+    o.hide_render = True
 bpy.context.view_layer.update()
+print('objetos en escena:', len(bpy.data.objects))
 
 # --- datos para los planos 2D (misma fuente que el modelo)
-def _datos(K, E):
-    out = dict(nombre=E['nombre'], aberturas=K.aberturas, niveles=[], escaleras=[], muebles=getattr(K, 'muebles', []))
+def _datos(K, E, clave):
+    muebles = []
+    for nv in E['niveles']:
+        for cid, m, h in A.huellas_nivel(clave, nv['id']):
+            muebles.append(dict(nivel=nv['id'], cuarto=cid, t=m['t'], pts=[[round(a, 3), round(b, 3)] for a, b in h.exterior.coords]))
+    out = dict(nombre=E['nombre'], aberturas=K.aberturas, niveles=[], escaleras=[], muebles=muebles)
     for nv, mu in zip(E['niveles'], K.interior['muros']):
         ext = INT.exterior(nv)
         out['niveles'].append(dict(id=nv['id'], nombre=nv['nombre'], z0=nv['z0'], z1=nv['z1'],
@@ -279,9 +300,9 @@ def _datos(K, E):
         out['escaleras'].append(dict(caja=esc['caja'], cajas=t['cajas'], n=t['n'], sube=t['sube'],
                                      huella=t['huella'], marcha=t['marcha'], z0=esc['z0'], z1=esc['z1']))
     return out
-print('camas puestas (pedidas, colocadas):', K_GRIS.camas)
-json.dump(dict(casa=_datos(K_CASA, INT.CASA), gris=_datos(K_GRIS, INT.GRIS), supuestos=INT.SUPUESTOS,
-               camas=dict(K_GRIS.camas)),
+print('camas por cuarto:', K_CASA.camas, K_GRIS.camas)
+json.dump(dict(casa=_datos(K_CASA, INT.CASA, 'casa'), gris=_datos(K_GRIS, INT.GRIS, 'gris'), supuestos=INT.SUPUESTOS,
+               camas=dict(casa=K_CASA.camas, gris=K_GRIS.camas)),
           open(os.path.join(OUT, 'interiores.json'), 'w'), ensure_ascii=False, indent=1)
 
 # --- prueba de recorrido: piso continuo, escalones, altura libre y muros (rayos en la escena)
@@ -332,14 +353,16 @@ def prueba(nombre, E, pts):
 
 t_c = INT.tramos_escalera(INT.CASA['escaleras'][0])['marcha']
 t_g = INT.tramos_escalera(INT.GRIS['escaleras'][0])['marcha']
-REC = [
-    prueba('Casa amarilla: calle → recepción → escalera → oficina del gerente → balcón', sitio.CASA,
-           [(9.575, -1.5), (9.575, 0.6), (8.0, 2.0), (6.3, 2.0), (6.3, 7.7), (t_c[0][0], 7.7)] + t_c +
-           [(7.2, 7.7), (7.2, 6.4), (8.8, 5.8), (8.8, 2.6), (7.2, 1.9), (7.2, 0.0)]),
-    prueba('Edificio gris: calle → recepción → escalera → hospitalización y terraza', sitio.GRIS,
-           [(7.4, -1.0), (7.4, 1.5), (7.4, 6.0), (t_g[0][0], 6.6)] + t_g +
-           [(7.6, t_g[-1][1]), (7.6, 7.6), (9.7, 7.6), (7.6, 7.6), (7.6, 10.5), (7.5, 12.2)]),
-]
+RUTAS = {
+    'casa': (sitio.CASA, 'Casa amarilla: calle → recepción → comedor → escalera → recámara alta → balcón',
+             [(9.575, -1.5), (9.575, 0.6), (8.6, 1.55), (6.4, 2.1), (6.38, 7.7), (t_c[0][0], 7.7)] + t_c +
+             [(6.0, 7.7), (6.0, 6.4), (7.1, 5.6), (7.1, 2.4), (7.2, 0.0)]),
+    'gris': (sitio.GRIS, 'Edificio gris: calle → acceso → escalera → personas encamadas → área de coffee break',
+             [(7.4, -1.0), (7.4, 1.5), (7.4, 6.0), (t_g[0][0], 6.6)] + t_g +
+             [(7.6, t_g[-1][1]), (7.6, 6.95), (9.9, 6.95), (11.1, 6.95), (11.1, 9.0), (11.1, 6.95), (7.6, 6.95),
+              (7.6, 10.5), (7.5, 12.2)]),
+}
+REC = [prueba(nombre, E, pts) for (E, nombre, pts) in RUTAS.values()]
 json.dump(REC, open(os.path.join(OUT, 'recorrido.json'), 'w'), ensure_ascii=False, indent=1)
 
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, 'bloqueo.blend'))
@@ -412,24 +435,23 @@ for k, (E, c, z, esc) in AXOS.items():
     if SOLO and k in SOLO.split(','):
         axo(k, E, c, z, esc)
 
-INTERIORES = {   # (edificio, posición local (x, y, z), mira (x, y, z), lente)
-    'int_casa_recepcion': (sitio.CASA, (8.8, -0.35, 1.55), (3.2, 6.2, 1.25), 16),
-    'int_casa_escalera': (sitio.CASA, (9.05, 7.1, 1.6), (8.7, 11.9, 2.8), 15),
-    'int_casa_gerencia': (sitio.CASA, (5.2, 6.7, 4.7), (8.2, 1.4, 4.3), 16),
-    'int_gris_escalera': (sitio.GRIS, (8.8, 9.15, 1.6), (3.4, 7.9, 1.9), 15),
-    'int_gris_hosp': (sitio.GRIS, (11.9, 10.55, 4.8), (11.0, 4.6, 3.9), 14),
-    'int_gris_terraza': (sitio.GRIS, (5.0, 12.25, 4.75), (13.6, 12.6, 4.3), 16),
-}
-for k, (E, p, q, lens) in INTERIORES.items():
-    if SOLO and k in SOLO.split(','):
-        for o in C_LUZ.all_objects:
-            o.hide_render = False
-        visibles(sitio_on=True, ref_on=False)
+from vistas_interiores import INTERIORES
+pedidos = [k for k in INTERIORES if SOLO and (k in SOLO.split(',') or 'interiores' in SOLO.split(','))]
+if pedidos:
+    for o in C_LUZ.all_objects:
+        o.hide_render = False
+    visibles(sitio_on=True, ref_on=False)
+    scene.cycles.max_bounces = 6
+    scene.cycles.diffuse_bounces = 3; scene.cycles.glossy_bounces = 2; scene.cycles.transmission_bounces = 4
+    scene.cycles.caustics_reflective = False; scene.cycles.caustics_refractive = False; scene.cycles.blur_glossy = 1.0
+    scene.cycles.use_adaptive_sampling = True; scene.cycles.adaptive_threshold = 0.03
+    expo0 = scene.view_settings.exposure
+    for k in pedidos:
+        E, p, q, lens, expo = INTERIORES[k]
         cam = camara('cam_' + k, L(E, *p), L(E, *q), lens)
-        expo = scene.view_settings.exposure
-        scene.view_settings.exposure = -0.4
-        render(k, cam, ANCHO, int(ANCHO * 9 / 16), MUESTRAS)
         scene.view_settings.exposure = expo
-        for o in C_LUZ.all_objects:
-            o.hide_render = True
+        render(k, cam, ANCHO, int(ANCHO * 9 / 16), MUESTRAS)
+    scene.view_settings.exposure = expo0
+    for o in C_LUZ.all_objects:
+        o.hide_render = True
 print('listo')
