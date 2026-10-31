@@ -22,7 +22,16 @@ const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147
 export interface Mundo { update: (t: number, dt: number, cam: THREE.Camera) => void; agua: Water[]; escenaNubes: THREE.Scene; }
 
 // Zona plana del lote (coordenadas three.js: x = x sitio, z = -y sitio)
-const LOTE = { x0: -22, x1: 62, z0: -112, z1: 30 };
+let LOTE = { x0: -22, x1: 62, z0: -112, z1: 30 };
+
+// Sitio del modelo amueblado (residencia.glb): lote real, calles del satélite y vegetación del lote.
+// Sin configuración se usa la maqueta anterior (portada cinematográfica).
+export interface ConfigMundo {
+  lote: { x0: number; x1: number; z0: number; z1: number };
+  calles: { ancho: number; puntos: number[][] }[];
+  arboles: number[][]; palmas: number[][];
+  centro: number[];
+}
 function alturaTerreno(x: number, z: number) {
   // plano dentro del lote y los vecinos, ondulado afuera, colinas lejos, montaña al norte (z negativo)
   const dx = Math.max(0, LOTE.x0 - x, x - LOTE.x1), dz = Math.max(0, LOTE.z0 - z, z - LOTE.z1);
@@ -56,8 +65,19 @@ function windShader(mat: THREE.Material, fuerza: number, uTime: { value: number 
   };
 }
 
-export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, movil: boolean, sunDir: THREE.Vector3, evitar: number[][] = []): Mundo {
+export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, movil: boolean, sunDir: THREE.Vector3, evitar: number[][] = [], cfg?: ConfigMundo): Mundo {
   const uTime = { value: 0 };
+  if (cfg) LOTE = cfg.lote;
+  // desplazamiento del vecindario respecto al centro de la maqueta anterior (16, -40)
+  const DX = cfg ? cfg.centro[0] - 16 : 0, DZ = cfg ? cfg.centro[1] + 40 : 0;
+  // distancia de un punto a las calles (para no poner casas ni árboles encima)
+  const segs: [number, number, number, number, number][] = [];
+  if (cfg) for (const c of cfg.calles) {
+    const p = prolongar(c.puntos, 260);
+    for (let i = 0; i < p.length - 1; i++) segs.push([p[i][0], p[i][1], p[i + 1][0], p[i + 1][1], c.ancho]);
+  }
+  const cercaCalle = (x: number, z: number, m: number) => segs.some(([x0, z0, x1, z1, w]) => distSeg(x, z, x0, z0, x1, z1) < w / 2 + m);
+  const enZonaLote = (x: number, z: number, m = 0) => x > LOTE.x0 - m && x < LOTE.x1 + m && z > LOTE.z0 - m && z < LOTE.z1 + m;
   const grupo = new THREE.Group(); grupo.name = 'mundo'; scene.add(grupo);
 
   // ---------- terreno ----------
@@ -99,21 +119,41 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
     const m = new THREE.Mesh(g, matAsfalto); m.position.set((x0 + x1) / 2, 0.02, (z0 + z1) / 2); m.rotation.y = -Math.atan2(z1 - z0, x1 - x0) + Math.PI / 2;
     m.receiveShadow = true; grupo.add(m); return m;
   };
-  // la calle del lote sigue hacia el norte y el sur; una transversal al sur
-  calle(36.5, 230, 36.5, -330, 9); calle(-180, 30, 230, 30, 7); calle(-180, -112, 230, -112, 7);
-  // acera entre la cerca del lote y la calle, y línea central
-  const acera = new THREE.Mesh(new THREE.PlaneGeometry(2, 100).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#b9b4a8', roughness: 1 }));
-  acera.position.set(31, 0.03, -42); acera.receiveShadow = true; grupo.add(acera);
-  const linea = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 560).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#e8e2c8' }));
-  linea.position.set(36.5, 0.04, -50); grupo.add(linea);
+  if (cfg) {
+    // calles reales (C.A y calle de tierra), prolongadas fuera del recorte del satélite
+    const matTierra = new THREE.MeshStandardMaterial({ color: '#8a7a62', roughness: 1 });
+    cfg.calles.forEach((c, k) => {
+      const p = prolongar(c.puntos, 260);
+      for (let i = 0; i < p.length - 1; i++) {
+        const m = calle(p[i][0], p[i][1], p[i + 1][0], p[i + 1][1], c.ancho);
+        if (k === 1) m.material = matTierra;
+        m.position.y = 0.01 + k * 0.004;
+        // junta suave entre tramos
+        const j = new THREE.Mesh(new THREE.CircleGeometry(c.ancho / 2, 20).rotateX(-Math.PI / 2), k === 1 ? matTierra : matAsfalto);
+        j.position.set(p[i + 1][0], 0.01 + k * 0.004, p[i + 1][1]); j.receiveShadow = true; grupo.add(j);
+      }
+    });
+  } else {
+    // la calle del lote sigue hacia el norte y el sur; una transversal al sur
+    calle(36.5, 230, 36.5, -330, 9); calle(-180, 30, 230, 30, 7); calle(-180, -112, 230, -112, 7);
+    // acera entre la cerca del lote y la calle, y línea central
+    const acera = new THREE.Mesh(new THREE.PlaneGeometry(2, 100).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#b9b4a8', roughness: 1 }));
+    acera.position.set(31, 0.03, -42); acera.receiveShadow = true; grupo.add(acera);
+    const linea = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 560).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: '#e8e2c8' }));
+    linea.position.set(36.5, 0.04, -50); grupo.add(linea);
+  }
   const casas: THREE.Matrix4[] = []; const techos: THREE.Matrix4[] = []; const colores: THREE.Color[] = [];
   const paleta = ['#f3e6c8', '#e9d7a6', '#f2efe6', '#d9c9a8', '#efe1d2', '#e2ccb4'];
   const o = new THREE.Object3D();
   const lotes: [number, number][] = [];
   for (let i = 0; i < 46; i++) {
-    const x = -170 + rnd() * 390, z = -300 + rnd() * 420;
-    if (x > -14 && x < 60 && z > -118 && z < 36) continue;              // lote y calle
-    if (Math.abs(x - 36.5) < 9 || Math.abs(z - 30) < 8 || Math.abs(z + 112) < 8) continue;
+    const x = -170 + rnd() * 390 + DX, z = -300 + rnd() * 420 + DZ;
+    if (cfg) {
+      if (enZonaLote(x, z, 6) || cercaCalle(x, z, 9)) continue;
+    } else {
+      if (x > -14 && x < 60 && z > -118 && z < 36) continue;              // lote y calle
+      if (Math.abs(x - 36.5) < 9 || Math.abs(z - 30) < 8 || Math.abs(z + 112) < 8) continue;
+    }
     if (lotes.some(([a, b]) => Math.hypot(a - x, b - z) < 22)) continue;
     lotes.push([x, z]);
     const w = 9 + rnd() * 6, d = 8 + rnd() * 5, h = 3 + rnd() * 0.8;
@@ -203,16 +243,21 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
   const ARB = [[3, 36, 9], [4, 48, 8], [26, 50, 7], [3, 76, 9], [12, 77, 8], [26, 78, 6], [3, 4, 8], [22, 2, 7]];
   const PAL = [[27, 72, 7], [27, 50, 6.5], [16, 75, 7], [4, 72, 6], [27, 40, 5.5], [15, 47, 6], [28, 34, 6], [1, 42, 6], [1, 54, 7], [2, 64, 6.5], [26.8, 60.2, 3.4]];
   const libre = (x: number, z: number) => !evitar.some(([ex, ez]) => Math.hypot(ex - x, ez - z) < 9);
-  for (const [x, y, h] of ARB) if (libre(x, -y)) posArboles.push([x, -y, h * 0.72]);
-  for (const [x, y, h] of PAL) if (libre(x, -y)) posPalmas.push([x, -y, h * 0.85]);
+  if (cfg) {
+    for (const [x, z, h] of cfg.arboles) posArboles.push([x, z, h * 0.85]);
+    for (const [x, z, h] of cfg.palmas) posPalmas.push([x, z, h * 0.9]);
+  } else {
+    for (const [x, y, h] of ARB) if (libre(x, -y)) posArboles.push([x, -y, h * 0.72]);
+    for (const [x, y, h] of PAL) if (libre(x, -y)) posPalmas.push([x, -y, h * 0.85]);
+  }
   // vecindario y campo: árboles sueltos (sin invadir el lote ni la calle)
-  const enLote = (x: number, z: number) => x > -3 && x < 34 && z > -88 && z < 4;
-  const enCalle = (x: number, z: number) => x > 31 && x < 42;
+  const enLote = (x: number, z: number) => cfg ? enZonaLote(x, z) : x > -3 && x < 34 && z > -88 && z < 4;
+  const enCalle = (x: number, z: number) => cfg ? cercaCalle(x, z, 2) : x > 31 && x < 42;
   const nVec = movil ? 140 : 320;
   for (let i = 0; i < nVec; i++) {
-    const x = -200 + rnd() * 440, z = -260 + rnd() * 380;
+    const x = -200 + rnd() * 440 + DX, z = -260 + rnd() * 380 + DZ;
     if (enLote(x, z) || enCalle(x, z)) continue;
-    if (Math.abs(z - 30) < 6 || Math.abs(z + 112) < 6) continue;
+    if (!cfg && (Math.abs(z - 30) < 6 || Math.abs(z + 112) < 6)) continue;
     if (lotes.some(([a, b]) => Math.abs(a - x) < 9 && Math.abs(b - z) < 8)) continue;
     if (evitar.some(([ex, ez]) => Math.hypot(ex - x, ez - z) < 9)) continue;
     (rnd() < 0.28 ? posPalmas : posArboles).push([x, z, 5 + rnd() * 6]);
@@ -222,7 +267,7 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
   const posBosque: [number, number, number][] = [];
   for (let i = 0; i < nBosque; i++) {
     const a = rnd() * Math.PI * 2, r = 200 + rnd() * 900;
-    const x = 20 + Math.cos(a) * r, z = -40 + Math.sin(a) * r;
+    const x = 20 + DX + Math.cos(a) * r, z = -40 + DZ + Math.sin(a) * r;
     if (fbm(x * 0.01, z * 0.01, 2) < 0.42) continue;
     posBosque.push([x, z, 7 + rnd() * 9]);
   }
@@ -307,7 +352,7 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
     const o = new THREE.Object3D();
     aveDatos.forEach((a, i) => {
       const ang = t * 0.12 * a.s + a.off;
-      o.position.set(16 + Math.cos(ang) * a.r + Math.sin(t * 0.5 + a.ph) * 6, a.h + Math.sin(t * 0.7 + a.ph) * 3, -40 + Math.sin(ang) * a.r * 0.8);
+      o.position.set(16 + DX + Math.cos(ang) * a.r + Math.sin(t * 0.5 + a.ph) * 6, a.h + Math.sin(t * 0.7 + a.ph) * 3, -40 + DZ + Math.sin(ang) * a.r * 0.8);
       o.rotation.set(0, -ang + Math.PI / 2, Math.sin(t * 9 + a.ph) * 0.55);
       o.scale.setScalar(0.7); o.updateMatrix(); aves.setMatrixAt(i, o.matrix);
     });
@@ -316,6 +361,18 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
   }
 
   return { update, agua, crearAgua, escenaNubes } as Mundo & { crearAgua: typeof crearAgua };
+}
+
+// alarga una polilínea por sus dos extremos (las calles siguen más allá del recorte del satélite)
+function prolongar(p: number[][], L: number) {
+  if (p.length < 2) return p;
+  const ext = (a: number[], b: number[]) => { const dx = a[0] - b[0], dz = a[1] - b[1], d = Math.hypot(dx, dz) || 1; return [a[0] + (dx / d) * L, a[1] + (dz / d) * L]; };
+  return [ext(p[0], p[1]), ...p, ext(p[p.length - 1], p[p.length - 2])];
+}
+function distSeg(x: number, z: number, x0: number, z0: number, x1: number, z1: number) {
+  const dx = x1 - x0, dz = z1 - z0, L2 = dx * dx + dz * dz || 1;
+  const t = Math.max(0, Math.min(1, ((x - x0) * dx + (z - z0) * dz) / L2));
+  return Math.hypot(x - (x0 + t * dx), z - (z0 + t * dz));
 }
 
 function texturaNormalesAgua() {

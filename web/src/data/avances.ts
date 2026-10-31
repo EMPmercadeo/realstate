@@ -39,7 +39,7 @@ export const PARES: [string, string, string][] = [
   ['bano-accesible', 'int_gris_bano_acc', 'Baño accesible'],
   ['comedor', 'int_casa_comedor', 'Comedor'],
   ['terapia', 'int_casa_terapia', 'Terapia'],
-  ['cocina', 'int_casa_cocina', 'Cocina'],
+  ['cocina', 'int_gris_cocina', 'Cocineta del edificio gris'],
 ];
 
 export const PLANOS: [string, string][] = [

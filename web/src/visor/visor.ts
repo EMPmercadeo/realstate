@@ -11,9 +11,10 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { crearMundo } from './mundo';
+import { crearMundo, type ConfigMundo } from './mundo';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
-import vistas from '../data/vistas.json';
+import vistasMaqueta from '../data/vistas.json';
+import residencia from '../data/residencia.json';
 import fotos from '../data/fotos.json';
 
 type Modo = 'orbita' | 'recorrido' | 'cine';
@@ -22,7 +23,19 @@ type Preset = { pos: number[]; target: number[]; ed: string | null; piso: number
 
 const fantasma = document.createElement('div');
 const $ = (sel: string) => (document.querySelector(sel) as HTMLElement) || fantasma;
-const FOTOS = fotos as Record<string, { nombre: string; antes: string; despues: string | null }>;
+type Foto = { nombre: string; antes: string; despues: string | null };
+const F = fotos as Record<string, Foto>;
+// fotos reales ("hoy → así quedará") ligadas a los cuartos del modelo amueblado
+const FOTOS_RES: Record<string, Foto> = {
+  'hosp@gris': { ...F['hospitalizacion@gris'], nombre: 'Personas encamadas' },
+  'salon2@gris': { ...F['salon_2@gris'], nombre: 'Salón amarillo' },
+  'galeria@gris': { ...F['refrigerios@gris'], nombre: 'Área de coffee break' },
+  'cocina@gris': { ...F['cocina@gris'], nombre: 'Cocineta del área de coffee break' },
+  'terraza@gris': { ...F['terraza@gris'], nombre: 'Terraza' },
+  'bano_acc@gris': { ...F['bano_acc@gris'], nombre: 'Baño accesible para usuarios' },
+  'comedor@amarilla': { ...F['comedor@amarilla'], nombre: 'Comedor y TV' },
+  'terapia@amarilla': { ...F['terapia@amarilla'], nombre: 'Terapia con familiares' },
+};
 const MOVIL = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || window.innerWidth < 820;
 const RAPIDO = new URLSearchParams(location.search).has('rapido');   // capturas rápidas de depuración
 const NIVEL = 3.25;
@@ -32,6 +45,12 @@ export interface OpcionesVisor { cine?: boolean; ruta?: { pos: number[]; target:
 export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const base = document.body.dataset.base || '/';
   const CINE = !!opts.cine;
+  // El recorrido usa el modelo amueblado (residencia.glb); la portada cinematográfica sigue con la maqueta anterior.
+  const RES = !CINE;
+  const vistas: any = RES ? residencia : vistasMaqueta;
+  const FOTOS: Record<string, Foto> = RES ? FOTOS_RES : F;
+  const nivelDe = (ed: string | null) => (RES ? (vistas.edificios.find((e: any) => e.id === ed)?.nivel2 ?? 3.2) : NIVEL);
+  const LIM = RES ? (residencia as any).limites as number[] : [-6, 36, -92, 8];
   // ruta de cámara para el modo cine (curvas suaves por los puntos dados)
   const rutaPos = new THREE.CatmullRomCurve3((opts.ruta || []).map((p) => new THREE.Vector3(...p.pos)), false, 'centripetal', 0.5);
   const rutaTgt = new THREE.CatmullRomCurve3((opts.ruta || []).map((p) => new THREE.Vector3(...p.target)), false, 'centripetal', 0.5);
@@ -62,7 +81,8 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   sky.scale.setScalar(2000);
   scene.add(sky);
   // hora dorada: sol bajo desde el este-sureste (ilumina las fachadas que dan a la calle)
-  const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - 26), THREE.MathUtils.degToRad(14));
+  // en el modelo amueblado la fachada principal de la casa mira al noreste: sol de la mañana desde el este
+  const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - (RES ? 30 : 26)), THREE.MathUtils.degToRad(RES ? 72 : 14));
   const u = sky.material.uniforms;
   u.sunPosition.value.copy(sunDir);
   u.turbidity.value = 2.8; u.rayleigh.value = 1.1; u.mieCoefficient.value = 0.005; u.mieDirectionalG.value = 0.85;
@@ -71,9 +91,9 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   scene.environment = pmrem.fromScene(skyScene as any, 0.02).texture;
   scene.environmentIntensity = 0.45;
   scene.fog = new THREE.FogExp2(new THREE.Color('#d8d0c2'), MOVIL ? 0.0011 : 0.00075);
-  const mundo = crearMundo(scene, renderer, MOVIL, sunDir, (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]));
+  const mundo = crearMundo(scene, renderer, MOVIL, sunDir, (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]), RES ? (residencia as any).mundo as ConfigMundo : undefined);
 
-  const centro = new THREE.Vector3(15, 0, -42);
+  const centro = RES ? new THREE.Vector3(...(residencia as any).centro as [number, number, number]) : new THREE.Vector3(15, 0, -42);
   const sun = new THREE.DirectionalLight(0xffd6a0, 3.2);
   sun.position.copy(sunDir).multiplyScalar(140).add(centro);
   sun.target.position.copy(centro);
@@ -126,15 +146,22 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
 
   // ---------- presets de cámara ----------
   const presets: Record<string, Preset> = {};
-  presets['sitio'] = { pos: [110, 70, 30], target: [15, 2, -42], ed: null, piso: 99, nombre: 'Vista general', detalle: 'Terreno de 2.500 m² con dos edificios' };
-  presets['calle'] = { pos: [44, 1.9, -44], target: [14, 3, -61], ed: null, piso: 99, nombre: 'Desde la calle', detalle: 'Cerca perimetral, portón eléctrico y entrada circular' };
-  presets['gris-ext'] = { pos: [42, 2.2, -2], target: [12, 4, -18], ed: null, piso: 99, nombre: 'Edificio de hospitalización', detalle: 'Dos niveles, terraza y acceso accesible' };
+  if (RES) {
+    const P = (residencia as any).presets;
+    presets['sitio'] = { ...P.sitio, ed: null, piso: 99, nombre: 'Vista general', detalle: 'Terreno de 2.500 m² con dos edificios' };
+    presets['calle'] = { ...P.calle, ed: null, piso: 99, nombre: 'Desde la calle', detalle: 'Casa amarilla, frente a la C.A' };
+    presets['gris-ext'] = { ...P['gris-ext'], ed: null, piso: 99, nombre: 'Edificio gris', detalle: 'Fachada hacia la calle de tierra' };
+  } else {
+    presets['sitio'] = { pos: [110, 70, 30], target: [15, 2, -42], ed: null, piso: 99, nombre: 'Vista general', detalle: 'Terreno de 2.500 m² con dos edificios' };
+    presets['calle'] = { pos: [44, 1.9, -44], target: [14, 3, -61], ed: null, piso: 99, nombre: 'Desde la calle', detalle: 'Cerca perimetral, portón eléctrico y entrada circular' };
+    presets['gris-ext'] = { pos: [42, 2.2, -2], target: [12, 4, -18], ed: null, piso: 99, nombre: 'Edificio de hospitalización', detalle: 'Dos niveles, terraza y acceso accesible' };
+  }
   for (const ex of (vistas as any).exteriores) presets[ex.id] = { pos: ex.cam, target: ex.centro, ed: null, piso: 99, nombre: ex.nombre };
   for (const ed of (vistas as any).edificios) {
     for (const p of ed.pisos) {
       const c = p.rooms.reduce((a: number[], r: any) => [a[0] + r.centro[0], a[1] + r.centro[1], a[2] + r.centro[2]], [0, 0, 0]).map((v: number) => v / p.rooms.length);
       presets[`${ed.id}-p${p.n}`] = { pos: [c[0] + 14, c[1] + 22, c[2] + 18], target: c, ed: ed.id, piso: p.n, nombre: `${ed.nombre} · ${p.nombre}`, detalle: 'Vista de planta sin techo' };
-      for (const r of p.rooms) presets[r.id + '@' + ed.id] = { pos: r.cam, target: r.centro, ed: ed.id, piso: p.n, nombre: r.nombre, detalle: r.camas ? `${r.camas} ${r.camas === 1 ? 'cama' : 'camas'}` : undefined };
+      for (const r of p.rooms) presets[r.id + '@' + ed.id] = { pos: r.cam, target: r.mira || r.centro, ed: ed.id, piso: p.n, nombre: r.nombre, detalle: r.camas ? `${r.camas} ${r.camas === 1 ? 'cama' : 'camas'}` : undefined };
     }
   }
 
@@ -145,7 +172,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const pantalla = $('#pantalla-carga');
   const barra = $('#carga');
   const pct = $('#carga-pct');
-  loader.load(`${base}modelo/${CINE ? 'exterior' : 'escena'}.glb`, (gltf) => {
+  loader.load(`${base}modelo/${CINE ? 'exterior' : 'residencia'}.glb`, (gltf) => {
     gltf.scene.traverse((o: any) => {
       if (o.isMesh) {
         o.castShadow = true; o.receiveShadow = true;
@@ -195,8 +222,9 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   // ---------- controles ----------
   const orbit = new OrbitControls(camera, renderer.domElement);
   orbit.target.copy(centro).setY(2);
+  if (RES) camera.position.set(...(presets['sitio'].pos as [number, number, number]));
   orbit.enableDamping = true; orbit.dampingFactor = 0.06;
-  orbit.maxPolarAngle = Math.PI / 2.02; orbit.minDistance = 2.5; orbit.maxDistance = 240;
+  orbit.maxPolarAngle = Math.PI / 2.02; orbit.minDistance = RES ? 0.8 : 2.5; orbit.maxDistance = 240;
   orbit.addEventListener('start', () => { if (estado.tour) detenerTour(); });
 
   const plc = new PointerLockControls(camera, renderer.domElement);
@@ -246,7 +274,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
       if (r.tipo === 'circulacion' && !r.id.startsWith('acceso')) continue;
       mk(r.id + '@' + ed.id, r.nombre, r.centro, ed.id, p.n, !!FOTOS[r.id + '@' + ed.id]);
     }
-    mk('calle', 'Entrada principal', [30, 1, -60], null, 99, false);
+    mk('calle', 'Entrada principal', RES ? (residencia as any).etiquetaCalle : [30, 1, -60], null, 99, false);
   }
   function actualizarEtiquetas() {
     const { edificio, piso } = estado.vista;
@@ -287,7 +315,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     if (m === 'recorrido') {
       const t = orbit.target.clone();
       const dir = camera.position.clone().sub(t).setY(0).normalize();
-      const nivel = estado.vista.edificio && estado.vista.piso === 2 ? NIVEL : 0;
+      const nivel = estado.vista.edificio && estado.vista.piso === 2 ? nivelDe(estado.vista.edificio) : 0;
       camera.position.copy(t).addScaledVector(dir, 2.2).setY(nivel + alturaOjos);
       camera.lookAt(t.x, nivel + 1.4, t.z);
       $('#hint').textContent = MOVIL ? 'Arrastra para mirar · joystick para caminar' : 'Clic en la escena para mirar con el mouse · WASD o flechas para caminar · Shift corre · Esc suelta el mouse';
@@ -351,7 +379,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     const tag = f ? `<i class="tag">${f.despues ? 'foto' : 'foto actual'}</i>` : '';
     return `<li data-id="${id}"><span>${nombre}${tag}</span>${detalle ? `<em>${detalle}</em>` : ''}</li>`;
   }
-  let html = `<h3>Terreno</h3><ul>${li('sitio', 'Vista general', '2.500 m²')}${li('calle', 'Desde la calle', 'Entrada')}${li('gris-ext', 'Edificio de hospitalización', 'Exterior')}`;
+  let html = `<h3>Terreno</h3><ul>${li('sitio', 'Vista general', '2.500 m²')}${li('calle', 'Desde la calle', 'Entrada')}${li('gris-ext', RES ? 'Edificio gris' : 'Edificio de hospitalización', 'Exterior')}`;
   for (const ex of (vistas as any).exteriores) html += li(ex.id, ex.nombre);
   html += `</ul>`;
   for (const ed of (vistas as any).edificios) for (const p of ed.pisos) {
@@ -371,7 +399,21 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   $('#btn-panel').addEventListener('click', () => $('#panel').classList.toggle('abierto'));
 
   // ---------- recorrido guiado ----------
-  const TOUR: { id: string; texto: string; espera: number }[] = [
+  const TOUR_RES: { id: string; texto: string; espera: number }[] = [
+    { id: 'sitio', texto: 'Un terreno de 2.500 m² en Altos de San Cristóbal, David: la casa amarilla al frente y el edificio gris atrás.', espera: 4 },
+    { id: 'calle', texto: 'La casa amarilla da a la C.A. La propiedad ya tiene cerca perimetral y portones eléctricos.', espera: 4 },
+    { id: 'recepcion@amarilla', texto: 'Recepción 24 h en la entrada principal de la casa amarilla.', espera: 4 },
+    { id: 'comedor@amarilla', texto: 'Comedor y TV: el área social de la casa amarilla.', espera: 4 },
+    { id: 'terapia@amarilla', texto: 'Terapia con familiares y, detrás, los talleres de pintura, acuarela y costura.', espera: 4 },
+    { id: 'suite@amarilla', texto: 'Cuatro cuartos privados, un huésped en cada uno. La suite tiene baño y clóset propios.', espera: 4 },
+    { id: 'gris-ext', texto: 'El edificio gris es la parte asistencial: 22 camas en dos niveles.', espera: 4 },
+    { id: 'hosp@gris', texto: 'Personas encamadas: 10 camas de hospital con barandales, luz sobre cada cama y estación de enfermería.', espera: 6 },
+    { id: 'salon2@gris', texto: 'Salón amarillo: 4 camas para personas con movilidad reducida.', espera: 4 },
+    { id: 'galeria@gris', texto: 'Área de coffee break en la terraza con verjas del piso alto.', espera: 5 },
+    { id: 'salonB@gris', texto: 'Abajo, los salones de las personas que deambulan: 6 camas en este y 2 en el otro.', espera: 4 },
+    { id: 'sitio', texto: 'Una residencia lista para operar. Solicita el expediente completo para inversionistas.', espera: 5 },
+  ];
+  const TOUR_MAQUETA: { id: string; texto: string; espera: number }[] = [
     { id: 'sitio', texto: 'Un terreno de 2.500 m² en Altos de San Cristóbal, David, con dos edificios, jardines y arboleda.', espera: 4 },
     { id: 'calle', texto: 'Cerca perimetral, portón eléctrico y entrada circular. Todo el campus ya cuenta con seguridad certificada.', espera: 4 },
     { id: 'recepcion@amarilla', texto: 'La casa principal recibe a residentes y familias: recepción, consultorio de salud, comedor y sala de terapia.', espera: 5 },
@@ -386,6 +428,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     { id: 'huerto', texto: 'Huerto cercado para siembra de hortalizas y flores, con su oficina de herramientas.', espera: 4 },
     { id: 'sitio', texto: 'Una residencia lista para abrir. Solicita el expediente completo para inversionistas.', espera: 5 },
   ];
+  const TOUR = RES ? TOUR_RES : TOUR_MAQUETA;
   let tourIdx = 0; let tourTimer: number | null = null;
   const subt = $('#subtitulo');
   function pasoTour() {
@@ -454,10 +497,10 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
         ray.set(camera.position.clone().setY(camera.position.y - 0.4), vel.clone().normalize()); ray.far = 0.6;
         if (ray.intersectObjects(muros, false).length === 0) camera.position.addScaledVector(vel, dt);
       }
-      const nivel = estado.vista.edificio && estado.vista.piso === 2 ? NIVEL : 0;
+      const nivel = estado.vista.edificio && estado.vista.piso === 2 ? nivelDe(estado.vista.edificio) : 0;
       camera.position.y += (nivel + alturaOjos - camera.position.y) * 0.2;
-      camera.position.x = THREE.MathUtils.clamp(camera.position.x, -6, 36);
-      camera.position.z = THREE.MathUtils.clamp(camera.position.z, -92, 8);
+      camera.position.x = THREE.MathUtils.clamp(camera.position.x, LIM[0], LIM[1]);
+      camera.position.z = THREE.MathUtils.clamp(camera.position.z, LIM[2], LIM[3]);
     }
     // relleno interior: solo dentro de un edificio
     const dentro = !CINE && !!estado.vista.edificio && (estado.modo === 'recorrido' || camera.position.y < 7);

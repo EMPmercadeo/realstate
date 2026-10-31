@@ -1,6 +1,6 @@
 # Contexto del proyecto — Residencia Altos de San Cristóbal
 
-> **Fuente de verdad del proyecto** (actualizado 30-10-2026). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, y 3 notas de voz adicionales del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
+> **Fuente de verdad del proyecto** (actualizado 30-10-2026). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, 3 notas de voz adicionales y las indicaciones de Ernesto del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
 
 La propietaria vende la propiedad (2.500 m², casa amarilla + edificio gris) en US$600.000 tal como está. La propuesta es ofrecerla a un inversionista lista para operar como residencia de 26 adultos mayores, con pasadía y estadías temporales, por unos US$800.000 con unos US$200.000 de adecuaciones incluidos.
 
@@ -8,7 +8,7 @@ La propietaria vende la propiedad (2.500 m², casa amarilla + edificio gris) en 
 
 Se vende el terreno completo con los dos edificios, pero presentado como una residencia lista para operar, no como un inmueble vacío.
 
-**La propiedad.** Antiguo Instituto Superior Publies Educa, en Altos de San Cristóbal, David Sur, Chiriquí. Terreno de 2.500 m² con una casa amarilla de dos pisos al frente y un edificio gris de dos pisos atrás. Ya tiene cerca perimetral y portones eléctricos.
+**La propiedad.** Propietaria: Beatriz De Samudio ("la profe"). Antiguo Instituto Superior Publies Educa, en Altos de San Cristóbal, David Sur, Chiriquí. Terreno de 2.500 m² con una casa amarilla de dos pisos al frente y un edificio gris de dos pisos atrás. Ya tiene cerca perimetral y portones eléctricos.
 
 **Precio y modelo de venta.**
 
@@ -38,7 +38,7 @@ Se vende el terreno completo con los dos edificios, pero presentado como una res
 
 **Comparable.** Un médico, amigo de la hija de la propietaria, compró una casa en Panamá por US$350.000 para cuidado diurno de adultos mayores, con pernocta solo para los que caminan. Tiene pocas habitaciones (el audio no se entiende bien; ¿seis?) y abre en enero.
 
-**Requisitos que pesan en la licencia** (mencionados al hablar de ese comparable): personal las 24 horas, nutricionista exigida por el MINSA, cocina toda en acero inoxidable, convenio con un médico y un centro médico para urgencias. La licencia no es fácil de sacar.
+**Requisitos que pesan en la licencia** (mencionados al hablar de ese comparable): personal las 24 horas, nutricionista exigida por el MINSA, cocina toda en acero inoxidable (el 30-10 se indicó que el granito se acepta), convenio con un médico y un centro médico para urgencias. La licencia no es fácil de sacar.
 
 ## Capacidad
 
@@ -66,7 +66,7 @@ La casa amarilla concentra las áreas comunes, la recepción, el consultorio y l
 | Parte de atrás del área de terapia (mesa de trabajo de profesores) | Área de talleres: pintura, acuarela, costura | Nada |
 | Comedor | Comedor y área de televisión: el área es grande y en la casa amarilla solo hay 4 huéspedes | Nada |
 | Terraza abierta de atrás | Área creativa al aire libre | Nada |
-| Cocina | Área de preparación de alimentos | Confirmar si cumple MINSA (acero inoxidable) |
+| Cocina | Área de preparación de alimentos | Nada: aquí se cocina para los dos edificios y la comida se lleva al gris |
 | Parte de atrás de la cocina | Lavandería | Instalarla o contratar el servicio afuera |
 | Oficina dentro de la lavandería | Atención psicológica | Nada |
 | Oficina que en la foto dice "Rector" | Consultorio de salud: médico por agenda, nutricionista, psicóloga, terapista | Nada (tiene aire acondicionado) |
@@ -85,11 +85,12 @@ El edificio gris es la parte asistencial: aquí van los 22 residentes con cuidad
 | --- | --- | --- |
 | Antiguo salón de conferencias | Sala de personas encamadas (10 camas) | Camas de hospital con barandales, mesita y lámpara sobre cada cama, estación de enfermería donde estaba el podio |
 | Salón amarillo (al lado) | Sala de personas con movilidad reducida (4 camas). Pueden bajarse de la cama e ir a la terraza y otras áreas | Camas con mesita; no lleva estación de enfermería |
-| Junto a la biblioteca | Baño y servicio para el salón amarillo | Agregar baño (ducha) y servicio. Confirmar si es aparte del de la terraza |
+| Dentro del salón amarillo, al lado de la biblioteca | Baño para las personas del salón amarillo | Construir baño nuevo |
 | Biblioteca | Área de estudio y lectura, o depósito y cuarto de ropa (la propietaria dijo las dos cosas) | Definir uso |
 | Área de refrigerios (tipo cafetería) | Área de coffee break o área del té | Nada |
 | Terraza | Terraza al aire libre para personas que deambulan o caminan | Nada |
-| Baño de la terraza | Baño para huéspedes o usuarios | Agregar regadera |
+| Servicio de la terraza (solo inodoro) | Servicio para los que usan la terraza | Nada, queda igual |
+| Cocineta (con granito) | Apoyo para servir la comida que se cocina en la casa amarilla | Nada: el granito se acepta |
 
 **Planta baja**
 
@@ -100,7 +101,7 @@ El edificio gris es la parte asistencial: aquí van los 22 residentes con cuidad
 | Oficina 2 | Oficina administrativa | Nada |
 | Baño grande para discapacitados (hoy es solo servicio) | Baño para huéspedes o usuarios (los que deambulan y los que bajan la escalera) | Agregar regadera (cabe) |
 
-Los encamados se bañan en la cama. Los baños nuevos son para los que se mueven, y van afuera de las salas porque adentro no se puede diseñar otro baño. Las lámparas se pegan sobre la cama: no hay que romper paredes.
+Los encamados se bañan en la cama. El baño nuevo va dentro del salón amarillo, al lado de la biblioteca; el servicio de la terraza queda igual. Las lámparas se pegan sobre la cama: no hay que romper paredes.
 
 ## Exteriores
 
@@ -123,8 +124,7 @@ Estas son las obras y compras que el inversionista recibiría hechas, después d
 **Obras**
 
 - [ ] Edificio gris, planta baja: regadera en el baño grande de discapacitados (hoy es solo servicio)
-- [ ] Edificio gris, planta alta: regadera en el servicio de la terraza
-- [ ] Edificio gris, planta alta: baño y servicio para el salón amarillo, junto a la biblioteca (confirmar si es aparte del de la terraza)
+- [ ] Edificio gris, planta alta: baño nuevo dentro del salón amarillo, al lado de la biblioteca
 - [ ] Estación de enfermería en la sala de encamados, donde estaba el podio
 - [ ] Gazebo en los jardines internos
 - [ ] Tina de hidroterapia con agua en movimiento
@@ -181,7 +181,7 @@ Debe mostrar, como mínimo:
 
 - Sala de personas encamadas con camas de hospital con barandales, mesita al lado y luz sobre cada cama, y la estación de enfermería donde estaba el podio.
 - Salón amarillo con 4 camas y mesitas; los dos salones de abajo con 4 camas cada uno.
-- Los baños con las regaderas nuevas y el baño nuevo junto a la biblioteca.
+- La regadera nueva del baño de discapacitados y el baño nuevo dentro del salón amarillo.
 - En la casa amarilla: recepción, sala de terapia con familiares, talleres, comedor con TV, consultorio, cuartos privados.
 - Afuera: gazebo con su letrero, tina de hidroterapia al medio, huerto con surcos y cerca.
 - El entorno: naturaleza, tranquilidad y espacio.
@@ -223,20 +223,15 @@ La propietaria dijo que está de acuerdo y que no quiere invertir ni operar el n
 
 Estos puntos se contradicen entre audios o no quedan claros, y conviene cerrarlos antes de los renders finales.
 
-- [x] **Cuartos privados:** resuelto el 30-10: son 4. El que faltaba es la recámara de arriba, que deja de ser oficina del gerente.
 - [ ] **Sala de encamados:** ¿10 camas u 8 para que no queden apretadas?
 - [ ] **Biblioteca:** ¿área de estudio y lectura, o depósito y cuarto de ropa? Lo último que dijo es que "mejor" depósito.
-- [ ] **Comida del edificio gris:** el comedor de la casa amarilla es para los 4 huéspedes; ¿dónde comen los 22 del gris? ¿En el área de refrigerios?
 - [ ] **Encamados en planta alta:** ¿hay ascensor o rampa para traslados y evacuación?
-- [ ] **Cocina:** ¿ya es de acero inoxidable o hay que cambiarla para el MINSA?
 - [ ] **Lavandería:** ¿se instala o se contrata afuera?
 - [ ] **Huerto:** ¿qué zona es "donde están los tallos"? Puede que la transcripción haya confundido "talleres".
 - [ ] **Presupuesto:** los US$200.000 son una cifra al tanteo. Falta cotización de arquitecto o ingeniero.
-- [ ] **Baño junto a la biblioteca:** la nota del 29-10 pide baño y servicio nuevos para el salón amarillo, pero en la grabación dijo que adentro no cabe otro baño. ¿Es obra aparte o el mismo servicio de la terraza?
 - [ ] **Secretaria:** ¿lunes a viernes o lunes a sábado? En la misma nota dijo las dos cosas.
 - [ ] **Personal:** ¿entran gerente, supervisor, nutricionista, psicóloga y coordinador del huerto en el personal mínimo?
 - [ ] **Fisioterapeuta / terapeuta ocupacional:** ¿cuántas veces por semana?
-- [x] **Identidad:** confirmado: Beatriz De Samudio es la propietaria.
 - [ ] **Oficina del gerente:** la recámara de arriba ahora es cuarto privado. ¿Dónde va el gerente?
 - [ ] **Pasadía y estadías temporales:** ¿cuánto se cobra la hora extra después de las 5:00 p. m.? ¿Las estadías usan solo los 4 cuartos privados?
 - [ ] **Recepción:** falta la foto correcta de la recepción.
@@ -255,7 +250,8 @@ Ese archivo se armó el 28-10 con la grabación, los croquis y las fotos. Sigue 
 | Servicios | Solo residencia | Residencia + pasadía (8 a. m. a 5 p. m.) + estadías temporales |
 | "75%" | Licencia o registro sanitario en trámite (~75%) | Es una forma de presentar el avance del proyecto. El vendedor **no** tramita licencias |
 | Gazebo | Gazebo de hidroterapia donde estaba el mango | Dos cosas: gazebo de juegos en los jardines + tina de hidroterapia al medio, donde estaba el mango |
-| Baños | Regadera en el baño de arriba y en el de discapacitados | Lo mismo, más un baño y servicio junto a la biblioteca (por confirmar) |
+| Baños | Regadera en el baño de arriba y en el de discapacitados | Regadera solo en el de discapacitados (abajo); el servicio de la terraza queda igual; baño nuevo dentro del salón amarillo, al lado de la biblioteca |
+| Cocina | Cocina con granito en el gris | Se cocina en la casa amarilla y se lleva al gris; la cocineta del gris tiene granito y se acepta |
 | Personal, equipo médico, reglas de cobro | No estaban | Ver secciones de arriba |
 
 ## Fuentes
@@ -272,5 +268,6 @@ Ese archivo se armó el 28-10 con la grabación, los croquis y las fotos. Sigue 
 | Nota de voz adicional 1 | 30-10-2026 | 1 min 42 s | Pasadía (8 a. m. a 5 p. m., hora extra con cargo) y estadías temporales |
 | Nota de voz adicional 2 | 30-10-2026 | 52 s | La recámara de arriba pasa a ser el 4.º cuarto privado |
 | Nota de voz adicional 3 | 30-10-2026 | 1 min 31 s | Nombres de los espacios en el sitio; no usar "pacientes"; recepción equivocada |
+| Indicaciones de Ernesto por chat | 30-10-2026 | — | Baño dentro del salón amarillo; servicio de la terraza queda igual; se cocina en la casa amarilla |
 
 Las transcripciones del 29-10 y del 30-10 están en `transcripcion-notas-de-voz-2026-10-29.md` y `transcripcion-notas-de-voz-2026-10-30.md`. Son automáticas: tienen errores de reconocimiento y no distinguen quién habla.

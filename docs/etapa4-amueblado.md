@@ -83,6 +83,27 @@ $b = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
 ```
 Las imágenes quedan en `build\bloqueo\int_*.png`. Para una sola vista: `--vistas int_gris_hosp`.
 
+## Recorrido 3D de la web con el modelo amueblado (30-10-2026)
+El recorrido (`/recorrido`) ya carga este modelo en lugar de la maqueta anterior: `web/public/modelo/residencia.glb`
+(2,1 MB con Draco) y `web/src/data/residencia.json` (cuartos, cámaras, niveles, calles y árboles del lote).
+- Los materiales procedurales no existen en la web: `blender/web_muestras.py` saca el color medio de cada uno y
+  texturas repetibles para pisos, azulejos, cielo de losetas y bloques de vidrio.
+- `blender/export_web.py` une las piezas por edificio y nivel (muros, cielos, techo, resto), marca cada grupo para
+  que el visor muestre "Gris · PB", "Amarilla · PA", etc., y escribe los cuartos con sus cámaras (las mismas de las
+  vistas interiores cuando existen).
+- El visor y el mundo procedural (`web/src/visor/visor.ts`, `mundo.ts`) usan el lote real, las dos calles del
+  satélite (C.A asfaltada y calle de tierra) y el sol de la mañana desde el este. La portada cinematográfica sigue
+  con la maqueta anterior (`exterior.glb`).
+- Aún no están en 3D el gazebo, la tina de hidroterapia ni el huerto (van en la etapa de exteriores).
+
+Regenerar en la PC después de cambiar el modelo (PowerShell dentro de `realstate`):
+```
+$b = "C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
+& $b -b -P blender\bloqueo.py -- --solo ninguno
+& $b -b -P blender\web_muestras.py
+& $b -b -P blender\export_web.py
+```
+
 ## Pendiente
 - Confirmar con la propietaria: 10 u 8 encamados, dónde va el gerente, cuál es el cuarto de la foto con puertas de
   vidrio, baño nuevo junto a la biblioteca, dónde comen los 22 del gris. Falta la foto real de la recepción.
