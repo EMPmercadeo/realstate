@@ -11,18 +11,19 @@ export interface ParadaCine {
 
 // Ruta sobre el modelo amueblado (residencia-exterior.glb): la casa amarilla da al noreste (C.A),
 // el edificio gris queda al suroeste y el jardín interno entre los dos.
+// 01-11-2026: coordenadas x/z multiplicadas por 1,21 (escala medida del satélite, ver docs/fase-mapa.md)
 export const RUTA: PuntoRuta[] = [
-  { pos: [78, 50, -64], target: [3, 2, 2] },          // 0.00 llegada aérea desde el noreste
-  { pos: [58, 30, -56], target: [11, 3, -12] },
-  { pos: [42, 11, -42], target: [18, 3, -18] },       // bajando hacia la C.A
-  { pos: [29, 3.6, -31], target: [14, 3, -15] },      // 0.30 en el portón
-  { pos: [31, 4.8, -13], target: [14, 2.8, -15] },    // 0.40 casa amarilla en 3/4
-  { pos: [18, 15, -3], target: [6, 1.5, 9] },         // sobre la casa hacia el jardín
-  { pos: [19, 8, 3], target: [3, 1.2, 14] },          // 0.60 jardín interno
-  { pos: [15, 7, 36], target: [-11, 3.5, 24] },       // 0.70 edificio gris desde el jardín
-  { pos: [7, 6.2, 35], target: [-6, 4.3, 27.5] },     // 0.80 área de coffee break (terraza con verjas)
-  { pos: [12, 22, 48], target: [-3, 2, 14] },         // subiendo
-  { pos: [64, 52, 58], target: [3, 2, 2] },           // vista final
+  { pos: [94.5, 60.6, -77.5], target: [3.6, 2, 2.4] },          // 0.00 llegada aérea desde el noreste
+  { pos: [70.2, 36.3, -67.8], target: [13.3, 3, -14.5] },
+  { pos: [50.9, 11, -50.9], target: [21.8, 3, -21.8] },       // bajando hacia la C.A
+  { pos: [35.1, 3.6, -37.5], target: [17, 3, -18.2] },      // 0.30 en el portón
+  { pos: [37.5, 4.8, -15.7], target: [17, 2.8, -18.2] },    // 0.40 casa amarilla en 3/4
+  { pos: [21.8, 18.2, -3.6], target: [7.3, 1.5, 10.9] },         // sobre la casa hacia el jardín
+  { pos: [23, 8, 3.6], target: [3.6, 1.2, 17] },          // 0.60 jardín interno
+  { pos: [18.2, 7, 43.6], target: [-13.3, 3.5, 29.1] },       // 0.70 edificio gris desde el jardín
+  { pos: [8.5, 6.2, 42.4], target: [-7.3, 4.3, 33.3] },     // 0.80 área de coffee break (terraza con verjas)
+  { pos: [14.5, 26.6, 58.1], target: [-3.6, 2, 17] },         // subiendo
+  { pos: [77.5, 63, 70.2], target: [3.6, 2, 2.4] },           // vista final
 ];
 
 export const PARADAS_CINE: ParadaCine[] = [

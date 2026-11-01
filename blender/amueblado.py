@@ -173,7 +173,7 @@ GRIS_PA = {
                 W('lavamanos', '-y', 0.70, 9.78)],
     'cocina': [W('granito_fregadero', '-y', 4.87, 5.37), W('granito_plano', '-y', 4.87, 6.30, w=0.66),
                W('refri_chico', '+y', 7.34, 4.98), W('granito_plano', '+y', 7.34, 5.45, w=0.38)],
-    'deposito': [W('estante', '+y', 7.34, 3.20), W('estante', '+y', 7.34, 4.10), W('estante', '-y', 5.00, 3.20)],
+    'deposito': [W('estante', '+y', 7.34, 3.20), W('estante', '+y', 7.34, 4.10)],
     'closet': [W('estante', '+y', 10.80, 5.20, d=0.40, w=0.70)],
     'salon2': fila('cama_hosp', '+y', 4.14, 9.45, 4, 0.40, mesa='mesita_hosp') +
               [W('reclinable', '-y', 0.70, 12.95, sep=0.05), W('silla_ruedas', '-y', 0.70, 11.80, sep=0.05)],

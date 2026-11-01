@@ -300,6 +300,17 @@ def exportar(objs, ruta):
     except Exception as e:
         print('sin draco:', e)
         bpy.ops.export_scene.gltf(**kw)
+    # el módulo bpy de pip no trae la librería Draco: si el GLB salió sin comprimir, se comprime con
+    # gltf-transform (Node). El visor usa DRACOLoader.
+    if os.path.getsize(ruta) > 3e6:
+        import shutil, subprocess
+        npx = shutil.which('npx') or shutil.which('npx.cmd')
+        if npx:
+            tmp = ruta + '.raw.glb'
+            os.replace(ruta, tmp)
+            subprocess.run([npx, '--yes', '@gltf-transform/cli@4.1.1', 'draco', tmp, ruta, '--method', 'edgebreaker'],
+                           check=True)
+            os.remove(tmp)
     print('GLB', ruta, round(os.path.getsize(ruta) / 1e6, 2), 'MB', flush=True)
 
 
@@ -410,6 +421,11 @@ prohibido = unary_union([huella['gris'].buffer(5.5), huella['amarilla'].buffer(5
                          corredor(presets['calle']), corredor(presets['gris-ext'])] +
                         [v.buffer(1.0) for v in vias] + [box(zonas['parqueo'][0][0], zonas['parqueo'][0][1],
                                                               zonas['parqueo'][1][0], zonas['parqueo'][1][1]).buffer(2)])
+# exteriores de las fotos (rampas, caminos, oficinita, quiosco, gazebo, tina, huerto): sin árboles encima
+_ext = [MultiPoint([(o.matrix_world @ v.co).to_2d()[:] for v in o.data.vertices]).convex_hull.buffer(1.5)
+        for o in bpy.data.objects if o.type == 'MESH' and o.name.startswith('ext_') and 'vegetacion' not in o.name]
+if _ext:
+    prohibido = unary_union([prohibido] + _ext)
 dentro = lote.buffer(-1.6)
 borde = lote.exterior
 arboles, palmas, puestos = [], [], []

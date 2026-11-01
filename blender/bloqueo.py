@@ -41,7 +41,7 @@ def neutro(nombre, gris, rough=0.8, metal=0.0):
 
 M = dict(
     amarillo=neutro('muro_casa', (0.76, 0.53, 0.19)),          # amarillo ocre de las fotos de la fachada
-    gris_claro=neutro('muro_gris', (0.56, 0.58, 0.61)),
+    gris_claro=neutro('muro_gris', (0.36, 0.40, 0.47)),        # gris azulado de las fotos del 31-10-2026
     blanco=neutro('blanco', 0.80, 0.6),
     marco=neutro('marco', 0.82, 0.5),
     teja=neutro('cubierta_casa', (0.43, 0.10, 0.05), 0.7),     # teja terracota de las fotos
@@ -79,6 +79,10 @@ M.update(MR)
 M.update(puerta=MR['madera_media'], puerta_roja=MR['madera_rojiza'], marco=MR['metal_blanco'],
          escalon=MR['piso_terraza'], bloque=MR['bloque_vidrio'], hierro=MR['metal_negro'],
          muro_int=MR['pintura_gris'], piso_int=MR['piso_gris'])
+
+import exteriores
+M.update(exteriores.materiales(mat, neutro))
+M['pintura_azul'] = M['azul_accesible']          # estacionamientos: azul fuerte como en las fotos
 
 C_SITIO = coll('Sitio')
 C_CASA = coll('Casa_amarilla')
@@ -145,16 +149,22 @@ def construir_referencia():
 
 # ---------------- cercas ----------------
 def cercas(g):
-    """Murete amarillo con pilares y remates en bola sobre los bordes del lote que dan a una vía.
-    Portones en los puntos de acceso conocidos por las fotos."""
+    """Muro con pilares y remates en bola sobre los bordes del lote que dan a una vía.
+    Portones en los puntos de acceso conocidos por las fotos. Frente al gris (calle de tierra) los pilares
+    y el muro son color arena, el portón vehicular lleva arco y celosía y hay un portón peatonal en arco
+    (fotos y video del 31-10-2026); el del patio de grava de la casa es de barrotes rectos (foto 114626)."""
     from shapely.geometry import Point
+    import exteriores as EX
     s = sitio.s()
     lote = g['lote']
     ca, oe = g['ca'], g['oeste']
-    portones = [sitio.local_a_m(sitio.CASA, 23.5, 0.5),
-                sitio.local_a_m(sitio.GRIS, 1.5, -8.0)]
+    portones = [(sitio.local_a_m(sitio.CASA, 23.5, 0.5), 'vehicular', 2.6),
+                (sitio.local_a_m(sitio.GRIS, 1.5, -8.0), 'vehicular_arco', 2.6),
+                (sitio.local_a_m(sitio.GRIS, 6.4, -8.0), 'peatonal', 1.4),
+                (sitio.local_a_m(sitio.GRIS, -23.5, -8.0), 'vehicular', 2.6)]
+    from muebles3d import Malla
+    mp = Malla()
     pts = list(lote.exterior.coords)
-    pil, panel, rejas = [], [], []
     for i in range(len(pts) - 1):
         a, b = pts[i], pts[i + 1]
         mid = Point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
@@ -172,23 +182,37 @@ def cercas(g):
             lx, ly = sitio.m_a_local(sitio.CASA, cx, cy)
             if -6.0 < lx < 15.6 and -16.0 < ly < -6.0:
                 continue
-            en_porton = any(math.hypot(cx - px, cy - py) < 2.6 for px, py in portones)
-            org = (A[0], A[1], 0)
-            o = obox(f'cerca_{i}_{k}', (u1 - u0, 0.2, 0.95 if en_porton else 1.55), (u0, -0.1, 0), org, ang, M['amarillo'], C_CERCA)
-            if en_porton:
-                o.scale.z = 0.02
-                bars = []
-                kk = u0 + 0.06
-                while kk < u1:
-                    bars.append(obox(f'pb_{i}_{k}', (0.022, 0.022, 1.9), (kk, -0.011, 0.05), org, ang, M['hierro'], C_CERCA))
-                    kk += 0.12
-                for zz in (0.05, 1.85):
-                    bars.append(obox(f'pr_{i}_{k}', (u1 - u0, 0.05, 0.06), (u0, -0.025, zz), org, ang, M['hierro'], C_CERCA))
-                join(bars, f'porton_{i}_{k}')
-            panel.append(o)
-            px, py = A[0] + math.cos(ang) * u0, A[1] + math.sin(ang) * u0
-            pil.append(box(f'pilar_{i}_{k}', (0.42, 0.42, 1.95), (px - 0.21, py - 0.21, 0), M['amarillo'], C_CERCA))
-            pil.append(sphere(f'bola_{i}_{k}', 0.16, (px, py, 2.12), M['blanco'], C_CERCA, 2))
+            gx, gy = sitio.m_a_local(sitio.GRIS, cx, cy)
+            arena = mid.distance(oe) < mid.distance(ca) and gx > -12.0
+            mat_m = 'arena' if arena else 'amarillo_muro'
+            tipo = None
+            for (px, py), t, r in portones:
+                if math.hypot(cx - px, cy - py) < r:
+                    tipo = t
+            P0 = (A[0] + math.cos(ang) * u0, A[1] + math.sin(ang) * u0)
+            P1 = (A[0] + math.cos(ang) * u1, A[1] + math.sin(ang) * u1)
+            if tipo is None:
+                EX.tramo(mp, P0, P1, 0.2, 0.0, 1.55, mat_m)
+            elif tipo == 'peatonal':
+                um = (u0 + u1) / 2
+                Q0 = (A[0] + math.cos(ang) * (um - 0.65), A[1] + math.sin(ang) * (um - 0.65))
+                Q1 = (A[0] + math.cos(ang) * (um + 0.65), A[1] + math.sin(ang) * (um + 0.65))
+                EX.tramo(mp, P0, Q0, 0.2, 0.0, 1.55, mat_m)
+                EX.tramo(mp, Q1, P1, 0.2, 0.0, 1.55, mat_m)
+                for Q in (Q0, Q1):
+                    mp.cc(Q[0], Q[1], 0.0, 0.42, 0.42, 1.95, mat_m)
+                    mp.esfera(Q[0], Q[1], 2.12, 0.16, 'blanco', seg=10)
+                EX.porton_negro(mp, Q0, Q1, alto=1.75, arco=0.35, celosia=True, paso=0.11)
+            else:
+                EX.tramo(mp, P0, P1, 0.2, 0.0, 0.4 if tipo == 'vehicular_arco' else 0.05, mat_m)
+                EX.porton_negro(mp, P0, P1, alto=1.85, arco=0.3 if tipo == 'vehicular_arco' else 0.0,
+                                celosia=tipo == 'vehicular_arco')
+            mp.cc(P0[0], P0[1], 0.0, 0.42, 0.42, 1.95, mat_m)
+            mp.cc(P0[0], P0[1], 1.95, 0.5, 0.5, 0.08, 'blanco')
+            mp.esfera(P0[0], P0[1], 2.2, 0.16, 'blanco', seg=10)
+    ob = mp.objeto('cercas_lote', M, C_CERCA)
+    from lib import box_uv
+    box_uv(ob, 1.0)
 
 
 # ---------------- luz y cámaras ----------------
@@ -255,6 +279,7 @@ def visibles(sitio_on=True, ref_on=False):
 g = construir_sitio()
 construir_referencia()
 cercas(g)
+exteriores.construir(M, coll('Exteriores'))
 ox, oy, a = sitio.marco(sitio.CASA)
 K_CASA = casa_amarilla(M, C_CASA, (ox, oy), a)
 ox, oy, a = sitio.marco(sitio.GRIS)

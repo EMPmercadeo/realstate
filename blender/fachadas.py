@@ -267,6 +267,56 @@ def porton(K, x0, x1, y, alto=1.9, arco=0.3, paso=0.12):
     return o
 
 
+def anillo(K, t, eje, plano, u, z, ru, rz, grosor=0.022, prof=0.025, segs=18, m='hierro'):
+    """Aro elíptico (adorno de las verjas) en el plano de la fachada. eje 'x': fachada en y=plano;
+    'y': fachada en x=plano. u = posición a lo largo, z = centro."""
+    vs, fs = [], []
+    for i in range(segs):
+        a = 2 * math.pi * i / segs
+        for (r1, r2) in ((ru, rz), (ru - grosor, rz - grosor)):
+            for d in (-prof / 2, prof / 2):
+                uu, zz = u + r1 * math.cos(a), z + r2 * math.sin(a)
+                vs.append((uu, plano + d, zz) if eje == 'x' else (plano + d, uu, zz))
+    def ix(i, ring, side):
+        return (i % segs) * 4 + ring * 2 + side
+    for i in range(segs):
+        j = i + 1
+        fs.append((ix(i, 0, 0), ix(j, 0, 0), ix(j, 0, 1), ix(i, 0, 1)))      # canto exterior
+        fs.append((ix(i, 1, 1), ix(j, 1, 1), ix(j, 1, 0), ix(i, 1, 0)))      # canto interior
+        fs.append((ix(i, 1, 0), ix(j, 1, 0), ix(j, 0, 0), ix(i, 0, 0)))      # cara
+        fs.append((ix(i, 0, 1), ix(j, 0, 1), ix(j, 1, 1), ix(i, 1, 1)))      # cara de atrás
+    return K.poly(t, vs, fs, m)
+
+
+def verja(K, eje, a0, a1, plano, z0, z1, postes, m='hierro'):
+    """Verja de piso a techo de las galerías del gris (fotos del 31-10-2026): barrotes verticales, baranda
+    a 1 m, postes por bahía y en cada bahía dos adornos de aros (abajo y arriba), como en la foto."""
+    def bx(t, u0, u1, zz0, zz1, d0=-0.0125, d1=0.0125):
+        if eje == 'x':
+            return K.B(t, u0, plano + d0, zz0, u1, plano + d1, zz1, m)
+        return K.B(t, plano + d0, u0, zz0, plano + d1, u1, zz1, m)
+    u = a0 + 0.06
+    while u < a1 - 0.03:
+        bx('verja_barrote', u - 0.011, u + 0.011, z0 + 0.05, z1 - 0.05)
+        u += 0.105
+    for zz in (z0 + 0.03, z0 + 0.95, z0 + 1.0, z1 - 0.07):
+        bx('verja_riel', a0, a1, zz, zz + 0.05, -0.02, 0.02)
+    for p in postes:
+        bx('verja_poste', p - 0.05, p + 0.05, z0, z1, -0.05, 0.05)
+    bah = list(zip(postes[:-1], postes[1:]))
+    for (p0, p1) in bah:
+        for frac in (0.3, 0.7):
+            uc = p0 + (p1 - p0) * frac
+            if p1 - p0 < 1.2 and frac == 0.7:
+                continue
+            uc = uc if p1 - p0 >= 1.2 else (p0 + p1) / 2
+            anillo(K, 'verja_aro', eje, plano, uc, z0 + 0.5, 0.11, 0.24)          # balaustrada
+            anillo(K, 'verja_aro', eje, plano, uc, z0 + 1.75, 0.12, 0.42)         # paño alto
+            anillo(K, 'verja_aro', eje, plano, uc, z0 + 1.75, 0.06, 0.18)
+            bx('verja_marco', uc - 0.2, uc + 0.2, z0 + 1.25, z0 + 1.28)
+            bx('verja_marco', uc - 0.2, uc + 0.2, z0 + 2.25, z0 + 2.28)
+
+
 def colocar(K, root):
     for o in K.objs:
         if o and o.name in bpy.data.objects and o.parent is None:
@@ -428,36 +478,52 @@ def edificio_gris(M, c, origen, ang):
     K.B('remate_s', XL - 0.1, 0.0, Z2 - 0.2, XL + 0.05, YE, ZT, 'lamina')
     for (xa, r0, r1) in ((4.6, 1.9, 4.3), (6.7, 0.0, 1.9)):         # retornos de cada escalón
         K.B('remate_ret', xa - 0.07, r0, Z2 - 0.2, xa + 0.07, r1 + 0.1, ZT, 'lamina')
+    tapas = [(a0, r - 0.08, a1, r + 0.13) for (a0, a1, r) in tramos] + [
+        (0.0, YE - 0.13, XL, YE + 0.08), (-0.08, tramos[0][2], 0.13, YE), (XL - 0.13, 0.0, XL + 0.08, YE),
+        (4.6 - 0.1, 1.9, 4.6 + 0.1, 4.3 + 0.13), (6.7 - 0.1, 0.0, 6.7 + 0.1, 1.9 + 0.13)]
+    for (xa, ya, xb, yb) in tapas:
+        K.B('remate_tapa', xa, ya, ZT, xb, yb, ZT + 0.05, 'blanco')
+        K.B('remate_canto', xa, ya, Z2 - 0.32, xb, yb, Z2 - 0.2, 'blanco')
 
-    # ---- galería norte cerrada: losa, listones verticales, paneles decorativos
+    # ---- galería en L del tramo norte (fotos y video del 31-10-2026): verjas negras de piso a techo con
+    # adornos de aros, sobre la fachada norte (mira a la casa amarilla) y sobre la oeste (calle de tierra);
+    # la planta baja queda retirada debajo. Canto de losa y cielo blancos.
     y0n, y1n = tramos[0][2] + ov, YE - ov
+    yO = tramos[0][2] + 0.15                                       # frente de la verja oeste
     K.B('gal_n_piso', 0.15, y0n, Z1 - 0.25, ov + GN, y1n, Z1, 'concreto')
-    y = y0n + 0.1
-    while y < y1n - 0.05:
-        K.B('liston', 0.2, y, Z1, 0.27, y + 0.05, Z2 - 0.2, 'metal_gris'); y += 0.15
-    for yy in (y0n + 0.9, y0n + 3.6, y0n + 6.3):
-        K.B('panel_deco', 0.17, yy, Z1 + 0.9, 0.2, yy + 0.9, Z2 - 0.9, 'hierro')
-    K.B('gal_n_pasam', 0.15, y0n, Z1 + 1.0, 0.3, y1n, Z1 + 1.1, 'metal_gris')
-    for yy in (y0n, (y0n + y1n) / 2, y1n - 0.15):
-        K.B('gal_n_poste', 0.12, yy, Z1, 0.32, yy + 0.15, Z2 - 0.2, 'metal_gris')
-    # planta baja norte: puerta y dos ventanas bajo la galería
+    K.B('gal_o_piso', 0.15, yO - 0.05, Z1 - 0.25, tramos[0][1], y0n, Z1, 'concreto')
+    K.B('gal_canto', 0.05, yO - 0.1, Z1 - 0.32, 0.17, y1n, Z1 + 0.03, 'blanco')          # canto norte
+    K.B('gal_canto', 0.05, yO - 0.1, Z1 - 0.32, tramos[0][1], yO - 0.02, Z1 + 0.03, 'blanco')   # canto oeste
+    pn = [yO, yO + 2.3] + [yO + 2.3 + k * (y1n - 0.1 - yO - 2.3) / 3 for k in (1, 2, 3)]
+    verja(K, 'y', yO, y1n - 0.1, 0.22, Z1, Z2 - 0.2, pn)
+    verja(K, 'x', 0.22, tramos[0][1] - 0.05, yO, Z1, Z2 - 0.2, [0.22, 2.4, tramos[0][1] - 0.1])
+    # planta baja bajo la galería oeste: puerta de metal café y dos ventanas con rejas (video 113649)
+    puerta(K, 'x', 1.38, 2.28, 0, 2.1, y0n, -1, m='puerta_roja')
+    ventana(K, 'x', 2.55, 3.15, 0.95, 2.1, y0n, -1)
+    ventana(K, 'x', 3.4, 4.0, 0.95, 2.1, y0n, -1)
+    # planta baja norte: dos ventanas altas junto a la esquina y la del pasillo
     xpb = ov + 0.6
-    puerta(K, 'y', 5.4, 6.4, 0, 2.2, xpb, -1, m='puerta_roja')
+    ventana(K, 'y', 5.15, 5.7, 0.7, 2.1, xpb, -1)
+    ventana(K, 'y', 5.95, 6.5, 0.7, 2.1, xpb, -1)
     ventana(K, 'y', 8.2, 9.4, 0.9, 2.3, xpb, -1)
-    # planta alta norte: puerta de la biblioteca a la galería y ventana de la escalera
-    puerta(K, 'y', 5.6, 6.5, Z1, Z1 + 2.2, ov + GN, -1)
+    # planta alta: puerta del depósito (antes biblioteca) a la galería norte, ventana de la escalera y
+    # ventana del depósito hacia la galería oeste
+    puerta(K, 'y', 6.15, 6.95, Z1, Z1 + 2.1, ov + GN, -1)
     ventana(K, 'y', 8.3, 9.3, Z1 + 0.9, Z1 + 2.1, ov + GN, -1, rejas=False)
+    ventana(K, 'x', 3.0, 4.0, Z1 + 0.9, Z1 + 2.1, 5.8, -1, rejas=False)
 
     # ---- fachada oeste: ventanitas de bloque de vidrio, aire acondicionado, puerta
-    bloques = [(2.85, 4.8, 1.3), (5.65, 2.4, 1.3), (8.6, 0.5, 1.3), (10.3, 0.5, 1.3), (12.7, 0.5, 1.3),
-               (3.55, 4.8, Z1 + 1.3), (5.65, 2.4, Z1 + 1.3), (7.55, 0.5, Z1 + 1.3), (11.15, 0.5, Z1 + 1.3)]
+    bloques = [(5.65, 2.4, 1.3), (8.6, 0.5, 1.3), (10.3, 0.5, 1.3), (12.7, 0.5, 1.3),
+               (5.65, 2.4, Z1 + 1.3), (5.65, 2.4, Z1 + 0.35), (7.55, 0.5, Z1 + 1.3), (11.15, 0.5, Z1 + 1.3)]
     for (mid, yw, zz) in bloques:
         ventana(K, 'x', mid - 0.35, mid + 0.35, zz, zz + 0.7, yw, -1, rejas=False, vidrio='bloque')
     K.B('ac', 5.2, 1.9 + ov - 0.35, Z1 + 1.6, 6.0, 1.9 + ov, Z1 + 2.15, 'blanco')
     puerta(K, 'x', 6.9, 7.9, 0, 2.2, ov, -1, m='puerta_roja')
     # estacionamientos con pintura (frente al acceso)
-    for i, xx in enumerate((1.0, 3.8)):
-        K.B('parqueo', xx, -1.8, 0, xx + 2.5, 3.6, 0.02, 'pintura_azul')
+    # estacionamiento accesible pintado de azul (fotos del 31-10-2026) y uno normal de concreto
+    K.B('parqueo', 1.0, -1.8, 0, 3.6, 3.6, 0.02, 'pintura_azul')
+    K.B('parqueo_conc', 3.6, -1.8, 0, 6.3, 2.35, 0.015, 'concreto')
+    K.B('parqueo_linea', 3.6, -1.8, 0.015, 3.68, 2.35, 0.025, 'blanco')
 
     # ---- galería este (terraza): postes delgados y losa volada. Según el propietario (30-10-2026) hoy
     # está cerrada con verjas de piso a techo; la foto edificio-gris.jpg es anterior y la muestra abierta.

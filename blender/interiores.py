@@ -122,13 +122,14 @@ GRIS = dict(
              # la losa cubre la planta alta; las franjas de planta baja fuera de ella quedan bajo las
              # losas de las galerías (fachadas.py), sin caras coplanares
              losa_rects=[R(2.5, 4.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 11.0), R(6.7, 0.5, 13.9, 11.0)],
-             masas=[R(2.5, 4.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 11.0), R(6.7, 0.5, 13.9, 11.0)],
+             # el muro oeste del depósito queda detrás de la galería con verjas (y = 5,8)
+             masas=[R(2.5, 5.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 11.0), R(6.7, 0.5, 13.9, 11.0)],
              cuartos=[
                  dict(id='pasillo', nombre='Pasillo y estar', tipo='abierto', rects=[R(6.7, 0.5, 8.4, 11.0)]),
                  # servicio de la terraza: queda como está, solo inodoro (indicación del 30-10-2026)
                  dict(id='bano', nombre='Servicio de la terraza (solo inodoro)', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
                  dict(id='cocina', nombre='Cocineta del área de coffee break', rects=[R(4.6, 4.8, 6.7, 7.4)], conecta=['pasillo']),
-                 dict(id='deposito', nombre='Depósito y ropería (antes biblioteca)', rects=[R(2.5, 4.8, 4.6, 7.4)],
+                 dict(id='deposito', nombre='Depósito y ropería (antes biblioteca)', rects=[R(2.5, 5.8, 4.6, 7.4)],
                       conecta=['cocina']),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(2.7, 7.4, 6.7, 9.8)]),
                  dict(id='closet', nombre='Clóset de limpieza', rects=[R(4.6, 9.8, 6.7, 11.0)], conecta=['pasillo']),
