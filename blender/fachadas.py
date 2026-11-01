@@ -520,10 +520,12 @@ def edificio_gris(M, c, origen, ang):
     K.B('ac', 5.2, 1.9 + ov - 0.35, Z1 + 1.6, 6.0, 1.9 + ov, Z1 + 2.15, 'blanco')
     puerta(K, 'x', 6.9, 7.9, 0, 2.2, ov, -1, m='puerta_roja')
     # estacionamientos con pintura (frente al acceso)
-    # estacionamiento accesible pintado de azul (fotos del 31-10-2026) y uno normal de concreto
-    K.B('parqueo', 1.0, -1.8, 0, 3.6, 3.6, 0.02, 'pintura_azul')
-    K.B('parqueo_conc', 3.6, -1.8, 0, 6.3, 2.35, 0.015, 'concreto')
-    K.B('parqueo_linea', 3.6, -1.8, 0.015, 3.68, 2.35, 0.025, 'blanco')
+    # bolsillo de estacionamiento entre el muro de la calle y los tramos norte y medio (fotos del 31-10-2026):
+    # piso de concreto y un puesto accesible pintado de azul frente a la puerta café
+    K.B('parqueo_conc', -4.2, -0.45, 0, 4.6, 4.8, 0.015, 'concreto')
+    K.B('parqueo_conc', 4.6, -0.45, 0, 6.65, 2.4, 0.015, 'concreto')
+    K.B('parqueo', 1.25, -0.3, 0.015, 3.85, 4.6, 0.025, 'pintura_azul')
+    K.B('parqueo_linea', 3.85, -0.3, 0.015, 3.93, 4.6, 0.027, 'blanco')
 
     # ---- galería este (terraza): postes delgados y losa volada. Según el propietario (30-10-2026) hoy
     # está cerrada con verjas de piso a techo; la foto edificio-gris.jpg es anterior y la muestra abierta.

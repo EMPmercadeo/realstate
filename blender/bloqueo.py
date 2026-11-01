@@ -159,16 +159,19 @@ def cercas(g):
     lote = g['lote']
     ca, oe = g['ca'], g['oeste']
     portones = [(sitio.local_a_m(sitio.CASA, 23.5, 0.5), 'vehicular', 2.6),
-                (sitio.local_a_m(sitio.GRIS, 1.5, -8.0), 'vehicular_arco', 2.6),
-                (sitio.local_a_m(sitio.GRIS, 6.4, -8.0), 'peatonal', 1.4),
-                (sitio.local_a_m(sitio.GRIS, -23.5, -8.0), 'vehicular', 2.6)]
+                (sitio.local_a_m(sitio.GRIS, 1.6, -0.6), 'vehicular_arco', 2.6),
+                (sitio.local_a_m(sitio.GRIS, 7.4, -0.55), 'peatonal', 1.4),      # frente a la puerta de acceso
+                (sitio.local_a_m(sitio.GRIS, -23.5, -8.5), 'vehicular', 2.6)]
+    corte = g.get('corte')
+    borde_corte = corte.exterior if corte is not None else None
     from muebles3d import Malla
     mp = Malla()
     pts = list(lote.exterior.coords)
     for i in range(len(pts) - 1):
         a, b = pts[i], pts[i + 1]
         mid = Point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
-        if min(mid.distance(ca), mid.distance(oe)) > 4:
+        d_corte = mid.distance(borde_corte) if borde_corte is not None else 99
+        if min(mid.distance(ca), mid.distance(oe), d_corte) > 4:
             continue
         A, Bm = sitio.m(*a), sitio.m(*b)
         L = math.hypot(Bm[0] - A[0], Bm[1] - A[1])
@@ -183,18 +186,19 @@ def cercas(g):
             if -6.0 < lx < 15.6 and -16.0 < ly < -6.0:
                 continue
             gx, gy = sitio.m_a_local(sitio.GRIS, cx, cy)
-            arena = mid.distance(oe) < mid.distance(ca) and gx > -12.0
+            arena = min(mid.distance(oe), d_corte) < mid.distance(ca) and gx > -12.0
             mat_m = 'arena' if arena else 'amarillo_muro'
             tipo = None
             for (px, py), t, r in portones:
                 if math.hypot(cx - px, cy - py) < r:
                     tipo = t
+                    u_p = (px - A[0]) * math.cos(ang) + (py - A[1]) * math.sin(ang)   # proyección del portón
             P0 = (A[0] + math.cos(ang) * u0, A[1] + math.sin(ang) * u0)
             P1 = (A[0] + math.cos(ang) * u1, A[1] + math.sin(ang) * u1)
             if tipo is None:
                 EX.tramo(mp, P0, P1, 0.2, 0.0, 1.55, mat_m)
             elif tipo == 'peatonal':
-                um = (u0 + u1) / 2
+                um = min(max(u_p, u0 + 0.9), u1 - 0.9)
                 Q0 = (A[0] + math.cos(ang) * (um - 0.65), A[1] + math.sin(ang) * (um - 0.65))
                 Q1 = (A[0] + math.cos(ang) * (um + 0.65), A[1] + math.sin(ang) * (um + 0.65))
                 EX.tramo(mp, P0, Q0, 0.2, 0.0, 1.55, mat_m)
@@ -202,7 +206,11 @@ def cercas(g):
                 for Q in (Q0, Q1):
                     mp.cc(Q[0], Q[1], 0.0, 0.42, 0.42, 1.95, mat_m)
                     mp.esfera(Q[0], Q[1], 2.12, 0.16, 'blanco', seg=10)
-                EX.porton_negro(mp, Q0, Q1, alto=1.75, arco=0.35, celosia=True, paso=0.11)
+                # hoja abierta hacia adentro del lote (bisagra en Q0), como en el video 113649
+                nx, ny = -math.sin(ang), math.cos(ang)
+                if not lote.contains(Point(sitio.m_a_px(Q0[0] + nx * 1.0, Q0[1] + ny * 1.0))):
+                    nx, ny = -nx, -ny
+                EX.porton_negro(mp, Q0, (Q0[0] + nx * 1.25, Q0[1] + ny * 1.25), alto=1.75, arco=0.35, celosia=True, paso=0.11)
             else:
                 EX.tramo(mp, P0, P1, 0.2, 0.0, 0.4 if tipo == 'vehicular_arco' else 0.05, mat_m)
                 EX.porton_negro(mp, P0, P1, alto=1.85, arco=0.3 if tipo == 'vehicular_arco' else 0.0,

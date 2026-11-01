@@ -46,21 +46,32 @@ def _shapely():
     return Polygon, LineString, unary_union
 
 
-def geometria_px():
+# Lindero oeste entre el patio de grava de la casa y el gris (fotos y video del 31-10-2026): el muro de la
+# calle de tierra corre a ~1 u al oeste del tramo sur del gris (el pilar del portón peatonal toca la
+# fachada) y el muro amarillo del jardín queda a ~4 m del camino de baldosa. El trazo, menos la calle,
+# lo dejaba ~10 m más afuera. Polígono a recortar, en unidades de diseño del marco del gris.
+CORTE_OESTE_GRIS = [(-19.6, -0.9), (16.5, -0.4), (16.5, -40.0), (-19.6, -40.0)]
+
+
+def geometria_px(cortar=True):
     Polygon, LineString, unary_union = _shapely()
     rojo = Polygon(ROJO).buffer(0)
     ca = LineString(CA).buffer(CA_ANCHO / 2, cap_style=2)
     oe = LineString(OESTE).buffer(OESTE_ANCHO / 2, cap_style=2)
     lote = rojo.difference(unary_union([ca, oe]))
+    corte = None
+    if cortar:
+        corte = Polygon([m_a_px(*local_a_m(GRIS, x, y)) for x, y in CORTE_OESTE_GRIS])
+        lote = lote.difference(corte)
     if lote.geom_type != 'Polygon':
         lote = max(lote.geoms, key=lambda g: g.area)
     lote = lote.simplify(1.5)
-    return dict(rojo=rojo, ca=ca, oeste=oe, lote=lote)
+    return dict(rojo=rojo, ca=ca, oeste=oe, lote=lote, corte=corte)
 
 
 def escala_trazo():
     """Escala vieja: la que haría medir 2.500 m² al trazo sin vías (0,117 m/px)."""
-    return math.sqrt(AREA_OBJETIVO / geometria_px()['lote'].area)
+    return math.sqrt(AREA_OBJETIVO / geometria_px(cortar=False)['lote'].area)
 
 
 S = None

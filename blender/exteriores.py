@@ -226,16 +226,16 @@ def tina(m, cx, cy):
     """PROPUESTA: tina de hidroterapia (agua tibia en movimiento) sobre deck de madera con escalón y
     pasamanos, donde estaba el palo de mango."""
     with m.at(cx, cy, 0):
-        m.caja(-1.9, -1.9, 0.0, 1.9, 1.9, 0.45, 'madera_deck')
+        m.caja(-1.6, -1.6, 0.0, 1.6, 1.6, 0.45, 'madera_deck')
         m.cil(0, 0, 0.0, 0.47, 1.12, 'piedra_clara', segs=32)
         m.cil(0, 0, 0.05, 0.42, 0.98, 'agua', segs=32)
         m.toro(0, 0, 0.47, 1.05, 0.06, 'piedra_clara', seg=32, seg2=6)
-        m.caja(-0.7, -2.35, 0.0, 0.7, -1.9, 0.22, 'madera_deck')
+        m.caja(-0.7, -2.05, 0.0, 0.7, -1.6, 0.22, 'madera_deck')
         for s in (-1, 1):
-            m.tubo((s * 0.45, -2.3, 0.22), (s * 0.45, -2.3, 1.1), 0.025, 'acero', segs=8)
-            m.tubo((s * 0.45, -2.3, 1.1), (s * 0.45, -1.4, 1.35), 0.025, 'acero', segs=8)
+            m.tubo((s * 0.45, -2.0, 0.22), (s * 0.45, -2.0, 1.1), 0.025, 'acero', segs=8)
+            m.tubo((s * 0.45, -2.0, 1.1), (s * 0.45, -1.4, 1.35), 0.025, 'acero', segs=8)
             m.tubo((s * 0.45, -1.4, 1.35), (s * 0.45, -1.15, 0.47), 0.025, 'acero', segs=8)
-        for (x, y) in ((-1.6, 1.6), (1.6, 1.6)):
+        for (x, y) in ((-1.35, 1.35), (1.35, 1.35)):
             m.cil(x, y, 0.45, 0.85, 0.22, 'maceta_terracota', segs=12)
 
 
@@ -322,7 +322,7 @@ def construir(M, C):
     rampa(m, P(-11.5, 7.0), P(-17.2, 7.0))
     descanso(m, *P(-18.8, 3.6), *P(-17.2, 7.7))
     # ---- muro amarillo con portón negro entre el jardín y el patio de grava de la casa (foto 113831)
-    muro(m, P(-19.6, -8.0), P(-19.6, 2.3), alto=1.5)
+    muro(m, P(-19.6, -0.6), P(-19.6, 2.3), alto=1.5)
     muro(m, P(-19.6, 3.8), P(-19.6, 9.5), alto=1.5)
     porton_negro(m, P(-19.6, 2.3), P(-19.6, 3.8), alto=1.55)
     # ---- patio de grava detrás de la casa (foto casa-amarilla-patio y video 114626)
@@ -333,13 +333,13 @@ def construir(M, C):
     # ---- construcciones pequeñas existentes
     m = F.malla()
     oficinita(m, *P(-12.8, 16.2), g=90.0)            # frente (vidrio) hacia el camino, al oeste
-    quiosco(m, *P(-7.0, -7.15), g=180.0)             # contra el muro de la calle de tierra
+    quiosco(m, *P(-8.6, -0.12), g=180.0)             # contra el muro de la calle de tierra
     objs.append(cerrar(m, 'ext_oficinita_quiosco', M, C))
 
     # ---- propuesta (contexto del proyecto): gazebo, tina de hidroterapia y huerto
     m = F.malla()
-    gazebo(m, *P(-15.0, -3.2))
-    tina(m, *P(-9.0, -3.0))
+    gazebo(m, *P(-16.2, 13.2))                        # jardín del noreste, entre la oficinita y el patio
+    tina(m, *P(-12.2, 0.75))                          # donde estaba el mango (tocón al oeste del camino)
     hx0, hy0 = P(-10.6, 10.6); hx1, hy1 = P(-4.8, 17.6)
     huerto(m, hx0, hy0, hx1, hy1, n=4)
     objs.append(cerrar(m, 'ext_propuesta_gazebo_tina_huerto', M, C))
@@ -351,11 +351,11 @@ def construir(M, C):
         if i >= 10:
             x = rnd.uniform(-10.5, -4.5)
         banano(m, *P(x, y), rnd.uniform(3.0, 4.2), rnd)
-    for (x, y, h) in ((-1.7, 10.4, 4.6), (-1.9, 12.6, 4.0), (-4.8, 1.0, 4.2), (-3.0, -1.2, 3.6)):
+    for (x, y, h) in ((-1.7, 10.4, 4.6), (-1.9, 12.6, 4.0), (-5.0, 1.2, 4.2), (-3.4, 0.0, 3.6)):
         palma_fenix(m, *P(x, y), h, rnd, troncos=rnd.randint(3, 5))
-    for (x, y) in ((-17.0, 1.2), (-14.5, 1.5), (-19.0, 8.8), (-8.2, 8.4), (-5.5, 8.6)):
+    for (x, y) in ((-17.0, 1.2), (-15.2, 0.2), (-19.0, 8.8), (-8.2, 8.4), (-5.5, 8.6)):
         croton(m, *P(x, y), rnd.uniform(1.0, 1.5), rnd)
-    tx, ty = P(-12.0, -1.0)
+    tx, ty = P(-14.4, 0.6)
     m.cil(tx, ty, 0.0, 0.55, 0.16, 'tronco_palma', segs=9, r2=0.12)               # tocón (foto 113831)
     objs.append(cerrar(m, 'ext_vegetacion', M, C))
     for o in objs:
