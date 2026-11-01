@@ -6,5 +6,37 @@
   "mini": "/pano/hosp-gris_m.jpg",
   "ancho": 2048,
   "muestras": 16
+ },
+ {
+  "id": "salon2@gris",
+  "nombre": "Salón amarillo",
+  "archivo": "/pano/salon2-gris.jpg",
+  "mini": "/pano/salon2-gris_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "galeria@gris",
+  "nombre": "Área recreativa y de coffee break",
+  "archivo": "/pano/galeria-gris.jpg",
+  "mini": "/pano/galeria-gris_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "recepcion@amarilla",
+  "nombre": "Recepción 24 h",
+  "archivo": "/pano/recepcion-amarilla.jpg",
+  "mini": "/pano/recepcion-amarilla_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "comedor@amarilla",
+  "nombre": "Comedor y TV",
+  "archivo": "/pano/comedor-amarilla.jpg",
+  "mini": "/pano/comedor-amarilla_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
  }
 ]
