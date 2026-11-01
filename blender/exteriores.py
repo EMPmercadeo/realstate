@@ -63,20 +63,21 @@ def tramo(m, p, q, ancho, z0, z1, mat, off=0.0):
         m.caja(0, off - ancho / 2, z0, L, off + ancho / 2, z1, mat)
 
 
-def baranda_tubo(m, p, q, alto=0.92, paso=1.6, mat='metal_negro', base=True):
-    """Baranda de tubo cuadrado negro: postes con dado de concreto y dos pasamanos (0,45 y 0,92 m)."""
+def baranda_tubo(m, p, q, alto=0.92, paso=1.6, mat='metal_negro', base=True, z0=0.0):
+    """Baranda de tubo cuadrado: postes (con dado de concreto si base) y dos pasamanos (0,45 m y arriba),
+    apoyada a la altura z0 (p. ej. sobre un murete)."""
     p, q = Vector((p[0], p[1], 0)), Vector((q[0], q[1], 0))
     d = q - p
     L = d.length
     g = math.degrees(math.atan2(d.y, d.x))
     n = max(1, round(L / paso))
-    with m.at(p.x, p.y, 0, g=g):
+    with m.at(p.x, p.y, z0, g=g):
         for i in range(n + 1):
             u = L * i / n
             m.caja(u - 0.025, -0.025, 0.0, u + 0.025, 0.025, alto, mat)
             if base:
                 m.cil(u, 0, 0.0, 0.10, 0.075, 'concreto_claro', segs=10)
-        for z in (0.45, alto - 0.04):
+        for z in (min(0.45, alto * 0.5), alto - 0.04):
             m.caja(0, -0.025, z, L, 0.025, z + 0.045, mat)
 
 
@@ -294,6 +295,27 @@ def palma_fenix(m, x, y, h, rnd, troncos=4):
             m.hoja(top, d, rnd.uniform(1.7, 2.3), 0.26, 'fronda', curva=0.4, giro=R(90))
 
 
+def palma_navidad(m, x, y, h, rnd):
+    """Palma de navidad (Adonidia) de un tronco, como las del portón del gris (Street View y video 113649)."""
+    lean = rnd.uniform(-0.25, 0.25)
+    top = (x + lean, y + rnd.uniform(-0.2, 0.2), h)
+    m.tubo((x, y, 0), top, 0.11, 'tronco_gris', segs=8)
+    m.cil(top[0], top[1], h - 0.9, h + 0.05, 0.13, 'tallo_banano', segs=8, r2=0.10)      # capitel verde
+    for i in range(11):
+        b = 2 * math.pi * i / 11 + rnd.uniform(-0.15, 0.15)
+        d = Vector((math.cos(b), math.sin(b), rnd.uniform(0.0, 0.9)))
+        m.hoja((top[0], top[1], h + 0.02), d, rnd.uniform(1.6, 2.1), 0.5, 'fronda', curva=0.45, giro=R(90))
+
+
+def cipres(m, x, y, h, rnd):
+    """Árbol columnar oscuro (tuya o ciprés) de la hilera de la calle de tierra (Street View)."""
+    m.cil(x, y, 0.0, 0.5, 0.12, 'tronco_palma', segs=6)
+    r = rnd.uniform(0.75, 1.0)
+    for k, (z, rr) in enumerate(((0.35, 1.0), (0.55, 0.9), (0.75, 0.7), (0.9, 0.45))):
+        m.esfera(x + rnd.uniform(-0.08, 0.08), y + rnd.uniform(-0.08, 0.08), h * z, r * rr, 'cipres', seg=8,
+                 esc=(1, 1, h * 0.22 / max(0.3, r * rr)))
+
+
 def croton(m, x, y, h, rnd):
     for i in range(10):
         a = rnd.uniform(0, 2 * math.pi); r = rnd.uniform(0, 0.35)
@@ -355,6 +377,12 @@ def construir(M, C):
         palma_fenix(m, *P(x, y), h, rnd, troncos=rnd.randint(3, 5))
     for (x, y) in ((-17.0, 1.2), (-15.2, 0.2), (-19.0, 8.8), (-8.2, 8.4), (-5.5, 8.6)):
         croton(m, *P(x, y), rnd.uniform(1.0, 1.5), rnd)
+    # hilera de árboles columnares en la orilla de la calle de tierra y palmas de navidad frente al gris
+    # (Street View en la calle de tierra, panorama de 8,41245 N 82,44374 O)
+    for k, x in enumerate((-4.4, -6.5, -8.1, -10.6, -12.9, -15.8, -17.6)):
+        cipres(m, *P(x + rnd.uniform(-0.3, 0.3), -2.0 + rnd.uniform(-0.25, 0.25)), rnd.uniform(3.6, 5.2), rnd)
+    for x in (9.4, 11.3, 13.2):
+        palma_navidad(m, *P(x, -1.6), rnd.uniform(5.5, 7.0), rnd)
     tx, ty = P(-14.4, 0.6)
     m.cil(tx, ty, 0.0, 0.55, 0.16, 'tronco_palma', segs=9, r2=0.12)               # tocón (foto 113831)
     objs.append(cerrar(m, 'ext_vegetacion', M, C))
@@ -398,4 +426,6 @@ def materiales(mat, neutro):
         croton_rojo=neutro('croton_rojo', (0.40, 0.08, 0.03), 0.7),
         croton_verde=neutro('croton_verde', (0.12, 0.28, 0.05), 0.7),
         toldo_rojo=neutro('toldo_rojo', (0.42, 0.04, 0.05), 0.75),
+        cipres=neutro('cipres', (0.13, 0.24, 0.04), 0.85),          # tuya verde amarillento (Street View)
+        tronco_gris=neutro('tronco_gris', (0.40, 0.38, 0.34), 0.9),
     )

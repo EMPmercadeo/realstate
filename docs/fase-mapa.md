@@ -29,16 +29,17 @@ lámparas, aires y cuadros conservan su tamaño real.
 | Techo de la casa (sin cochera) | ~15 × 14 m | ~18 × 17 m |
 | Sala de personas encamadas | ~35 m², pasillo central de ~1,0 m, mesa puente | ~51 m², pasillo central de ~2,1 m, mesita entre camas |
 | Salón amarillo | ~20 m² | ~30 m² (con el baño nuevo adentro) |
-| Trazo del lote menos calles | 2.500 m² (supuesto) | ~3.670 m²; con el lindero oeste corregido, **~3.290 m²** |
+| Trazo del lote menos calles | 2.500 m² (supuesto) | ~3.670 m²; con el lindero oeste y la calle de tierra corregidos, **~3.260 m²** |
 
 **Lote:** con la escala medida el trazo no cabe en 2.500 m². Si la escritura dice 2.500 m², el lindero
 real es más chico que el trazo (el este y el sur, que dan a vecinos, no se ven en las fotos).
 Pendiente: pedir a la propietaria el plano catastral o la escritura con el polígono.
 
-**Registro entre satélites:** Google, Esri y Bing no coinciden en posición absoluta (difieren de 3 a 7 m
-por la inclinación de cada toma). El modelo sigue la imagen de Google. En Esri la casa amarilla aparece
-unos 5–7 m más cerca de la C.A que en el modelo; el gris coincide. Se confirma con una medida en sitio
-(ver la lista del final).
+**Registro entre satélites:** Google, Esri y Bing no coinciden en posición absoluta (difieren 3–5 m por la
+inclinación de cada toma); se registraron entre sí por puntos comunes (`docs/mapa/registro-satelites.json`).
+Los techos del modelo (casa y gris) caen sobre los techos de Google y también sobre los de Esri, así que la
+posición de los dos edificios queda confirmada. La calle de tierra, en cambio, pasa más al este de lo que se
+había leído: su eje junto al gris se corrigió en la ronda 2 con Esri y con Street View (sección 7).
 
 ## 2. Altura con la mano a 1,80 m
 
@@ -114,7 +115,7 @@ baño nuevo y depósito, y los planos con áreas en metros reales. El módulo `b
   palmas de la calle de tierra en el modelo de la web.
 - Casa amarilla con las fotos nuevas: farol y bloques de vidrio del lado del garaje (114732), toldo rojo y
   tanque negro del lado del patio (114557, 114759), muro crema con remate curvo hacia la C.A (114821).
-- Terreno con desnivel cuando haya una medida.
+- Terreno con desnivel (~1 m, ver sección 7) en Blender y en el visor web: ronda 3.
 - Volver a renderizar las demás vistas interiores con la escala nueva (las de `/avances` que no se
   rehicieron todavía muestran los cuartos un 21 % más chicos). En la PC con la RTX 3080:
   `& $b -b -P blender\bloqueo.py -- --solo interiores --muestras 64 --ancho 1280` y copiar
@@ -123,12 +124,46 @@ baño nuevo y depósito, y los planos con áreas en metros reales. El módulo `b
 ## 6. Medidas para la próxima visita (cinta métrica, 20 minutos)
 
 1. Largo de la fachada oeste del gris de esquina a esquina y ancho de la cara norte.
-2. Distancia del muro de la C.A a la fachada de la casa (para fijar la casa entre Google y Esri).
+2. Distancia del muro de la C.A a la fachada de la casa (para confirmar el retiro del frente).
 3. Ancho y largo de la sala de encamadas y del salón amarillo (por dentro).
 4. Altura de piso a techo de la planta baja del gris (para confirmar los 3,20 m).
 5. Diferencia de altura entre el pie de la rampa (junto al gris) y el portón del patio de grava.
 6. Medidas de la oficinita blanca y del quiosco.
 7. Distancia del camino de baldosa al muro amarillo de la calle de tierra.
+
+## 7. Ronda 2 · Street View, calle de tierra y desnivel (01-11-2026)
+
+Se usaron dos panorámicas de Street View (anteriores a las fotos de 2026): **SV1** en la calle de tierra,
+frente al portón vehicular del gris, y **SV2** en la C.A, frente a la casa (marcadas en el mapa). De cada
+una se sacaron vistas a rumbos conocidos (80°, 120° y 160° en SV1) y se renderizó el modelo desde la misma
+cámara (altura ~2,5 m, mismo campo de visión).
+
+**Calle de tierra.** Con la cámara de SV1 donde la ubicaba el trazo anterior, el gris salía más chico y
+lejos que en Street View. Se probaron cámaras corridas hacia el gris hasta que la galería en L, la esquina
+del gris y el portón quedaron del mismo tamaño y en el mismo lugar del cuadro: eso pasa con la cámara a
+**~5,8 m de la fachada oeste** (antes 8,3 m). Como el carro de Street View circula por el centro de una
+calle angosta, el eje se movió ~2,5 m hacia el gris junto al edificio (`sitio.OESTE`), con el mismo ancho.
+Encaja con la foto 114153 (cabe un carro de frente entre el muro y el gris) y con el satélite de Esri, que
+muestra la franja de tierra pegada al gris. El lindero junto al gris no cambia (lo fija el muro de las
+fotos); el lote pasa de ~3.290 a **~3.260 m²**.
+
+![Street View contra modelo](mapa/comparacion-street-view.jpg)
+
+**Casa.** Los techos del modelo caen sobre los de Google y de Esri, y desde SV2 la fachada de la C.A se ve
+del tamaño esperado: la casa no se mueve. (Una lectura anterior con Esri la ponía 5–7 m más cerca de la C.A;
+era un error de registro entre imágenes, ya corregido.)
+
+**Desnivel.** Desde SV1, al norte del portón vehicular el jardín queda **más alto que la calle**: muro de
+contención de concreto de unos 0,6–0,8 m, encima un muro curvo crema con verja y la baranda de la rampa
+detrás. Con las rampas del camino de baldosa (fotos 113759–113851) el jardín sube del gris hacia la casa
+~1 m en total. En el modelo se dibujó el murete de 0,7 m con baranda en ese tramo del lindero; el terreno
+sigue plano hasta tener la medida (pregunta 5 de la sección 6). Pasa a la ronda 3.
+
+**Otros ajustes de la ronda 2:** frente al tramo sur del gris no hay muro (en Street View la fachada da
+directo a la orilla con palmas), así que se quitó ese tramo; los pilares del frente de la casa llevan bola
+color teja (Street View desde la C.A);
+el mapa (`blender/mapa_fotos.py`) se arma ahora con los techos reales del modelo, el eje de la calle y las
+dos cámaras de Street View.
 
 ## Archivos
 
@@ -138,6 +173,9 @@ baño nuevo y depósito, y los planos con áreas en metros reales. El módulo `b
 | `docs/mapa/comparacion-fotos-modelo.jpg` | Foto real contra modelo (gris desde la calle, cara norte, camino y rampas) |
 | `docs/mapa/puerta-medida.jpg` | Medición del marco de la puerta con la mano a 1,80 m |
 | `docs/mapa/modelo-cenital.jpg` | Vista cenital del modelo |
+| `docs/mapa/comparacion-street-view.jpg` | Street View (SV1) contra el modelo desde la misma cámara |
+| `docs/mapa/satelite-esri-z19.jpg`, `satelite-bing-z19.jpg`, `registro-satelites.json` | Satélites a escala conocida y su registro con la imagen de Google |
+| `blender/mapa_fotos.py` | Arma `mapa-fase1.jpg` (techos leídos de `bloqueo.blend`) |
 | `docs/fotos-referencia-2026-10-31/` | Fotos (1280 px) y cuadros de los videos |
 | `blender/vista_rapida.py` | Render rápido desde cualquier cámara para comparar con una foto |
 
@@ -146,4 +184,5 @@ Regenerar (PowerShell en `realstate`, o `python3` con el módulo `bpy` en la nub
 & $b -b -P blender\bloqueo.py -- --solo ninguno
 & $b -b -P blender\web_muestras.py
 & $b -b -P blender\export_web.py
+python blender\mapa_fotos.py      # con el módulo bpy
 ```

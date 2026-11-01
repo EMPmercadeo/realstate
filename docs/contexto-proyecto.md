@@ -246,7 +246,7 @@ Estos puntos se contradicen entre audios o no quedan claros, y conviene cerrarlo
 - [ ] **Oficina del gerente:** la recámara de arriba ahora es cuarto privado. ¿Dónde va el gerente?
 - [ ] **Pasadía y estadías temporales:** ¿cuánto se cobra la hora extra después de las 5:00 p. m.? ¿Las estadías usan solo los 4 cuartos privados?
 - [ ] **Recepción:** falta la foto correcta de la recepción.
-- [ ] **Área del lote:** con la escala medida, el trazo del lote da ~3.290 m² (no 2.500). Pedir el plano
+- [ ] **Área del lote:** con la escala medida, el trazo del lote da ~3.260 m² (no 2.500). Pedir el plano
   catastral o la escritura para fijar el lindero real.
 - [ ] **Huerto:** ¿la "oficinita de abajo" es la casita blanca con puerta de vidrio junto al bananal, y el
   bananal es "donde están los tallos"?

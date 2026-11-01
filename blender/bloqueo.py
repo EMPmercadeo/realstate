@@ -159,7 +159,7 @@ def cercas(g):
     lote = g['lote']
     ca, oe = g['ca'], g['oeste']
     portones = [(sitio.local_a_m(sitio.CASA, 23.5, 0.5), 'vehicular', 2.6),
-                (sitio.local_a_m(sitio.GRIS, 1.6, -0.6), 'vehicular_arco', 2.6),
+                (sitio.local_a_m(sitio.GRIS, 3.0, -0.6), 'vehicular_arco', 3.3),     # ocupa todo el frente del estacionamiento
                 (sitio.local_a_m(sitio.GRIS, 7.4, -0.55), 'peatonal', 1.4),      # frente a la puerta de acceso
                 (sitio.local_a_m(sitio.GRIS, -23.5, -8.5), 'vehicular', 2.6)]
     corte = g.get('corte')
@@ -195,6 +195,17 @@ def cercas(g):
                     u_p = (px - A[0]) * math.cos(ang) + (py - A[1]) * math.sin(ang)   # proyección del portón
             P0 = (A[0] + math.cos(ang) * u0, A[1] + math.sin(ang) * u0)
             P1 = (A[0] + math.cos(ang) * u1, A[1] + math.sin(ang) * u1)
+            # tramos de la calle de tierra según Street View (8,41245 N 82,44374 O): frente al tramo sur del gris no
+            # hay muro (la fachada da a la orilla con palmas); al norte del portón vehicular, murete con baranda
+            # de tubo y macetas (el jardín queda más alto que la calle)
+            sin_muro = d_corte < 4 and gx > 8.4
+            murete = d_corte < 4 and -9.0 < gx < -0.4
+            if tipo is None and sin_muro:
+                continue
+            if tipo is None and murete:
+                EX.tramo(mp, P0, P1, 0.22, 0.0, 0.7, 'murete_gris')
+                EX.baranda_tubo(mp, P0, P1, alto=0.95, paso=1.5, mat='metal_blanco', base=False, z0=0.7)
+                continue
             if tipo is None:
                 EX.tramo(mp, P0, P1, 0.2, 0.0, 1.55, mat_m)
             elif tipo == 'peatonal':

@@ -32,8 +32,12 @@ ROJO = [(297, 83), (345, 100), (400, 140), (450, 172), (500, 190), (550, 213), (
 # ---- ejes aproximados de las vías que el trazo incluye (px) ----
 CA = [(250, 45), (300, 85), (330, 112), (420, 155), (500, 195), (565, 232), (608, 278), (632, 335), (660, 420)]
 CA_ANCHO = 44          # px (incluye cunetas/orillas)
-OESTE = [(300, 92), (266, 145), (238, 215), (207, 290), (178, 360), (150, 430), (121, 498), (92, 556), (70, 616),
-         (57, 690), (20, 726), (-10, 735)]
+# eje de la calle de tierra; desde y≈420 px sigue el trazo sobre el satélite de Esri (01-11-2026), que la
+# muestra 3-4 m más al este que la lectura anterior, pegada al gris. Junto al gris se acercó ~2 m más con
+# Street View: desde la cámara de la panorámica de la calle (que circula por el eje), el gris y el portón se
+# ven del mismo tamaño que en el modelo solo si el eje pasa a ~5,8 m de la fachada (ver docs/fase-mapa.md)
+OESTE = [(300, 92), (266, 145), (238, 215), (207, 290), (185, 360), (181, 428), (164, 501), (140, 560), (108, 629),
+         (79, 693), (47, 733), (-10, 740)]
 OESTE_ANCHO = 32
 
 AREA_OBJETIVO = 2500.0          # área que dijo la propietaria (no se usa para la escala)
@@ -82,12 +86,13 @@ def s():
     return S_MEDIDA
 
 
+S_DISENO = 0.11682942          # m/px con que se dibujaron los edificios (etapas 2-4); fijo desde el 01-11-2026
+
+
 def kp():
-    """Factor de planta: unidades de diseño de los edificios -> metros (≈ 1,21)."""
-    global _KP
-    if _KP is None:
-        _KP = S_MEDIDA / escala_trazo()
-    return _KP
+    """Factor de planta: unidades de diseño de los edificios -> metros (1,2112). No depende del trazo ni de
+    las calles, para que los edificios no cambien de tamaño si se corrige el lindero."""
+    return S_MEDIDA / S_DISENO
 
 
 def m(px, py):
@@ -150,7 +155,7 @@ def m_a_px(X, Y):
 if __name__ == '__main__':
     g = geometria_px()
     k = s()
-    print('escala m/px', round(k, 4), ' escala vieja (2.500 m²)', round(escala_trazo(), 4), ' KP', round(kp(), 3))
+    print('escala m/px', round(k, 4), ' escala de diseño', S_DISENO, ' KP', round(kp(), 4))
     print('lote m2', round(g['lote'].area * k * k), ' trazo rojo completo m2', round(g['rojo'].area * k * k))
     for n, E in (('casa', CASA), ('gris', GRIS)):
         print(n, [round(v, 2) for v in marco(E)[:2]], round(math.degrees(marco(E)[2]), 1))

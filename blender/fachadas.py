@@ -450,7 +450,7 @@ def casa_amarilla(M, c, origen, ang):
     for xx in pilares:
         K.B('pilar', xx - 0.22, YF - 0.22, 0, xx + 0.22, YF + 0.22, 1.95, Y)
         K.B('pilar_cap', xx - 0.28, YF - 0.28, 1.95, xx + 0.28, YF + 0.28, 2.05, 'blanco')
-        K.cyl('pilar_bola', xx, YF, 2.05, 0.17, 0.32, 'blanco', segs=12, r2=0.06)
+        K.cyl('pilar_bola', xx, YF, 2.05, 0.17, 0.32, 'teja', segs=12, r2=0.06)        # remate terracota (Street View)
     for (p0, p1) in portones:
         porton(K, p0 + 0.05, p1 - 0.05, YF, alto=1.85, arco=0.35 if p1 - p0 > 4 else 0.2)
 

@@ -431,9 +431,10 @@ dentro = lote.buffer(-1.6)
 borde = lote.exterior
 arboles, palmas, puestos = [], [], []
 # árboles y palmas que se ven en las fotos del 31-10-2026 (marco del gris o de la casa, unidades de diseño)
-CURADOS = [('p', sitio.GRIS, 9.6, -1.7, 8.0), ('p', sitio.GRIS, 12.3, -1.9, 7.0),          # palmas de navidad del portón
-           ('p', sitio.GRIS, -6.0, -2.7, 7.5), ('p', sitio.GRIS, -10.5, -2.9, 8.0),         # hilera de la calle de tierra
-           ('p', sitio.GRIS, -15.0, -3.0, 7.0), ('p', sitio.GRIS, -19.0, -3.2, 7.5),
+CURADOS = [('p', sitio.GRIS, 9.4, -1.6, 7.0), ('p', sitio.GRIS, 11.3, -1.6, 6.5),          # palmas de navidad del portón
+           ('p', sitio.GRIS, 13.2, -1.6, 6.5),                                              # tercera palma del portón
+           ('a', sitio.GRIS, -6.2, -1.9, 5.5), ('a', sitio.GRIS, -9.5, -1.9, 6.0),          # hilera de árboles columnares
+           ('a', sitio.GRIS, -13.0, -1.9, 5.5), ('a', sitio.GRIS, -16.4, -1.9, 6.0),        # de la calle de tierra (Street View)
            ('a', sitio.GRIS, -8.4, 4.05, 4.5), ('a', sitio.GRIS, -15.6, 1.2, 5.5),          # naranjo y árboles del césped
            ('a', sitio.GRIS, -17.8, 0.2, 6.0), ('a', sitio.GRIS, -6.5, 0.4, 5.0),
            ('a', sitio.CASA, 14.2, -4.2, 7.5)]                                              # pino del jardín del frente
