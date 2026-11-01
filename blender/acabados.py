@@ -10,6 +10,7 @@ from shapely.geometry import box as sbox, Point, LineString
 from shapely.ops import unary_union
 import interiores as I
 from muebles3d import Malla, R
+import amueblado as A
 
 # ------------------------------------------------------------------ configuración por edificio y cuarto
 EDIF = {
@@ -26,6 +27,7 @@ REVEST = {   # bandas sobre la cara interior de los muros: (material, z desde, z
     ('casa', 'pb', 'lavanderia'): [('azulejo_blanco', 0.0, 1.30)],
     ('gris', 'pb', 'bano_acc'): [('azulejo_rojo', 0.0, 1.60), ('pintura_celeste', 1.60, None)],
     ('gris', 'pa', 'bano'): [('azulejo_rojo', 0.0, 1.60), ('pintura_celeste', 1.60, None)],
+    ('gris', 'pa', 'bano_s2'): [('azulejo_blanco', 0.0, 2.10)],
     ('gris', 'pa', 'cocina'): [('azulejo_blanco', 0.0, 1.50)],
     ('gris', 'pa', 'salon2'): [('pintura_amarilla', 0.0, None)],
     ('gris', 'pb', 'salonA'): [('pintura_salvia', 0.0, 0.85)],
@@ -33,7 +35,7 @@ REVEST = {   # bandas sobre la cara interior de los muros: (material, z desde, z
     ('casa', 'pb', 'terapia'): [('pintura_salvia', 0.0, None)],
 }
 PISO_ESP = {('casa', 'pb', 'bano1'), ('casa', 'pb', 'bano2'), ('casa', 'pa', 'bano_rec'), ('gris', 'pb', 'bano_acc'),
-            ('gris', 'pa', 'bano'), ('casa', 'pb', 'lavanderia')}
+            ('gris', 'pa', 'bano'), ('gris', 'pa', 'bano_s2'), ('casa', 'pb', 'lavanderia')}
 GUARDA = {('gris', 'pa', 'hosp'), ('gris', 'pa', 'salon2'), ('gris', 'pb', 'salonA'), ('gris', 'pb', 'salonB'),
           ('gris', 'pa', 'pasillo'), ('gris', 'pb', 'pasillo')}
 CORTINAS = {   # cuartos con cortinas en sus ventanas: material
@@ -58,7 +60,7 @@ AIRES = {
     ('casa', 'pa'): [('recamara', '-x', 4.90, 4.3)],
     ('gris', 'pb'): [('salonA', '-x', 4.80, 11.2), ('salonB', '-x', 9.16, 11.4), ('oficina1', '-y', 0.70, 9.7),
                      ('oficina2', '-y', 0.70, 11.9)],
-    ('gris', 'pa'): [('hosp', '-y', 4.26, 8.9), ('hosp', '-y', 4.26, 12.6), ('salon2', '-y', 0.70, 9.7)],
+    ('gris', 'pa'): [('hosp', '-y', 4.26, 8.9), ('hosp', '-y', 4.26, 12.6), ('salon2', '-y', 0.70, 12.9)],
 }
 # cuadros: (cuarto, lado, cara, u, z centro, ancho, alto)
 CUADROS = {
@@ -73,7 +75,7 @@ CUADROS = {
                      ('salonB', '+x', 13.70, 11.4, 1.6, 0.6, 0.45), ('estar', '+x', 9.04, 8.15, 1.6, 0.9, 0.55),
                      ('pasillo', '+y', 7.34, 4.6, 1.6, 0.8, 0.55), ('acceso', '-x', 6.76, 2.2, 1.6, 0.6, 0.8)],
     ('gris', 'pa'): [('hosp', '+x', 13.70, 7.4, 1.75, 0.55, 0.40), ('hosp', '-x', 8.46, 9.75, 1.75, 0.5, 0.40),
-                     ('salon2', '-y', 0.70, 9.0, 1.7, 0.7, 0.5), ('salon2', '+x', 13.70, 2.4, 1.6, 0.6, 0.45),
+                     ('salon2', '-y', 0.70, 11.6, 1.7, 0.7, 0.5), ('salon2', '+x', 13.70, 2.4, 1.6, 0.6, 0.45),
                      ('pasillo', '+x', 8.34, 9.3, 1.6, 0.7, 0.5), ('pasillo', '-x', 6.70, 8.6, 1.6, 0.6, 0.8)],
 }
 ESPEJOS = {('casa', 'pb'): [('terapia', '+y', 4.14, 9.85, 1.2, 0.6, 1.5)]}
@@ -200,9 +202,15 @@ def construir(K, E, clave, C_LUZ):
     cfg = EDIF[clave]
     luces = []
 
+    # piezas medidas a un vano (cortinas, hojas de puerta) quedan en unidades de diseño; lo demás
+    # (lámparas, abanicos, aires, cuadros) conserva su tamaño real bajo el Empty escalado (sitio.kp)
+    A_VANO = ('cortina', 'puerta_corrediza', 'hoja_puerta')
+
     def poner(nombre, m, x, y, z, g=0):
         ob = m.objeto(f'{K.pfx}_{nombre}_{len(K.objs)}', K.M, K.c)
         ob.location = (x, y, z); ob.rotation_euler = (0, 0, R(g))
+        if nombre not in A_VANO:
+            ob.scale = (1 / A.KP, 1 / A.KP, 1.0)
         K.objs.append(ob)
         for (co, pw, rad, colr) in m.luces:
             luces.append((ob, co, pw, rad, colr))
@@ -295,14 +303,13 @@ def construir(K, E, clave, C_LUZ):
             poner('espejo', m, x, y, nv['z0'] + zz, g)
         # luminaria sobre la cabecera de cada cama de encamados y del salón amarillo
         if clave == 'gris' and nv['id'] == 'pa':
-            import amueblado as A
             for cid in ('hosp', 'salon2'):
                 for it in A.DIST[('gris', 'pa')][cid]:
                     if it['t'] != 'cama_hosp':
                         continue
                     g = it['g']
                     bx = math.sin(R(g)); by = -math.cos(R(g))
-                    d = A.CAT['cama_hosp'][1]
+                    d = A.CAT['cama_hosp'][1] / A.KP
                     x = it['x'] + bx * d / 2; y = it['y'] + by * d / 2
                     m = Malla(); lampara_cama(m)
                     poner('lampara_cama', m, x, y, nv['z0'] + 1.65, g)

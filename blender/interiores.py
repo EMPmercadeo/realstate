@@ -125,18 +125,23 @@ GRIS = dict(
              masas=[R(2.5, 4.8, 4.6, 10.2), R(4.6, 2.4, 6.7, 11.0), R(6.7, 0.5, 13.9, 11.0)],
              cuartos=[
                  dict(id='pasillo', nombre='Pasillo y estar', tipo='abierto', rects=[R(6.7, 0.5, 8.4, 11.0)]),
-                 dict(id='bano', nombre='Baño para usuarios (con regadera)', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
+                 # servicio de la terraza: queda como está, solo inodoro (indicación del 30-10-2026)
+                 dict(id='bano', nombre='Servicio de la terraza (solo inodoro)', rects=[R(4.6, 2.4, 6.7, 4.8)], conecta=['pasillo']),
                  dict(id='cocina', nombre='Cocineta del área de coffee break', rects=[R(4.6, 4.8, 6.7, 7.4)], conecta=['pasillo']),
                  dict(id='deposito', nombre='Depósito y ropería (antes biblioteca)', rects=[R(2.5, 4.8, 4.6, 7.4)],
                       conecta=['cocina']),
                  dict(id='escalera', nombre='Escalera', tipo='abierto', escalera=True, rects=[R(2.7, 7.4, 6.7, 9.8)]),
                  dict(id='closet', nombre='Clóset de limpieza', rects=[R(4.6, 9.8, 6.7, 11.0)], conecta=['pasillo']),
-                 dict(id='salon2', nombre='Salón amarillo · personas con movilidad reducida', rects=[R(8.4, 0.5, 13.9, 4.2)],
-                      conecta=['pasillo']),
+                 dict(id='salon2', nombre='Salón amarillo · personas con movilidad reducida',
+                      rects=[R(10.3, 0.5, 13.9, 2.25), R(8.4, 2.25, 13.9, 4.2)], conecta=['pasillo']),
+                 # baño nuevo dentro del salón amarillo, en la esquina del lado de la biblioteca (obra nueva)
+                 dict(id='bano_s2', nombre='Baño nuevo del salón amarillo (huéspedes o usuarios)',
+                      rects=[R(8.4, 0.5, 10.3, 2.25)], conecta=['salon2']),
                  dict(id='hosp', nombre='Personas encamadas', rects=[R(8.4, 4.2, 13.9, 11.0)], conecta=['pasillo']),
              ],
              puertas=[dict(entre=('hosp', 'pasillo'), u=6.945, ancho=0.95, abre='hosp', bisagra='hi'),
-                      dict(entre=('salon2', 'pasillo'), u=1.2, ancho=0.95, abre='salon2', bisagra='lo'),
+                      dict(entre=('salon2', 'pasillo'), u=3.2, ancho=0.95, abre='salon2', bisagra='lo'),
+                      dict(entre=('bano_s2', 'salon2'), u=1.45, ancho=0.85, abre='salon2', bisagra='lo'),
                       dict(entre=('bano', 'pasillo'), u=3.4, abre='bano', bisagra='lo'),
                       dict(entre=('cocina', 'pasillo'), u=6.7, abre='cocina', bisagra='hi'),
                       dict(entre=('deposito', 'cocina'), u=5.8, abre='deposito', bisagra='lo'),
@@ -158,13 +163,16 @@ SUPUESTOS = [
     'pequeño del fondo (por confirmar). Escalera interior en U en la torre, junto al pasillo.',
     'Edificio gris: escalera interior en U al norte; la metálica exterior sigue al sur. Acceso sin recepción '
     '(la recepción está en la casa). Oficina 1 = supervisor, Oficina 2 = administrativa.',
+    'Escala (01-11-2026): las medidas de planta de este archivo son unidades de diseño; en metros valen x1,21 '
+    '(sitio.kp(), escala medida con la barra de Google, Esri y Bing). Las alturas no cambian.',
     'Programa colocado: 26 camas. Gris: personas encamadas 10, salón amarillo 4, salones grandes de abajo 2 + 6 '
-    '(el salón 1 solo admite 2 con mesita y paso libre; el 2 admite 6). Casa: 4.',
-    'Personas encamadas: caben las 10 camas de hospital y la estación de enfermería a la cabeza del pasillo '
-    'central (donde estaba el podio), pero justas: pasillo central de ~1,0 m y, del lado de la puerta, 25 cm '
-    'entre camas, con mesa puente en vez de mesita. Con 8 camas quedaría holgada. Luz sobre cada cama.',
-    'Biblioteca → depósito y ropería (lo último que dijo la propietaria). El baño nuevo junto a la biblioteca '
-    'sigue por confirmar y no se dibujó.',
+    '(el salón 1, de ~17 m², admite 2 con mesita y paso libre; el 2, de ~46 m², admite 6). Casa: 4.',
+    'Personas encamadas (~51 m² con la escala medida): 10 camas de hospital con mesita entre camas, pasillo '
+    'central de ~2,1 m y la estación de enfermería a la cabeza del pasillo (donde estaba el podio). Luz sobre '
+    'cada cama.',
+    'Biblioteca → depósito y ropería (lo último que dijo la propietaria). Baño nuevo dentro del salón amarillo, '
+    'en su esquina del lado de la biblioteca, con regadera; las 4 camas siguen cabiendo. El servicio de la '
+    'terraza queda igual: solo inodoro y lavamanos.',
     'Terraza de arriba del gris (hoy cerrada con verjas): área de coffee break o del té, y estar.',
     'Baño accesible de abajo: puerta que abre hacia el pasillo para dejar libre el giro de la silla de ruedas; '
     'regadera a ras de piso con asiento abatible y barras de apoyo.',
@@ -479,7 +487,7 @@ def construir(K, E, mat_ext, mat_int='muro_int', mat_piso='piso_int', mat_losa='
     for esc in E['escaleras']:
         t = tramos_escalera(esc)
         for (a, b, c, d, za, zb) in t['cajas']:
-            K.B('escalon', a, b, za, c, d, zb, 'escalon')
+            K.B('escalon', a - 0.004, b - 0.004, za, c + 0.004, d + 0.004, zb, 'escalon')   # se traslapan 8 mm: sin rendijas
         for (p, q) in t['barandas']:
             baranda_inclinada(K, p, q)
         for (p, q) in esc.get('barandas_sup', []):

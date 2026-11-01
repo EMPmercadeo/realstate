@@ -4,8 +4,16 @@ Emplazamiento proporcional sobre docs/lote-satelite.png (770 x 996 px).
 Todo lo de este archivo es una LECTURA A OJO de la imagen aérea, no una medición:
 - El trazo rojo del usuario se copió como referencia y NO se trata como lindero legal.
 - Las dos vías que el trazo incluye (C.A al noreste y la calle de tierra al oeste) se restan.
-- La escala sale de pedir que el polígono restante mida 2.500 m² (escala uniforme, provisional):
-      s = sqrt(2500 / area_px)  ->  ~0,117 m por píxel
+- ESCALA MEDIDA (01-11-2026): 0,1415 m por píxel de docs/lote-satelite.png. Sale de tres fuentes que
+  coinciden: la barra de escala de Google Maps en la misma imagen (5 m = 66 px css -> 0,144 m/px),
+  y las imágenes de Esri y Bing a escala Web Mercator conocida (distancia casa-gris y techo del gris
+  -> 0,139-0,140 m/px). Antes se usaba s = sqrt(2500 / area_px) = 0,117 m/px (suponer que el trazo
+  medía 2.500 m²): eso dejaba todo un ~21 % más chico en planta. Con la escala medida el trazo (sin
+  las vías) mide ~3.670 m²; si el lote escriturado es de 2.500 m², el lindero real es más chico que
+  el trazo (pendiente: plano catastral). Ver docs/fase-mapa.md.
+- Los edificios se dibujaron en "unidades de diseño" (las medidas de las etapas 2-4, hechas con la
+  escala vieja). KP pasa esas unidades a metros en planta (x, y); las alturas no cambian (se midieron
+  con fotos y con la puerta del gris: mano a 1,80 m -> marco a ~2,22 m, hoja de 2,10 m).
 - Marco del modelo: X a la derecha de la imagen, Y hacia arriba de la imagen ("norte de imagen").
   No se afirma norte geográfico.
 """
@@ -28,7 +36,8 @@ OESTE = [(300, 92), (266, 145), (238, 215), (207, 290), (178, 360), (150, 430), 
          (57, 690), (20, 726), (-10, 735)]
 OESTE_ANCHO = 32
 
-AREA_OBJETIVO = 2500.0
+AREA_OBJETIVO = 2500.0          # área que dijo la propietaria (no se usa para la escala)
+S_MEDIDA = 0.1415               # m por píxel de lote-satelite.png (ver arriba)
 
 
 def _shapely():
@@ -49,18 +58,25 @@ def geometria_px():
     return dict(rojo=rojo, ca=ca, oeste=oe, lote=lote)
 
 
-def escala():
+def escala_trazo():
+    """Escala vieja: la que haría medir 2.500 m² al trazo sin vías (0,117 m/px)."""
     return math.sqrt(AREA_OBJETIVO / geometria_px()['lote'].area)
 
 
 S = None
+_KP = None
 
 
 def s():
-    global S
-    if S is None:
-        S = escala()
-    return S
+    return S_MEDIDA
+
+
+def kp():
+    """Factor de planta: unidades de diseño de los edificios -> metros (≈ 1,21)."""
+    global _KP
+    if _KP is None:
+        _KP = S_MEDIDA / escala_trazo()
+    return _KP
 
 
 def m(px, py):
@@ -101,14 +117,18 @@ def marco(E):
 
 
 def local_a_m(E, x, y):
+    """Unidades de diseño del edificio -> metros del modelo (incluye el factor de planta KP)."""
     ox, oy, a = marco(E)
+    k = kp()
+    x, y = x * k, y * k
     return (ox + x * math.cos(a) - y * math.sin(a), oy + x * math.sin(a) + y * math.cos(a))
 
 
 def m_a_local(E, X, Y):
     ox, oy, a = marco(E)
     dx, dy = X - ox, Y - oy
-    return (dx * math.cos(a) + dy * math.sin(a), -dx * math.sin(a) + dy * math.cos(a))
+    k = kp()
+    return ((dx * math.cos(a) + dy * math.sin(a)) / k, (-dx * math.sin(a) + dy * math.cos(a)) / k)
 
 
 def m_a_px(X, Y):
@@ -119,7 +139,7 @@ def m_a_px(X, Y):
 if __name__ == '__main__':
     g = geometria_px()
     k = s()
-    print('escala m/px', round(k, 4))
+    print('escala m/px', round(k, 4), ' escala vieja (2.500 m²)', round(escala_trazo(), 4), ' KP', round(kp(), 3))
     print('lote m2', round(g['lote'].area * k * k), ' trazo rojo completo m2', round(g['rojo'].area * k * k))
     for n, E in (('casa', CASA), ('gris', GRIS)):
         print(n, [round(v, 2) for v in marco(E)[:2]], round(math.degrees(marco(E)[2]), 1))

@@ -1185,6 +1185,7 @@ def amueblar(K, E, clave, coleccion=None):
                 zb = z0 + (0.0 if cid != 'galeria' else 0.0)
                 ob.location = (it['x'], it['y'], zb)
                 ob.rotation_euler = (0, 0, R(it['g']))
+                ob.scale = (1 / A.KP, 1 / A.KP, 1.0)
                 K.objs.append(ob)
                 for (co, pw, rad, colr) in m.luces:
                     luces.append((ob, co, pw, rad, colr))

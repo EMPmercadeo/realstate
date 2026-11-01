@@ -11,7 +11,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 OUT = os.path.join(ROOT, 'build', 'bloqueo')
 FB = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 FR = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-S = 46          # píxeles por metro
+S = 46          # píxeles por unidad de diseño (1 u = KP metros en planta; ver sitio.py)
+KP = 1.0        # se lee de interiores.json
 MG = 70         # margen
 CORTE = 1.2     # altura del corte del plano
 
@@ -271,8 +272,9 @@ def dibujar(clave, ed, nv, rutas):
         sz -= 1
     d.text((MG - 30, 16), tit, font=F(sz, True), fill=C_TXT)
     bx, by = MG - 30, 54
-    d.rectangle((bx, by, bx + 5 * S, by + 7), fill=C_TXT)
-    d.rectangle((bx + 2.5 * S, by, bx + 5 * S, by + 7), fill=(200, 200, 200))
+    L5 = 5 * S / KP          # 5 m reales en unidades de diseño (sitio.kp)
+    d.rectangle((bx, by, bx + L5, by + 7), fill=C_TXT)
+    d.rectangle((bx + L5 / 2, by, bx + L5, by + 7), fill=(200, 200, 200))
     d.text((bx, by + 10), '0       2,5       5 m', font=F(12), fill=C_SUAVE)
     return im
 
@@ -337,6 +339,7 @@ def supuestos(w, lista, rutas):
 
 if __name__ == '__main__':
     data = json.load(open(os.path.join(OUT, 'interiores.json')))
+    KP = data.get('kp', 1.0)
     rec = json.load(open(os.path.join(OUT, 'recorrido.json')))
     rutas = {'casa': [r for r in rec if r['nombre'].startswith('Casa')], 'gris': [r for r in rec if r['nombre'].startswith('Edificio')]}
     hojas = {}

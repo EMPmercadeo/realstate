@@ -292,7 +292,7 @@ def _datos(K, E, clave):
         out['niveles'].append(dict(id=nv['id'], nombre=nv['nombre'], z0=nv['z0'], z1=nv['z1'],
                                    contorno=list(ext.exterior.coords),
                                    cuartos=[dict(id=c['id'], nombre=c['nombre'], tipo=c.get('tipo', 'cerrado'),
-                                                 rects=c['rects'], area=round(INT.poly_cuarto(c).area, 1),
+                                                 rects=c['rects'], area=round(INT.poly_cuarto(c).area * sitio.kp() ** 2, 1),
                                                  escalera=c.get('escalera', False)) for c in nv['cuartos']],
                                    muros=mu['ext'] + mu['int'], puertas=mu['puertas']))
     for esc in E['escaleras']:
@@ -301,7 +301,7 @@ def _datos(K, E, clave):
                                      huella=t['huella'], marcha=t['marcha'], z0=esc['z0'], z1=esc['z1']))
     return out
 print('camas por cuarto:', K_CASA.camas, K_GRIS.camas)
-json.dump(dict(casa=_datos(K_CASA, INT.CASA, 'casa'), gris=_datos(K_GRIS, INT.GRIS, 'gris'), supuestos=INT.SUPUESTOS,
+json.dump(dict(kp=sitio.kp(), casa=_datos(K_CASA, INT.CASA, 'casa'), gris=_datos(K_GRIS, INT.GRIS, 'gris'), supuestos=INT.SUPUESTOS,
                camas=dict(casa=K_CASA.camas, gris=K_GRIS.camas)),
           open(os.path.join(OUT, 'interiores.json'), 'w'), ensure_ascii=False, indent=1)
 

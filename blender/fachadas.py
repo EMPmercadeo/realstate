@@ -280,6 +280,8 @@ def casa_amarilla(M, c, origen, ang):
     piedra aparte, a la derecha, con su reja hacia la calle de tierra."""
     K = Kit(M, c, 'ca')
     root = empty('casa_root', (origen[0], origen[1], 0), ang, c)
+    import sitio as _S
+    root.scale = (_S.kp(), _S.kp(), 1.0)       # unidades de diseño -> metros en planta (ver sitio.py)
     H = 3.0      # alero de las alas bajas
     Y = 'amarillo'
     W, D = 12.6, 13.8
@@ -403,6 +405,8 @@ def edificio_gris(M, c, origen, ang):
     lado norte; galería abierta en el lado este; escalera metálica exterior al sur."""
     K = Kit(M, c, 'gr')
     root = empty('gris_root', (origen[0], origen[1], 0), ang, c)
+    import sitio as _S
+    root.scale = (_S.kp(), _S.kp(), 1.0)       # unidades de diseño -> metros en planta (ver sitio.py)
     G = 'gris_claro'
     Z1, Z2, ZT = 3.2, 6.35, 7.9          # entrepiso, techo, remate
     ov = 0.5

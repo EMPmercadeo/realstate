@@ -14,6 +14,11 @@ import math
 from shapely.geometry import Polygon, box as sbox, LineString
 from shapely.ops import unary_union
 import interiores as I
+import sitio as _S
+
+# Los cuartos están en unidades de diseño (sitio.kp() las pasa a metros en planta). Los muebles tienen
+# su tamaño real en metros: en unidades de diseño miden w/KP x d/KP.
+KP = _S.kp()
 
 # tipo: (w, d, h) — medidas exteriores en metros
 CAT = {
@@ -58,6 +63,7 @@ def W(t, lado, c, u, sep=0.0, **kw):
     c = cara interior del muro, u = posición del centro a lo largo del muro."""
     w, d, h = CAT[t]
     w, d = kw.get('w', w), kw.get('d', d)
+    d, sep = d / KP, sep / KP          # metros -> unidades de diseño
     if lado == '-y':
         return P(t, u, c + sep + d / 2, 0, **kw)
     if lado == '+y':
@@ -69,14 +75,13 @@ def W(t, lado, c, u, sep=0.0, **kw):
 
 def fila(t, lado, c, u0, n, hueco, mesa=None, sep=0.0, **kw):
     """n muebles iguales contra un muro desde u0 (borde), con `mesa` (tipo) entre cada par si se da."""
-    w = CAT[t][0]
+    w = CAT[t][0] / KP
     out, u = [], u0
     for i in range(n):
         out.append(W(t, lado, c, u + w / 2, sep, **kw))
         u += w
         if i < n - 1:
             if mesa:
-                wm = CAT[mesa][0]
                 out.append(W(mesa, lado, c, u + hueco / 2, sep))
             u += hueco
     return out
@@ -85,7 +90,7 @@ def fila(t, lado, c, u0, n, hueco, mesa=None, sep=0.0, **kw):
 def huella(m):
     """Polígono de la planta del mueble."""
     w, d, h = CAT[m['t']]
-    w, d = m.get('w', w), m.get('d', d)
+    w, d = m.get('w', w) / KP, m.get('d', d) / KP
     g = math.radians(m['g'])
     cs, sn = math.cos(g), math.sin(g)
     pts = []
@@ -163,20 +168,21 @@ GRIS_PB = {
 }
 GRIS_PA = {
     'pasillo': [W('planta', '-y', 0.70, 7.75), W('banca', '-x', 6.90, 1.75)],
-    'bano': [W('ducha', '-y', 2.60, 5.30, w=1.00, d=1.00), W('inodoro', '+y', 4.74, 5.20), W('lavamanos', '+y', 4.74, 6.12)],
+    'bano': [W('inodoro', '+y', 4.74, 5.20), W('lavamanos', '+y', 4.74, 6.12)],      # servicio: sin regadera
+    'bano_s2': [W('ducha', '+y', 2.19, 9.02, w=1.00, d=1.00), W('inodoro', '-y', 0.70, 8.85),
+                W('lavamanos', '-y', 0.70, 9.78)],
     'cocina': [W('granito_fregadero', '-y', 4.87, 5.37), W('granito_plano', '-y', 4.87, 6.30, w=0.66),
                W('refri_chico', '+y', 7.34, 4.98), W('granito_plano', '+y', 7.34, 5.45, w=0.38)],
     'deposito': [W('estante', '+y', 7.34, 3.20), W('estante', '+y', 7.34, 4.10), W('estante', '-y', 5.00, 3.20)],
     'closet': [W('estante', '+y', 10.80, 5.20, d=0.40, w=0.70)],
-    'salon2': fila('cama_hosp', '+y', 4.14, 8.54, 4, 0.44, mesa='mesita_hosp') +
-              [W('reclinable', '-y', 0.70, 13.05, sep=0.05), W('silla_ruedas', '-y', 0.70, 11.10, sep=0.05)],
-    # 10 encamados: cabecera contra los muros largos y pasillo central de ~1 m. La puerta del pasillo
-    # queda entre la 2.ª y la 3.ª cama del lado norte; la estación de enfermería, a la cabeza del pasillo
-    # central (donde estaba el podio), mira a las 10 camas. Del lado norte no cabe mesita entre camas:
-    # llevan mesa puente.
+    'salon2': fila('cama_hosp', '+y', 4.14, 9.45, 4, 0.40, mesa='mesita_hosp') +
+              [W('reclinable', '-y', 0.70, 12.95, sep=0.05), W('silla_ruedas', '-y', 0.70, 11.80, sep=0.05)],
+    # 10 encamados: cabecera contra los muros largos y pasillo central de ~2,1 m (escala medida). La puerta
+    # del pasillo queda entre la 2.ª y la 3.ª cama del lado norte; la estación de enfermería, a la cabeza
+    # del pasillo central (donde estaba el podio), mira a las 10 camas. Mesita entre camas en los dos lados.
     'hosp': fila('cama_hosp', '+x', 13.70, 4.32, 5, 0.40, mesa='mesita_hosp') +
-            [W('cama_hosp', '-x', 8.46, yc) for yc in (4.76, 5.93, 7.96, 9.13, 10.30)] +
-            [P('mesa_puente', 9.55, yc, 90) for yc in (5.93, 9.13)] +
+            [W('cama_hosp', '-x', 8.46, yc) for yc in (4.70, 5.86, 7.88, 9.04, 10.20)] +
+            [W('mesita_hosp', '-x', 8.46, yc) for yc in (5.28, 8.46, 9.62)] +
             [W('estacion', '-y', 4.26, 11.09, sep=0.02, w=1.0)],
 }
 # galería este de la planta alta (terraza cerrada con verjas): refrigerios + estar
