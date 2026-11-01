@@ -113,7 +113,18 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     hdr.dispose();
   });
   scene.fog = new THREE.FogExp2(new THREE.Color(RES ? '#cdd6de' : '#d8d0c2'), MOVIL ? 0.0009 : 0.0006);
-  const evitar = (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]);
+  // puntos que la vegetación y las casas no deben tapar: la ruta de la portada (densificada, solo donde va baja)
+  // y las vistas fijas
+  const evitar: number[][] = [];
+  const R = opts.ruta || [];
+  for (let i = 0; i < R.length; i++) {
+    const a = R[i].pos, b = R[Math.min(R.length - 1, i + 1)].pos;
+    const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[2] - a[2]) / 3));
+    for (let k = 0; k < n; k++) {
+      const f = k / n, y = a[1] + (b[1] - a[1]) * f;
+      if (y < 18) evitar.push([a[0] + (b[0] - a[0]) * f, a[2] + (b[2] - a[2]) * f]);
+    }
+  }
   if (RES) for (const p of Object.values((residencia as any).presets) as any[]) evitar.push([p.pos[0], p.pos[2]]);
   const mundo = crearMundo(scene, renderer, MOVIL, sunDir, evitar,
     RES ? { ...(residencia as any).mundo, poligono: (residencia as any).lote } as ConfigMundo : undefined, base);

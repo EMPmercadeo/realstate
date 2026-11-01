@@ -11,6 +11,7 @@ Salida en web/public/tex/:
   hojas.png         racimo de hojas con alfa (tarjetas de las copas)
   hojas_ciprés.png  follaje escamoso con alfa (cipreses y tuyas)
   fronda.png        fronda de palma con alfa
+  hoja_banano.png   hoja de banano con rasgaduras
   corteza.jpg       corteza
 Uso: python3 blender/texturas_web.py
 """
@@ -237,6 +238,46 @@ def fronda(n_w=256, n_h=1024):
     print('fronda.png', os.path.getsize(os.path.join(OUT, 'fronda.png')) // 1024, 'KB')
 
 
+def hoja_banano(n_w=256, n_h=1024):
+    """hoja de banano: lámina ancha con nervadura central pálida, venas laterales y rasgaduras (video 113911)"""
+    img = Image.new('RGBA', (n_w, n_h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    cx = n_w / 2
+    medio = lambda v: (n_w * 0.47) * (math.sin(math.pi * (0.03 + 0.94 * v)) ** 0.45)
+    pts_i, pts_d = [], []
+    for k in range(101):
+        v = k / 100; y = n_h * (1 - v)
+        pts_d.append((cx + medio(v), y)); pts_i.append((cx - medio(v), y))
+    base = np.array([0.27, 0.52, 0.16])
+    d.polygon(pts_d + pts_i[::-1], fill=tuple(int(255 * c) for c in base) + (255,))
+    # venas laterales: oblicuas hacia la punta, algo más claras u oscuras
+    for k in range(0, n_h, 5):
+        v = 1 - k / n_h; w = medio(v)
+        for s in (1, -1):
+            tono = base * (0.86 + rng.random() * 0.3)
+            d.line([(cx, k), (cx + s * w, k - w * 0.45)], fill=tuple(int(255 * min(1, c)) for c in tono) + (255,), width=3)
+    # borde seco
+    for k in range(101):
+        v = k / 100; y = n_h * (1 - v)
+        for s in (1, -1):
+            x = cx + s * medio(v)
+            d.ellipse([x - 2.5, y - 3, x + 2.5, y + 3], fill=(150, 130, 60, 255))
+    # rasgaduras de la orilla hacia la nervadura
+    for _ in range(14):
+        v = 0.12 + rng.random() * 0.8; y = n_h * (1 - v); s = rng.choice((1, -1)); w = medio(v)
+        prof = w * (0.45 + rng.random() * 0.5)
+        d.line([(cx + s * (w + 4), y - (w + 4) * 0.45), (cx + s * (w - prof), y - (w - prof) * 0.45)], fill=(0, 0, 0, 0), width=2)
+    d.line([(cx, n_h - 2), (cx, 4)], fill=(196, 206, 120, 255), width=6)        # nervadura central
+    a = np.asarray(img).astype(np.float32)
+    a[..., :3] *= (0.85 + 0.3 * fbm(n_h, 6, 4)[:, :n_w])[..., None] if n_w <= n_h else 1
+    al = a[..., 3] / 255
+    idx = ndimage.distance_transform_edt(~(al > 0.05), return_distances=False, return_indices=True)
+    rgb = a[..., :3][idx[0], idx[1]]
+    out = np.dstack([np.clip(rgb, 0, 255), (al > 0.45) * 255]).astype(np.uint8)
+    Image.fromarray(out, 'RGBA').save(os.path.join(OUT, 'hoja_banano.png'), optimize=True)
+    print('hoja_banano.png', os.path.getsize(os.path.join(OUT, 'hoja_banano.png')) // 1024, 'KB')
+
+
 def corteza(n=512):
     x = fbm(n, 4, 5)
     vet = ruido(n, 64, 3)
@@ -254,3 +295,4 @@ if __name__ == '__main__':
     hojas('hojas.png', nh=700, largo=(16, 34))
     hojas('hojas_cipres.png', nh=1500, largo=(6, 11), ancho=0.6, tono=(0.12, 0.30, 0.10), escamas=True)
     fronda()
+    hoja_banano()

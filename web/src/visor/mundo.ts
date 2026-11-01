@@ -311,13 +311,17 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
 
   // ---------- vegetación ----------
   const plantas: Vegetal[] = [];
-  const add = (especie: Especie, x: number, z: number, alto: number) => plantas.push({ especie, x, y: enLote(x, z, 2) ? 0 : alturaTerreno(x, z), z, alto });
+  const add = (especie: Especie, x: number, z: number, alto: number, fija = false) => {
+    // la copa de un árbol de 12 m mide ~7 m de radio: el claro alrededor de la cámara crece con la altura
+    if (!fija && cercaEvitar(x, z, 4 + alto * 0.6)) return;
+    plantas.push({ especie, x, y: enLote(x, z, 2) ? 0 : alturaTerreno(x, z), z, alto });
+  };
   const frondosa = (h: number): Especie => (h < 5.2 ? 'joven' : rnd() < 0.55 ? 'mango' : 'abierto');
   if (cfg) {
     // los del lote puestos al azar se quitan si tapan la ruta de la portada o una vista fija; los de las fotos se quedan
-    for (const [x, z, h] of cfg.arboles) if (!cercaEvitar(x, z, 9)) add(frondosa(h), x, z, h);
-    for (const [x, z, h] of cfg.palmas) if (!cercaEvitar(x, z, 9)) add('coco', x, z, h * 1.05);
-    for (const v of cfg.vegetacion ?? []) add(v[0] as Especie, v[1] as number, v[2] as number, v[3] as number);
+    for (const [x, z, h] of cfg.arboles) add(frondosa(h), x, z, h);
+    for (const [x, z, h] of cfg.palmas) add('coco', x, z, h * 1.05);
+    for (const v of cfg.vegetacion ?? []) add(v[0] as Especie, v[1] as number, v[2] as number, v[3] as number, true);
   }
   // patios: árboles y palmas detrás y al lado de las casas, matas al frente
   for (const c of casas) {

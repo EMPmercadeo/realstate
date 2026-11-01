@@ -72,8 +72,17 @@ en celular (pantalla < 820 px o agente móvil) un tercio y sin sombras de árbol
 son instanciadas (una llamada de dibujo por especie). Si una PC lenta se traba, bajar `nArb` en
 `mundo.ts`.
 
+## Ronda 4 (01-11-2026)
+
+- **Bananal** con hojas de textura (lámina ancha, nervadura pálida, rasgaduras: `hoja_banano.png`) y
+  pseudotallo verde, en las 16 posiciones de `exteriores.py` (pasan a `ext_arboles` / `arboles_web`).
+- **Portada sin estorbos:** la ruta de la cámara se densifica cada 3 m y, donde va a menos de 18 m de
+  altura, ni árboles ni casas se plantan cerca; el claro crece con el tamaño del árbol (4 m + 0,6 × alto).
+  Se revisaron las paradas 0, 0,3, 0,4, 0,6, 0,7 y 0,8 en la RTX 3080 (`/?u=0.6&3d`): en la del
+  edificio gris (0,7) una copa tapaba un tercio del cuadro; ya no.
+
 ## Pendiente (siguientes rondas)
 
-- Desnivel del jardín (~1 m del gris a la casa) en Blender y en la web.
+- Desnivel del jardín (~1 m del gris a la casa) en Blender y en la web, cuando haya la medida.
 - Oclusión ambiental horneada en Cycles para los edificios (hoy es GTAO en pantalla, solo en escritorio).
-- Bananal y crotos con follaje de tarjetas (hoy siguen siendo los de Blender).
+- Crotos con tarjetas; detalles de la casa (tanque negro, farol, muro crema de la C.A).

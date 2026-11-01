@@ -368,11 +368,12 @@ def construir(M, C):
 
     # ---- vegetación de las fotos: bananal, palmas fénix, crotos, tocón del mango
     m = F.malla()
+    bananos = []
     for i in range(16):
         x = rnd.uniform(-11.5, -3.0); y = rnd.uniform(17.9, 21.5) if i < 10 else rnd.uniform(9.0, 10.3)
         if i >= 10:
             x = rnd.uniform(-10.5, -4.5)
-        banano(m, *P(x, y), rnd.uniform(3.0, 4.2), rnd)
+        bananos.append((x, y, rnd.uniform(3.0, 4.2)))
     for (x, y) in ((-17.0, 1.2), (-15.2, 0.2), (-19.0, 8.8), (-8.2, 8.4), (-5.5, 8.6)):
         croton(m, *P(x, y), rnd.uniform(1.0, 1.5), rnd)
     tx, ty = P(-14.4, 0.6)
@@ -383,6 +384,9 @@ def construir(M, C):
     # metros del marco del gris (las que devuelve Marco.P)
     m = F.malla()
     web = []
+    for (x, y, h) in bananos:                     # el bananal también lo dibuja la web (hojas con textura)
+        banano(m, *P(x, y), h, rnd)
+        web.append(('banano', *P(x, y), h))
     for (x, y, h) in ((-1.7, 10.4, 4.6), (-1.9, 12.6, 4.0), (-5.0, 1.2, 4.2), (-3.4, 0.0, 3.6)):
         n = rnd.randint(3, 5)
         palma_fenix(m, *P(x, y), h, rnd, troncos=n)

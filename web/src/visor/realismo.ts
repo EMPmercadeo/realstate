@@ -7,7 +7,7 @@ import * as THREE from 'three';
 
 export interface Texturas {
   cesped: THREE.Texture; seco: THREE.Texture; tierra: THREE.Texture; asfalto: THREE.Texture;
-  relieve: THREE.Texture; hojas: THREE.Texture; hojasCipres: THREE.Texture; fronda: THREE.Texture; corteza: THREE.Texture;
+  relieve: THREE.Texture; hojas: THREE.Texture; hojasCipres: THREE.Texture; fronda: THREE.Texture; corteza: THREE.Texture; banano: THREE.Texture;
 }
 
 let _tex: Texturas | null = null;
@@ -25,7 +25,7 @@ export function texturas(base: string, renderer: THREE.WebGLRenderer): Texturas 
   _tex = {
     cesped: t('cesped.jpg'), seco: t('cesped_seco.jpg'), tierra: t('tierra.jpg'), asfalto: t('asfalto.jpg'),
     relieve: t('relieve.png', false), hojas: t('hojas.png', true, false), hojasCipres: t('hojas_cipres.png', true, false),
-    fronda: t('fronda.png', true, false), corteza: t('corteza.jpg'),
+    fronda: t('fronda.png', true, false), corteza: t('corteza.jpg'), banano: t('hoja_banano.png', true, false),
   };
   return _tex;
 }

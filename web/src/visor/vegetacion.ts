@@ -83,10 +83,10 @@ function rama(A: Acum, p0: THREE.Vector3, p1: THREE.Vector3, r0: number, r1: num
   }
 }
 
-export type Especie = 'mango' | 'abierto' | 'joven' | 'lejano' | 'mata' | 'coco' | 'navidad' | 'fenix' | 'cipres' | 'pino';
-export const ALTO_REF: Record<Especie, number> = { mango: 8, abierto: 8, joven: 6, lejano: 9, mata: 1.6, coco: 9, navidad: 6, fenix: 4.2, cipres: 4.5, pino: 8 };
+export type Especie = 'mango' | 'abierto' | 'joven' | 'lejano' | 'mata' | 'coco' | 'navidad' | 'fenix' | 'cipres' | 'pino' | 'banano';
+export const ALTO_REF: Record<Especie, number> = { mango: 8, abierto: 8, joven: 6, lejano: 9, mata: 1.6, coco: 9, navidad: 6, fenix: 4.2, cipres: 4.5, pino: 8, banano: 3.6 };
 
-interface Partes { tronco?: THREE.BufferGeometry; follaje?: THREE.BufferGeometry; fronda?: THREE.BufferGeometry; tex: 'hojas' | 'cipres' }
+interface Partes { tronco?: THREE.BufferGeometry; follaje?: THREE.BufferGeometry; fronda?: THREE.BufferGeometry; banano?: THREE.BufferGeometry; tex: 'hojas' | 'cipres' }
 
 function frondoso(e: Especie): Partes {
   const T = new Acum(), F = new Acum();
@@ -182,6 +182,18 @@ function palma(e: 'coco' | 'navidad' | 'fenix'): Partes {
   return { tronco: T.geo(), fronda: R.geo(), tex: 'hojas' };
 }
 
+/** mata de banano: pseudotallo, 7-9 hojas anchas arqueadas (algunas caídas) y racimo */
+function banano(): Partes {
+  const T = new Acum(), H = new Acum();
+  const h = ALTO_REF.banano;
+  const top = V((rnd() - 0.5) * 0.15, h * 0.62, (rnd() - 0.5) * 0.15);
+  rama(T, V(0, -0.1, 0), top, 0.13, 0.09, 8);
+  // hijuelos
+  for (let i = 0; i < 2; i++) { const a = rnd() * Math.PI * 2; const b = V(Math.cos(a) * 0.45, 0, Math.sin(a) * 0.45); rama(T, b, b.clone().add(V(0, h * 0.25, 0)), 0.07, 0.05, 6); frondas(H, b.clone().add(V(0, h * 0.25, 0)), 3, [0.7, 1.0], 0.35, [0.9, 1.2], 0.3, 0); }
+  frondas(H, top, 8, [1.6, 2.2], 0.6, [0.55, 1.25], 0.42, 0.18);
+  return { tronco: T.geo(), banano: H.geo(), tex: 'hojas' };
+}
+
 export interface Vegetal { especie: Especie; x: number; y: number; z: number; alto: number; giro?: number; tinte?: THREE.Color }
 
 /** crea las mallas instanciadas para una lista de plantas y las agrega al grupo */
@@ -191,11 +203,13 @@ export function plantar(grupo: THREE.Group, lista: Vegetal[], tex: Texturas, uTi
   const matHojas = materialFollaje(tex.hojas, '#ffffff', { uTime, fuerza: 0.6 });
   const matCipres = materialFollaje(tex.hojasCipres, '#f2f6ea', { uTime, fuerza: 0.25 });
   const matFronda = materialFollaje(tex.fronda, '#ffffff', { uTime, fuerza: 1.0 });
+  const matBanano = materialFollaje(tex.banano, '#ffffff', { uTime, fuerza: 0.7 });
+  const matTallo = new THREE.MeshStandardMaterial({ color: '#7d9550', roughness: 0.8, vertexColors: true });
   const especies = [...new Set(lista.map((v) => v.especie))];
   const o = new THREE.Object3D();
   for (const e of especies) {
     const L = lista.filter((v) => v.especie === e);
-    const partes: Partes = e === 'coco' || e === 'navidad' || e === 'fenix' ? palma(e) : e === 'cipres' || e === 'pino' ? conifera(e) : frondoso(e);
+    const partes: Partes = e === 'banano' ? banano() : e === 'coco' || e === 'navidad' || e === 'fenix' ? palma(e) : e === 'cipres' || e === 'pino' ? conifera(e) : frondoso(e);
     const ms = L.map((v) => {
       const s = v.alto / ALTO_REF[e];
       o.position.set(v.x, v.y - 0.05, v.z); o.rotation.set(0, v.giro ?? rnd() * Math.PI * 2, 0);
@@ -217,8 +231,9 @@ export function plantar(grupo: THREE.Group, lista: Vegetal[], tex: Texturas, uTi
       grupo.add(im);
     };
     const esPalma = e === 'coco' || e === 'navidad' || e === 'fenix';
-    poner(partes.tronco, esPalma ? matPalma : matTronco, false);
+    poner(partes.tronco, e === 'banano' ? matTallo : esPalma ? matPalma : matTronco, false);
     poner(partes.follaje, partes.tex === 'cipres' ? matCipres : matHojas, true);
     poner(partes.fronda, matFronda, true);
+    poner(partes.banano, matBanano, true);
   }
 }
