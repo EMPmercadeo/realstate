@@ -406,6 +406,21 @@ def casa_amarilla(M, c, origen, ang):
     K.B('arco_tras_l', 1.2, D, 0, 1.5, D + 1.6, H, Y)
     K.B('arco_tras_r', 4.1, D, 0, 4.4, D + 1.6, H, Y)
     hip(K, 'arco_tras_techo', 1.2, D, 4.4, D + 1.75, H, 18, 0.4, 'teja', excluir=PLANTA)
+    # toldo rojo de lona en arco junto al porche en arco (fotos casa-amarilla-patio y 114557)
+    tx0_, tx1_, R_ = -1.9, 1.15, 1.9
+    vs, fs, n = [], [], 8
+    for i in range(n + 1):
+        a = (math.pi / 2) * i / n
+        yy, zz = D + R_ * math.sin(a), 2.15 + 0.75 * math.cos(a)
+        vs += [(tx0_, yy, zz), (tx1_, yy, zz)]
+    m_ = len(vs)
+    vs += [(x, y, z - 0.02) for (x, y, z) in vs]                       # lona con dos caras (se ve desde abajo)
+    for i in range(n):
+        fs.append((2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2))
+        fs.append((m_ + 2 * i + 2, m_ + 2 * i + 3, m_ + 2 * i + 1, m_ + 2 * i))
+    K.poly('toldo', vs, fs, 'toldo_rojo')
+    for xx in (tx0_ + 0.05, tx1_ - 0.12):
+        K.B('toldo_poste', xx, D + R_ - 0.08, 0, xx + 0.07, D + R_ - 0.01, 2.15, 'blanco')
     ventana(K, 'x', 5.9, 7.1, 0.9, 2.3, D, 1)
     ventana(K, 'x', 3.2, 4.4, 0.9, 2.3, D, 1)
     ventana(K, 'x', 0.6, 1.8, 0.9, 2.3, D, 1)
@@ -519,6 +534,8 @@ def edificio_gris(M, c, origen, ang):
         ventana(K, 'x', mid - 0.35, mid + 0.35, zz, zz + 0.7, yw, -1, rejas=False, vidrio='bloque')
     K.B('ac', 5.2, 1.9 + ov - 0.35, Z1 + 1.6, 6.0, 1.9 + ov, Z1 + 2.15, 'blanco')
     puerta(K, 'x', 6.9, 7.9, 0, 2.2, ov, -1, m='puerta_roja')
+    K.B('alero_acceso', 6.45, -0.25, 2.55, 8.35, ov, 2.62, 'blanco')            # alerito de lámina sobre el acceso
+    K.B('jardinera_azul', 8.15, ov - 0.55, 0, 9.6, ov, 0.45, 'pintura_azul')   # jardinera pintada de azul (foto 114245)
     # estacionamientos con pintura (frente al acceso)
     # bolsillo de estacionamiento entre el muro de la calle y los tramos norte y medio (fotos del 31-10-2026):
     # piso de concreto y un puesto accesible pintado de azul frente a la puerta café

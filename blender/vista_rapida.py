@@ -28,10 +28,13 @@ sc.camera = co
 for o in bpy.data.objects:
     if o.name == 'satelite':
         o.hide_render = True
-    if o.type == 'LIGHT' and o.data.type in ('POINT', 'AREA', 'SPOT') and '--luces' not in argv:
-        o.hide_render = True
+    if o.type == 'LIGHT' and o.data.type in ('POINT', 'AREA', 'SPOT'):
+        o.hide_render = '--luces' not in argv          # --luces: enciende las luces interiores
 sc.render.engine = 'CYCLES'; sc.cycles.device = 'CPU'; sc.cycles.samples = int(arg('--muestras', '16'))
 sc.cycles.use_denoising = True
+if '--luces' in argv:      # mismos ajustes que las vistas interiores de bloqueo.py
+    sc.cycles.max_bounces = 6; sc.cycles.diffuse_bounces = 3; sc.cycles.glossy_bounces = 2
+    sc.cycles.transmission_bounces = 4; sc.cycles.caustics_reflective = False; sc.cycles.caustics_refractive = False
 sc.render.resolution_x = int(arg('--ancho', '960')); sc.render.resolution_y = int(arg('--alto', '540'))
 sc.render.resolution_percentage = 100
 if arg('--expo'):

@@ -84,8 +84,17 @@ equivalentes) y la relación doble sobre el montante izquierdo (piso, mano y esq
   al oeste del camino), gazebo de juegos con letrero en el jardín del noreste y huerto de 4 surcos con
   cerca al lado de la oficinita.
 
-**Web**: el modelo y la ruta de la portada (`web/src/data/cine.ts`, x/z × 1,21) se regeneraron. El
-módulo `bpy` de pip no trae Draco: `export_web.py` ahora comprime con gltf-transform (Node).
+**Casa amarilla**: toldo rojo de lona en arco junto al porche en arco del patio (fotos
+casa-amarilla-patio y 114557). **Gris**: alerito blanco sobre la puerta de acceso y jardinera pintada de
+azul (114245).
+
+**Web**: el modelo y la ruta de la portada (`web/src/data/cine.ts`, x/z × 1,21) se regeneraron; la parada
+"Jardín" ahora mira desde arriba de la casa hacia las rampas, el gazebo, la tina y el huerto. En el
+recorrido 3D las palmas y árboles del lote salen de las fotos (palmas de navidad del portón del gris,
+hilera de la calle de tierra, naranjo y árboles del césped, pino del jardín del frente) y el resto se
+completa al azar. La página de avances tiene las vistas nuevas de personas encamadas, salón amarillo,
+baño nuevo y depósito, y los planos con áreas en metros reales. El módulo `bpy` de pip no trae Draco:
+`export_web.py` ahora comprime con gltf-transform (Node).
 
 ## 4. Interpretaciones (confirmar con la propietaria)
 

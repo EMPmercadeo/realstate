@@ -19,7 +19,7 @@ export const RUTA: PuntoRuta[] = [
   { pos: [35.1, 3.6, -37.5], target: [17, 3, -18.2] },      // 0.30 en el portón
   { pos: [37.5, 4.8, -15.7], target: [17, 2.8, -18.2] },    // 0.40 casa amarilla en 3/4
   { pos: [21.8, 18.2, -3.6], target: [7.3, 1.5, 10.9] },         // sobre la casa hacia el jardín
-  { pos: [23, 8, 3.6], target: [3.6, 1.2, 17] },          // 0.60 jardín interno
+  { pos: [18.2, 12, -0.3], target: [-4.9, 0.8, 8.8] },     // 0.60 jardín interno: rampas, gazebo, tina, huerto
   { pos: [18.2, 7, 43.6], target: [-13.3, 3.5, 29.1] },       // 0.70 edificio gris desde el jardín
   { pos: [8.5, 6.2, 42.4], target: [-7.3, 4.3, 33.3] },     // 0.80 área de coffee break (terraza con verjas)
   { pos: [14.5, 26.6, 58.1], target: [-3.6, 2, 17] },         // subiendo

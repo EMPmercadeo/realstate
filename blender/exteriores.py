@@ -397,4 +397,5 @@ def materiales(mat, neutro):
         croton_amarillo=neutro('croton_amarillo', (0.55, 0.40, 0.03), 0.7),
         croton_rojo=neutro('croton_rojo', (0.40, 0.08, 0.03), 0.7),
         croton_verde=neutro('croton_verde', (0.12, 0.28, 0.05), 0.7),
+        toldo_rojo=neutro('toldo_rojo', (0.42, 0.04, 0.05), 0.75),
     )

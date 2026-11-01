@@ -1,13 +1,14 @@
-// Avance del modelo 3D (etapa 4, 30-10-2026): vistas interiores renderizadas desde el modelo de Blender
+// Avance del modelo 3D (etapa 4 y fase del mapa, 01-11-2026): vistas interiores renderizadas desde el modelo de Blender
 // (realstate/blender, build/bloqueo/int_*.png). Nombres según lo que pidió la propietaria.
 export interface Vista { f: string; t: string; d: string }
 
-export const FECHA = '30 de octubre de 2026';
+export const FECHA = '1 de noviembre de 2026';
 
 export const GRIS: Vista[] = [
-  { f: 'int_gris_hosp', t: 'Personas encamadas', d: '10 camas de hospital con barandales, luz sobre cada cama y estación de enfermería al fondo.' },
+  { f: 'int_gris_hosp', t: 'Personas encamadas', d: '10 camas de hospital con barandales, mesita entre camas, luz sobre cada cama y estación de enfermería al fondo. Pasillo central de unos 2 m.' },
   { f: 'int_gris_hosp2', t: 'Personas encamadas', d: 'Vista desde la puerta del pasillo, hacia las ventanas del jardín.' },
-  { f: 'int_gris_salon2', t: 'Salón amarillo', d: '4 camas para personas con movilidad reducida, con mesita y silla de ruedas.' },
+  { f: 'int_gris_salon2', t: 'Salón amarillo', d: '4 camas para personas con movilidad reducida, con mesita, silla de ruedas y baño propio nuevo.' },
+  { f: 'int_gris_bano_s2', t: 'Baño nuevo del salón amarillo', d: 'Obra nueva dentro del salón, del lado de la biblioteca: regadera, inodoro y lavamanos.' },
   { f: 'int_gris_refrigerios', t: 'Área de coffee break', d: 'Terraza de arriba, cerrada con verjas: mesas, barra de café y frutas.' },
   { f: 'int_gris_salonB', t: 'Salón grande 2', d: '6 camas para personas que deambulan, con roperos y mesitas.' },
   { f: 'int_gris_salonA', t: 'Salón grande 1', d: '2 camas para personas que deambulan.' },

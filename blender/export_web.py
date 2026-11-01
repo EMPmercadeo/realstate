@@ -72,7 +72,8 @@ zonas = {
     'terraza_n': bbox_de(('gr_gal_n_piso',)),
     'parqueo': bbox_de(('gr_parqueo',)),
     'garaje': bbox_de(('ca_piso_garaje',)),
-    'porton_casa': bbox_de(('ca_porton_612',)),
+    'porton_casa': max((wbb(o) for o in bpy.data.objects if o.type == 'MESH' and o.name.startswith('ca_porton_')),
+                       key=lambda b: (b[1][0] - b[0][0]) ** 2 + (b[1][1] - b[0][1]) ** 2),   # el portón grande
     'balcon': bbox_de(('ca_balcon_losa',)),
 }
 vias = [MultiPoint([(o.matrix_world @ v.co).to_2d()[:] for v in o.data.vertices]).convex_hull
@@ -429,6 +430,18 @@ if _ext:
 dentro = lote.buffer(-1.6)
 borde = lote.exterior
 arboles, palmas, puestos = [], [], []
+# árboles y palmas que se ven en las fotos del 31-10-2026 (marco del gris o de la casa, unidades de diseño)
+CURADOS = [('p', sitio.GRIS, 9.6, -1.7, 8.0), ('p', sitio.GRIS, 12.3, -1.9, 7.0),          # palmas de navidad del portón
+           ('p', sitio.GRIS, -6.0, -2.7, 7.5), ('p', sitio.GRIS, -10.5, -2.9, 8.0),         # hilera de la calle de tierra
+           ('p', sitio.GRIS, -15.0, -3.0, 7.0), ('p', sitio.GRIS, -19.0, -3.2, 7.5),
+           ('a', sitio.GRIS, -8.4, 4.05, 4.5), ('a', sitio.GRIS, -15.6, 1.2, 5.5),          # naranjo y árboles del césped
+           ('a', sitio.GRIS, -17.8, 0.2, 6.0), ('a', sitio.GRIS, -6.5, 0.4, 5.0),
+           ('a', sitio.CASA, 14.2, -4.2, 7.5)]                                              # pino del jardín del frente
+for (t, E, x, y, h) in CURADOS:
+    X, Y = sitio.local_a_m(E, x, y)
+    xx, _, zz = T(X, Y, 0)
+    (palmas if t == 'p' else arboles).append([xx, zz, h])
+    puestos.append(Point(X, Y))
 for _ in range(4000):
     p = Point(rnd.uniform(lx0, lx1), rnd.uniform(ly0, ly1))
     if not dentro.contains(p) or prohibido.contains(p) or borde.distance(p) > 7:
@@ -438,7 +451,7 @@ for _ in range(4000):
     puestos.append(p)
     x, _, z = T(p.x, p.y, 0)
     (arboles if len(puestos) % 2 else palmas).append([x, z, round(rnd.uniform(5.5, 8.5), 1)])
-    if len(puestos) >= 18:
+    if len(puestos) >= 24:
         break
 
 limites = [round(lx0 - 6, 1), round(lx1 + 6, 1), round(-ly1 - 6, 1), round(-ly0 + 6, 1)]   # x0 x1 z0 z1 (three)

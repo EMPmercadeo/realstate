@@ -21,6 +21,7 @@ INTERIORES = {   # (edificio, posición local (x, y, z), mira (x, y, z), lente, 
     'int_gris_hosp2': (sitio.GRIS, (9.60, 6.90, 4.85), (13.3, 9.5, 3.9), 18, -0.5),
     'int_gris_salon2': (sitio.GRIS, (13.45, 0.95, 4.80), (9.0, 3.5, 3.95), 18, -0.5),
     'int_gris_refrigerios': (sitio.GRIS, (13.5, 12.75, 4.80), (4.8, 11.5, 4.1), 18, -1.3),
-    'int_gris_deposito': (sitio.GRIS, (1.50, 6.05, 4.80), (4.5, 6.4, 4.0), 18, -0.5),
+    'int_gris_deposito': (sitio.GRIS, (4.42, 6.12, 4.75), (2.7, 7.1, 4.0), 14, -0.5),
+    'int_gris_bano_s2': (sitio.GRIS, (11.15, 1.95, 4.75), (8.7, 1.1, 4.0), 16, -0.5),
     'int_gris_cocina': (sitio.GRIS, (6.55, 7.05, 4.90), (4.9, 4.95, 4.0), 16, -0.5),
 }
