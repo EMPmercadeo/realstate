@@ -156,7 +156,7 @@ GRIS_PB = {
     'oficina1': [W('escritorio', '+y', 10.00, 3.75), W('archivador', '-x', 2.96, 7.90),
                  W('librero', '+x', 4.54, 7.90, d=0.32)],
     'oficina2': [W('escritorio', '+y', 12.50, 5.72), P('mesa_reunion', 5.65, 8.95, 0),
-                 W('archivador', '-x', 4.66, 7.80), W('estante', '+x', 6.64, 7.90, d=0.40)],
+                 W('archivador', '-x', 4.66, 7.80), W('estante', '+x', 6.64, 10.20, d=0.40)],
     'deposito': [W('estante', '-y', 2.60, 5.30), W('estante', '-y', 2.60, 6.15), W('estante', '-x', 4.80, 3.60, d=0.40)],
     'pasillo': [W('banca', '-x', 6.76, 8.20, sep=0.02), W('planta_med', '-x', 6.76, 9.25, sep=0.02),
                 W('portagarrafon', '+x', 8.64, 7.25, sep=0.03)],
