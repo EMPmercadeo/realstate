@@ -16,3 +16,4 @@ assets/pbr/
 assets/hdri/
 *.blend1
 build/web/
+build/pano/
