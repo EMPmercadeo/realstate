@@ -99,7 +99,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const sunDir = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(90 - (RES ? 30 : 26)), THREE.MathUtils.degToRad(RES ? 72 : 14));
   const u = sky.material.uniforms;
   u.sunPosition.value.copy(sunDir);
-  u.turbidity.value = 2.8; u.rayleigh.value = 1.1; u.mieCoefficient.value = 0.005; u.mieDirectionalG.value = 0.85;
+  u.turbidity.value = RES ? 2.2 : 2.8; u.rayleigh.value = RES ? 2.0 : 1.1; u.mieCoefficient.value = 0.004; u.mieDirectionalG.value = 0.85;
   const pmrem = new THREE.PMREMGenerator(renderer);
   const skyScene = new THREE.Scene(); skyScene.add(sky.clone());
   scene.environment = pmrem.fromScene(skyScene as any, 0.02).texture;
@@ -108,11 +108,11 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   new RGBELoader().load(`${base}tex/entorno_parque.hdr`, (hdr) => {
     hdr.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = pmrem.fromEquirectangular(hdr).texture;
-    scene.environmentIntensity = 1.1;
+    scene.environmentIntensity = 1.35;
     scene.environmentRotation.set(0, Math.PI * 0.6, 0);
     hdr.dispose();
   });
-  scene.fog = new THREE.FogExp2(new THREE.Color('#d8d0c2'), MOVIL ? 0.0011 : 0.00075);
+  scene.fog = new THREE.FogExp2(new THREE.Color(RES ? '#cdd6de' : '#d8d0c2'), MOVIL ? 0.0009 : 0.0006);
   const evitar = (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]);
   if (RES) for (const p of Object.values((residencia as any).presets) as any[]) evitar.push([p.pos[0], p.pos[2]]);
   const mundo = crearMundo(scene, renderer, MOVIL, sunDir, evitar,
@@ -129,7 +129,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   sun.shadow.camera.near = 20; sun.shadow.camera.far = 320;
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
   scene.add(sun, sun.target);
-  scene.add(new THREE.HemisphereLight(0xdcc8ff, 0x6a5a3a, 0.18));
+  scene.add(new THREE.HemisphereLight(0xdfe6ff, 0x8a7a52, 0.28));
   // luz de relleno que acompaña a la cámara dentro de los edificios
   const relleno = new THREE.PointLight(0xfff4e0, 0, 14, 1.6);
   scene.add(relleno);
@@ -623,6 +623,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   if (CINE) { estado.modo = 'cine'; estado.etiquetas = false; orbit.enabled = false; container.classList.add('cine'); }
   else setModo('orbita');
   (window as any).__setProgreso = setProgreso;
+  (window as any).__info = () => ({ ...renderer.info.render, geometrias: renderer.info.memory.geometries, texturas: renderer.info.memory.textures });
   (window as any).__snap = () => { composer.render(); renderer.autoClear = false; renderer.render(mundo.escenaNubes, camera); renderer.autoClear = true; return renderer.domElement.toDataURL('image/jpeg', 0.85); };
   return { setModo, setVista, irA, setProgreso };
 }

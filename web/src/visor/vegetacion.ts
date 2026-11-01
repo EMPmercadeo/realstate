@@ -92,10 +92,10 @@ function frondoso(e: Especie): Partes {
   const T = new Acum(), F = new Acum();
   const h = ALTO_REF[e];
   const cfg = {
-    mango: { c: V(0, 5.1, 0), r: V(3.5, 2.7, 3.4), n: 120, tam: [1.5, 2.5] as [number, number], tr: 3.0, ramas: 5 },
-    abierto: { c: V(0, 5.6, 0), r: V(4.3, 1.9, 4.0), n: 100, tam: [1.6, 2.6] as [number, number], tr: 4.0, ramas: 6 },
+    mango: { c: V(0, 5.1, 0), r: V(3.5, 2.7, 3.4), n: 96, tam: [1.5, 2.5] as [number, number], tr: 3.0, ramas: 5 },
+    abierto: { c: V(0, 5.6, 0), r: V(4.3, 1.9, 4.0), n: 80, tam: [1.6, 2.6] as [number, number], tr: 4.0, ramas: 6 },
     joven: { c: V(0, 3.9, 0), r: V(2.1, 2.0, 2.1), n: 60, tam: [1.1, 1.8] as [number, number], tr: 2.2, ramas: 3 },
-    lejano: { c: V(0, 5.8, 0), r: V(3.6, 3.0, 3.6), n: 30, tam: [2.8, 3.8] as [number, number], tr: 3.0, ramas: 0 },
+    lejano: { c: V(0, 5.8, 0), r: V(3.6, 3.0, 3.6), n: 24, tam: [3.0, 4.1] as [number, number], tr: 3.0, ramas: 0 },
     mata: { c: V(0, 0.8, 0), r: V(0.9, 0.75, 0.9), n: 16, tam: [0.6, 1.0] as [number, number], tr: 0, ramas: 0 },
   }[e as 'mango']!;
   if (cfg.tr > 0) {
@@ -109,7 +109,7 @@ function frondoso(e: Especie): Partes {
   }
   copa(F, cfg.c, cfg.r, cfg.n, cfg.tam, e === 'lejano' ? 0.62 : 0.52);
   // un segundo lóbulo para que no sea una esfera perfecta
-  if (e === 'mango' || e === 'abierto') copa(F, V(cfg.r.x * 0.45, cfg.c.y + 0.6, -cfg.r.z * 0.3), cfg.r.clone().multiplyScalar(0.55), Math.round(cfg.n * 0.3), cfg.tam);
+  if (e === 'mango' || e === 'abierto') copa(F, V(cfg.r.x * 0.45, cfg.c.y + 0.6, -cfg.r.z * 0.3), cfg.r.clone().multiplyScalar(0.55), Math.round(cfg.n * 0.28), cfg.tam);
   return { tronco: cfg.tr > 0 ? T.geo() : undefined, follaje: F.geo(), tex: 'hojas' };
 }
 
@@ -134,7 +134,7 @@ function frondas(A: Acum, top: THREE.Vector3, n: number, L: [number, number], W:
     const dir = V(Math.cos(az), 0, Math.sin(az)); const lado = V(-dir.z, 0, dir.x);
     const Lf = L[0] + rnd() * (L[1] - L[0]);
     const el = sube[0] + rnd() * (sube[1] - sube[0]);
-    const S = 8; let prev: THREE.Vector3[] | null = null; let pv = 0;
+    const S = 6; let prev: THREE.Vector3[] | null = null; let pv = 0;
     const c = rnd() < seca ? 0.55 : 1;
     for (let k = 0; k <= S; k++) {
       const t = k / S;
@@ -176,7 +176,7 @@ function palma(e: 'coco' | 'navidad' | 'fenix'): Partes {
       rama(T, top.clone().add(V(0, -0.9, 0)), top.clone().add(V(0, 0.1, 0)), 0.14, 0.1, 8);       // capitel verde
       frondas(R, top.clone().add(V(0, 0.05, 0)), 13, [1.8, 2.4], 1.3, [0.7, 1.15], 0.45, 0.05);
     } else {
-      frondas(R, top, 18, [3.4, 4.4], 2.0, [0.25, 0.95], 0.55, 0.12);
+      frondas(R, top, 15, [3.4, 4.4], 2.1, [0.25, 0.95], 0.55, 0.12);
     }
   }
   return { tronco: T.geo(), fronda: R.geo(), tex: 'hojas' };

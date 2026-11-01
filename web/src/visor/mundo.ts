@@ -74,7 +74,13 @@ function prolongar(p: number[][], L: number) {
   return [ext(p[0], p[1]), ...p, ext(p[p.length - 1], p[p.length - 2])];
 }
 // quita de una polilínea lo que cae dentro de un círculo (las calles del lote ya están medidas en sitio.py)
-function recortarCirculo(p: number[][], c: number[], R: number): number[][][] {
+function recortarCirculo(p0: number[][], c: number[], R: number): number[][][] {
+  // primero se densifica (un tramo largo puede cruzar el círculo con los dos extremos afuera)
+  const p: number[][] = [p0[0]];
+  for (let i = 1; i < p0.length; i++) {
+    const a = p0[i - 1], b = p0[i]; const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 4));
+    for (let k = 1; k <= n; k++) p.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]);
+  }
   const fuera = (q: number[]) => Math.hypot(q[0] - c[0], q[1] - c[1]) >= R;
   const corte = (a: number[], b: number[]) => {
     let lo = 0, hi = 1; const fa = fuera(a);
@@ -90,7 +96,13 @@ function recortarCirculo(p: number[][], c: number[], R: number): number[][][] {
     } else if (i > 0 && fuera(p[i - 1])) { cur.push(corte(p[i - 1], q)); if (cur.length > 1) out.push(cur); cur = []; }
   }
   if (cur.length > 1) out.push(cur);
-  return out;
+  // quitar los puntos intermedios colineales que agregó la densificación
+  return out.map((q) => q.filter((v, i) => {
+    if (i === 0 || i === q.length - 1) return true;
+    const a = q[i - 1], b = q[i + 1];
+    const cr = (v[0] - a[0]) * (b[1] - a[1]) - (v[1] - a[1]) * (b[0] - a[0]);
+    return Math.abs(cr) / (Math.hypot(b[0] - a[0], b[1] - a[1]) || 1) > 0.05;
+  }));
 }
 /** cinta de calle: 3 vértices por punto (orilla, eje, orilla), UV en baldosas de `tile` metros */
 function cinta(p: number[][], ancho: number, tile: number, y: number) {
@@ -327,7 +339,7 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
   }
   // arboleda: densa donde no hay calles ni casas (el sur del lote es monte en el satélite), con claros
   // cerca (< 150 m) con especies completas; más lejos, árboles de tarjetas grandes (menos geometría)
-  const nArb = movil ? 3500 : 9500;
+  const nArb = movil ? 2600 : 9500;
   for (let i = 0; i < nArb; i++) {
     const a = rnd() * Math.PI * 2, r = 12 + Math.sqrt(rnd()) * 330;
     const x = C[0] + Math.cos(a) * r, z = C[1] + Math.sin(a) * r;
@@ -335,8 +347,16 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
     if (rnd() > (dens > 0.42 ? 0.95 : 0.35)) continue;
     if (enLote(x, z, 3) || cercaCalle(x, z, 3.5) || cercaCasa(x, z, 2.5) || cercaEvitar(x, z, 10)) continue;
     const t = rnd();
-    if (r > 150 && t >= 0.14) { add('lejano', x, z, 7 + rnd() * 7); continue; }
-    add(t < 0.14 ? 'coco' : t < 0.24 ? 'joven' : frondosa(7 + rnd() * 5), x, z, t < 0.14 ? 8 + rnd() * 6 : 6 + rnd() * 6);
+    if (r > 115 && t >= 0.08) { add('lejano', x, z, 7 + rnd() * 7); continue; }
+    add(t < 0.08 ? 'coco' : t < 0.2 ? 'joven' : frondosa(7 + rnd() * 5), x, z, t < 0.08 ? 8 + rnd() * 6 : 6 + rnd() * 6);
+  }
+  // monte al sur y sureste del lote (en el satélite es arboleda cerrada hasta los tanques)
+  for (let i = 0; i < (movil ? 700 : 2200); i++) {
+    const x = C[0] - 110 + rnd() * 260, z = C[1] + 28 + rnd() * 170;
+    if (enLote(x, z, 3) || cercaCalle(x, z, 3.5) || cercaCasa(x, z, 2.5) || cercaEvitar(x, z, 10)) continue;
+    const r = Math.hypot(x - C[0], z - C[1]);
+    if (r > 115) { add('lejano', x, z, 8 + rnd() * 8); continue; }
+    add(rnd() < 0.06 ? 'coco' : frondosa(8 + rnd() * 6), x, z, 7 + rnd() * 7);
   }
   // árboles a lo largo de la quebrada
   for (const A of (vecindario as any).agua as number[][][]) for (let i = 0; i < A.length - 1; i++) {
@@ -355,6 +375,8 @@ export function crearMundo(scene: THREE.Scene, renderer: THREE.WebGLRenderer, mo
     add('lejano', x, z, 8 + rnd() * 9);
   }
   plantar(grupo, plantas, tex, uTime, !movil);
+  const cuenta: Record<string, number> = {}; for (const p of plantas) cuenta[p.especie] = (cuenta[p.especie] || 0) + 1;
+  console.info('[mundo]', casas.length, 'casas', segs.length, 'tramos de calle', JSON.stringify(cuenta));
 
   // ---------- nubes ----------
   // las nubes van en una escena aparte (se dibujan después del post-proceso: el AO las ennegrecía)

@@ -5,6 +5,8 @@ entorno: césped de un solo color, casas vecinas de caja con techo de pirámide 
 bolas facetadas, calles que eran rectas prolongadas y cerros grises a 1 km. Los edificios eran de colores
 planos.
 
+![Antes y después](mapa/ronda3-antes-despues.jpg)
+
 ## Qué cambió
 
 **Luz y color** (`web/src/visor/visor.ts`)
@@ -62,6 +64,13 @@ cd web && npm run build
 
 `vecindario.json` se armó con la API de OpenStreetMap (bbox -82,4480 8,4090 -82,4390 8,4165) pasada al
 marco del modelo con la misma transformación lat/lon → metros que el registro de satélites.
+
+## Rendimiento
+
+En escritorio quedan ~7.000 árboles (los de más de ~115 m del lote con la versión liviana) y ~300 casas;
+en celular (pantalla < 820 px o agente móvil) un tercio y sin sombras de árboles. Las copas y las palmas
+son instanciadas (una llamada de dibujo por especie). Si una PC lenta se traba, bajar `nArb` en
+`mundo.ts`.
 
 ## Pendiente (siguientes rondas)
 
