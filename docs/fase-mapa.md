@@ -115,6 +115,10 @@ baño nuevo y depósito, y los planos con áreas en metros reales. El módulo `b
 - Casa amarilla con las fotos nuevas: farol y bloques de vidrio del lado del garaje (114732), toldo rojo y
   tanque negro del lado del patio (114557, 114759), muro crema con remate curvo hacia la C.A (114821).
 - Terreno con desnivel cuando haya una medida.
+- Volver a renderizar las demás vistas interiores con la escala nueva (las de `/avances` que no se
+  rehicieron todavía muestran los cuartos un 21 % más chicos). En la PC con la RTX 3080:
+  `& $b -b -P blender\bloqueo.py -- --solo interiores --muestras 64 --ancho 1280` y copiar
+  `build\bloqueo\int_*.png` como JPG a `web\public\avances\`.
 
 ## 6. Medidas para la próxima visita (cinta métrica, 20 minutos)
 
