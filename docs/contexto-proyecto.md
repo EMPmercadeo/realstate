@@ -1,6 +1,6 @@
 # Contexto del proyecto — Residencia Altos de San Cristóbal
 
-> **Fuente de verdad del proyecto** (actualizado 30-10-2026). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, 3 notas de voz adicionales y las indicaciones de Ernesto del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
+> **Fuente de verdad del proyecto** (actualizado 30-10-2026; medidas y mapa del 01-11-2026 en `fase-mapa.md`). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, 3 notas de voz adicionales y las indicaciones de Ernesto del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
 
 La propietaria vende la propiedad (2.500 m², casa amarilla + edificio gris) en US$600.000 tal como está. La propuesta es ofrecerla a un inversionista lista para operar como residencia de 26 adultos mayores, con pasadía y estadías temporales, por unos US$800.000 con unos US$200.000 de adecuaciones incluidos.
 
@@ -52,6 +52,11 @@ La última cuenta de la propietaria (nota de voz del 29-10) da **26 residentes**
 | Salón grande 2 | Gris, planta baja | Deambulan (caminan) | 4 |
 | Cuartos privados | Casa amarilla | Huéspedes independientes, tipo hotel | 4 |
 | **Total** | | | **26** |
+
+**Medidas (01-11-2026).** Con la escala del satélite medida (Google, Esri y Bing coinciden) los dos
+edificios son ~21 % más grandes en planta de lo que se había estimado: el gris mide ~17,4 × 16,3 m y la
+sala de personas encamadas ~51 m². Las 10 camas caben con mesita entre camas y un pasillo central de
+~2,1 m; ya no quedan "justas". Ver `docs/fase-mapa.md`.
 
 En la grabación del 28-10 la cuenta era otra: 10 encamados ("8 mínimo para que no queden apretadas"), 4 (o 3) en el salón amarillo y 5 + 4 en los salones de abajo. Sumó 23, "ampliable a 25", más 3 cuartos privados: 28 en total. El 30-10 la propietaria confirmó los 4 cuartos privados: 2 semiprivados que comparten baño y 2 privados con baño propio.
 
@@ -116,6 +121,12 @@ Los jardines internos llevan tres piezas nuevas: un gazebo de juegos, una tina d
 | Oficinita de abajo (iba a ser para fotocopias) | Oficina del huerto y bodega | Guardar herramientas e insumos, al lado del jardín |
 
 Lo demás no necesita nada: la propiedad ya tiene cerca perimetral, portones eléctricos y la parte de seguridad.
+
+**Lo que hay hoy en el jardín (fotos del 31-10-2026).** Camino de baldosa con rampas de concreto, barandas
+negras y descansos azules accesibles entre el gris y el patio de grava de la casa; una casita blanca con
+puerta de vidrio al noreste del gris y, a su lado, un bananal; un quiosco amarillo junto al muro de la
+calle de tierra; palmas fénix junto a la galería del gris; tocones en el césped. Probablemente la casita
+blanca es la "oficinita de abajo" y el bananal es "donde están los tallos" (por confirmar).
 
 ## Adecuaciones
 
@@ -235,6 +246,11 @@ Estos puntos se contradicen entre audios o no quedan claros, y conviene cerrarlo
 - [ ] **Oficina del gerente:** la recámara de arriba ahora es cuarto privado. ¿Dónde va el gerente?
 - [ ] **Pasadía y estadías temporales:** ¿cuánto se cobra la hora extra después de las 5:00 p. m.? ¿Las estadías usan solo los 4 cuartos privados?
 - [ ] **Recepción:** falta la foto correcta de la recepción.
+- [ ] **Área del lote:** con la escala medida, el trazo del lote da ~3.290 m² (no 2.500). Pedir el plano
+  catastral o la escritura para fijar el lindero real.
+- [ ] **Huerto:** ¿la "oficinita de abajo" es la casita blanca con puerta de vidrio junto al bananal, y el
+  bananal es "donde están los tallos"?
+- [ ] **Desnivel:** ¿cuánto sube el jardín del gris a la casa? (las rampas lo indican; se estima ~1 m).
 
 ## Qué cambia respecto a `programa-de-espacios.md`
 

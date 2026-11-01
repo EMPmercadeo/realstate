@@ -1,4 +1,10 @@
-# Siguiente fase — punto de partida (actualizado 30-10-2026, noche)
+# Siguiente fase — punto de partida (actualizado 01-11-2026)
+
+> **01-11-2026 · Fase 1 del mapa hecha** (`docs/fase-mapa.md`): escala medida del satélite (todo ×1,21
+> en planta), lindero oeste corregido con las fotos, galería en L con verjas del gris, baño nuevo en el
+> salón amarillo, servicio de la terraza sin regadera, exteriores reales (camino, rampas, oficinita,
+> quiosco, bananal) y propuesta (tina, gazebo, huerto). Lo que sigue está en la sección 5 y 6 de ese
+> archivo.
 
 Para un chat nuevo: leer primero `docs/contexto-proyecto.md` (fuente de verdad), luego este archivo y
 `docs/etapa4-amueblado.md`. El trabajo se hace en Blender (scripts en `blender/`) y la web en `web/`.
@@ -27,11 +33,11 @@ Para un chat nuevo: leer primero `docs/contexto-proyecto.md` (fuente de verdad),
 3. ¿Cuál es de verdad el cuarto de la foto con puertas de vidrio y arcos? (hoy: semiprivado 2)
 
 ## Cambios ya pedidos que faltan en el modelo
-- Baño nuevo **dentro del salón amarillo**, al lado de la biblioteca (depósito y ropería). Revisar que sigan
-  cabiendo las 4 camas.
-- El servicio de la terraza (gris, planta alta) queda **solo con inodoro, sin regadera** (hoy el modelo lo
-  nombra "Baño para usuarios (con regadera)").
+- ~~Baño nuevo dentro del salón amarillo~~ (hecho el 01-11; caben las 4 camas).
+- ~~Servicio de la terraza solo con inodoro~~ (hecho el 01-11).
 - La cocineta del gris es apoyo para servir: la comida se cocina en la casa amarilla.
+- Si se confirma que la casita blanca es la oficina del huerto, sacar "Oficina del huerto y bodega" de la
+  planta baja del gris.
 
 ## Plan propuesto (en este orden)
 1. **Medidas reales**: planos o medición en sitio de lo que más pesa: largo y ancho exterior de cada edificio,
