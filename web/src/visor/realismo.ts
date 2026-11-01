@@ -210,10 +210,13 @@ uniform sampler2D tCes, tSeco, tTierra, uRel; float rAlto;`)
     vec3 g1 = texture2D(tCes, p / 2.4).rgb;
     vec3 g2 = texture2D(tCes, mat2(0.8, -0.6, 0.6, 0.8) * p / 6.1).rgb;
     vec3 s1 = texture2D(tSeco, mat2(0.6, 0.8, -0.8, 0.6) * p / 3.3).rgb;
-    float mg = texture2D(uRel, p / 140.0).b * 0.65 + texture2D(uRel, p / 31.0).b * 0.35;
+    // tres escalas giradas y sin múltiplos comunes para que de lejos no se vean franjas repetidas
+    float mg = texture2D(uRel, mat2(0.92, -0.39, 0.39, 0.92) * p / 377.0).b * 0.45
+             + texture2D(uRel, mat2(0.6, 0.8, -0.8, 0.6) * p / 113.0).b * 0.35
+             + texture2D(uRel, p / 31.0).b * 0.2;
     float seco = smoothstep(0.48, 0.78, mg);
     vec3 g = mix(mix(g1, g2, 0.45), s1, seco * 0.75);
-    float tierra = smoothstep(0.80, 0.93, texture2D(uRel, p / 47.0 + 0.37).b) * 0.6;
+    float tierra = smoothstep(0.80, 0.93, texture2D(uRel, mat2(0.8, 0.6, -0.6, 0.8) * p / 61.0 + 0.37).b) * smoothstep(0.35, 0.6, mg) * 0.6;
     g = mix(g, texture2D(tTierra, p / 3.0).rgb * 0.8, tierra);
     rAlto = dot(g, vec3(0.3, 0.6, 0.1));
     diffuseColor.rgb = g * diffuseColor.rgb * 1.05;

@@ -1,5 +1,11 @@
 # Ronda 3 · Realismo en la web (01-11-2026)
 
+> **Cambio del 01-11-2026 (mañana):** Ernesto pidió quitar el entorno: solo importa la propiedad. Se
+> eliminaron las casas vecinas, las calles del barrio de OpenStreetMap (y `vecindario.json` con su
+> crédito), el monte, los árboles de la quebrada, el bosque lejano y la silueta del Barú. Quedan el
+> terreno de césped, las dos calles del frente del lote (C.A y calle de tierra, 10 m más allá del lote) y
+> la vegetación del lote. Lo de abajo sobre el barrio queda como historial.
+
 Objetivo: que el recorrido 3D y la portada dejen de verse "de videojuego". Lo que más lo delataba era el
 entorno: césped de un solo color, casas vecinas de caja con techo de pirámide puestas al azar, árboles de
 bolas facetadas, calles que eran rectas prolongadas y cerros grises a 1 km. Los edificios eran de colores
