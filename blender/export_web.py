@@ -37,7 +37,12 @@ def wbb(o):
 
 
 # ---------------------------------------------------------------- limpieza
+ARBOLES_WEB = []          # palmas y árboles columnares de exteriores.py: los dibuja el visor (follaje con textura)
 for o in list(bpy.data.objects):
+    if 'arboles_web' in o.keys():
+        ARBOLES_WEB += json.loads(o['arboles_web'])
+        bpy.data.objects.remove(o, do_unlink=True)
+        continue
     if o.type in ('LIGHT', 'CAMERA') or o.name in ('satelite', 'entorno') or o.name.startswith('lote'):
         bpy.data.objects.remove(o, do_unlink=True)
 for o in bpy.data.objects:
@@ -431,17 +436,23 @@ dentro = lote.buffer(-1.6)
 borde = lote.exterior
 arboles, palmas, puestos = [], [], []
 # árboles y palmas que se ven en las fotos del 31-10-2026 (marco del gris o de la casa, unidades de diseño)
-CURADOS = [('p', sitio.GRIS, 9.4, -1.6, 7.0), ('p', sitio.GRIS, 11.3, -1.6, 6.5),          # palmas de navidad del portón
-           ('p', sitio.GRIS, 13.2, -1.6, 6.5),                                              # tercera palma del portón
-           ('a', sitio.GRIS, -6.2, -1.9, 5.5), ('a', sitio.GRIS, -9.5, -1.9, 6.0),          # hilera de árboles columnares
-           ('a', sitio.GRIS, -13.0, -1.9, 5.5), ('a', sitio.GRIS, -16.4, -1.9, 6.0),        # de la calle de tierra (Street View)
-           ('a', sitio.GRIS, -8.4, 4.05, 4.5), ('a', sitio.GRIS, -15.6, 1.2, 5.5),          # naranjo y árboles del césped
+# las palmas del portón y la hilera de columnares vienen de exteriores.py (ARBOLES_WEB)
+CURADOS = [('a', sitio.GRIS, -8.4, 4.05, 4.5), ('a', sitio.GRIS, -15.6, 1.2, 5.5),          # naranjo y árboles del césped
            ('a', sitio.GRIS, -17.8, 0.2, 6.0), ('a', sitio.GRIS, -6.5, 0.4, 5.0),
-           ('a', sitio.CASA, 14.2, -4.2, 7.5)]                                              # pino del jardín del frente
+           ('pino', sitio.CASA, 14.2, -4.2, 7.5)]                                           # pino del jardín del frente
+vegetacion = []           # especies puntuales para el visor: [tipo, x, z, alto] (three.js)
 for (t, E, x, y, h) in CURADOS:
     X, Y = sitio.local_a_m(E, x, y)
     xx, _, zz = T(X, Y, 0)
-    (palmas if t == 'p' else arboles).append([xx, zz, h])
+    if t == 'a':
+        arboles.append([xx, zz, h])
+    else:
+        vegetacion.append([t, xx, zz, h])
+    puestos.append(Point(X, Y))
+for (t, lx, ly, h) in ARBOLES_WEB:                 # metros del marco del gris -> metros del modelo
+    X, Y = sitio.local_a_m(sitio.GRIS, lx / sitio.kp(), ly / sitio.kp())
+    xx, _, zz = T(X, Y, 0)
+    vegetacion.append([t, xx, zz, round(h, 2)])
     puestos.append(Point(X, Y))
 for _ in range(4000):
     p = Point(rnd.uniform(lx0, lx1), rnd.uniform(ly0, ly1))
@@ -463,7 +474,7 @@ datos = dict(
     mundo=dict(lote=dict(x0=limites[0] - 10, x1=limites[1] + 10, z0=limites[2] - 10, z1=limites[3] + 10),
                calles=[dict(ancho=round(ancho * sitio.s(), 2), puntos=[[round(x, 2), round(-y, 2)] for x, y in (sitio.m(*q) for q in pl)])
                        for pl, ancho in ((sitio.CA, sitio.CA_ANCHO * 0.8), (sitio.OESTE, sitio.OESTE_ANCHO * 0.8))],
-               arboles=arboles, palmas=palmas, centro=[c3[0], c3[2]]),
+               arboles=arboles, palmas=palmas, vegetacion=vegetacion, centro=[c3[0], c3[2]]),
 )
 with open(OUT_JSON, 'w', encoding='utf-8') as f:
     json.dump(datos, f, ensure_ascii=False, indent=1)

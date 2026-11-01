@@ -373,19 +373,34 @@ def construir(M, C):
         if i >= 10:
             x = rnd.uniform(-10.5, -4.5)
         banano(m, *P(x, y), rnd.uniform(3.0, 4.2), rnd)
-    for (x, y, h) in ((-1.7, 10.4, 4.6), (-1.9, 12.6, 4.0), (-5.0, 1.2, 4.2), (-3.4, 0.0, 3.6)):
-        palma_fenix(m, *P(x, y), h, rnd, troncos=rnd.randint(3, 5))
     for (x, y) in ((-17.0, 1.2), (-15.2, 0.2), (-19.0, 8.8), (-8.2, 8.4), (-5.5, 8.6)):
         croton(m, *P(x, y), rnd.uniform(1.0, 1.5), rnd)
-    # hilera de árboles columnares en la orilla de la calle de tierra y palmas de navidad frente al gris
-    # (Street View en la calle de tierra, panorama de 8,41245 N 82,44374 O)
-    for k, x in enumerate((-4.4, -6.5, -8.1, -10.6, -12.9, -15.8, -17.6)):
-        cipres(m, *P(x + rnd.uniform(-0.3, 0.3), -2.0 + rnd.uniform(-0.25, 0.25)), rnd.uniform(3.6, 5.2), rnd)
-    for x in (9.4, 11.3, 13.2):
-        palma_navidad(m, *P(x, -1.6), rnd.uniform(5.5, 7.0), rnd)
     tx, ty = P(-14.4, 0.6)
     m.cil(tx, ty, 0.0, 0.55, 0.16, 'tronco_palma', segs=9, r2=0.12)               # tocón (foto 113831)
     objs.append(cerrar(m, 'ext_vegetacion', M, C))
+    # palmas y árboles columnares: objeto aparte; la web no los exporta y dibuja los suyos (follaje con
+    # textura) en las mismas posiciones, guardadas en la propiedad 'arboles_web' (tipo, x, y, alto), con x, y en
+    # metros del marco del gris (las que devuelve Marco.P)
+    m = F.malla()
+    web = []
+    for (x, y, h) in ((-1.7, 10.4, 4.6), (-1.9, 12.6, 4.0), (-5.0, 1.2, 4.2), (-3.4, 0.0, 3.6)):
+        n = rnd.randint(3, 5)
+        palma_fenix(m, *P(x, y), h, rnd, troncos=n)
+        web.append(('fenix', *P(x, y), h))
+    # hilera de árboles columnares en la orilla de la calle de tierra y palmas de navidad frente al gris
+    # (Street View en la calle de tierra, panorama de 8,41245 N 82,44374 O)
+    for k, x in enumerate((-4.4, -6.5, -8.1, -10.6, -12.9, -15.8, -17.6)):
+        q = P(x + rnd.uniform(-0.3, 0.3), -2.0 + rnd.uniform(-0.25, 0.25)); h = rnd.uniform(3.6, 5.2)
+        cipres(m, *q, h, rnd)
+        web.append(('cipres', *q, h))
+    for x in (9.4, 11.3, 13.2):
+        h = rnd.uniform(5.5, 7.0)
+        palma_navidad(m, *P(x, -1.6), h, rnd)
+        web.append(('navidad', *P(x, -1.6), h))
+    ob = cerrar(m, 'ext_arboles', M, C)
+    import json
+    ob['arboles_web'] = json.dumps([(t, round(a, 2), round(b, 2), round(h, 2)) for t, a, b, h in web])
+    objs.append(ob)
     for o in objs:
         o['exterior_fotos'] = 1
     return objs

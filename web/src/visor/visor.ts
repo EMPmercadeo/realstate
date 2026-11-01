@@ -12,6 +12,8 @@ import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { crearMundo, type ConfigMundo } from './mundo';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { texturas, aplicarAlModelo } from './realismo';
 import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import vistasMaqueta from '../data/vistas.json';
 import residencia from '../data/residencia.json';
@@ -64,8 +66,10 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = MOVIL ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.72;
+  // tono: ?tono=aces|agx|neutral para comparar (por defecto ACES)
+  const TONO = new URLSearchParams(location.search).get('tono') || 'aces';
+  renderer.toneMapping = TONO === 'aces' ? THREE.ACESFilmicToneMapping : TONO === 'neutral' ? THREE.NeutralToneMapping : THREE.AgXToneMapping;
+  renderer.toneMappingExposure = TONO === 'aces' ? 0.76 : TONO === 'neutral' ? 0.62 : 0.95;
   container.appendChild(renderer.domElement);
 
   const labels = new CSS2DRenderer();
@@ -100,8 +104,19 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const skyScene = new THREE.Scene(); skyScene.add(sky.clone());
   scene.environment = pmrem.fromScene(skyScene as any, 0.02).texture;
   scene.environmentIntensity = 0.45;
+  // luz ambiente de una foto HDR real (Rooitou Park, Poly Haven, CC0) sin el sol: cielo arriba, césped abajo
+  new RGBELoader().load(`${base}tex/entorno_parque.hdr`, (hdr) => {
+    hdr.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = pmrem.fromEquirectangular(hdr).texture;
+    scene.environmentIntensity = 1.1;
+    scene.environmentRotation.set(0, Math.PI * 0.6, 0);
+    hdr.dispose();
+  });
   scene.fog = new THREE.FogExp2(new THREE.Color('#d8d0c2'), MOVIL ? 0.0011 : 0.00075);
-  const mundo = crearMundo(scene, renderer, MOVIL, sunDir, (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]), RES ? (residencia as any).mundo as ConfigMundo : undefined);
+  const evitar = (opts.ruta || []).map((r) => [r.pos[0], r.pos[2]]);
+  if (RES) for (const p of Object.values((residencia as any).presets) as any[]) evitar.push([p.pos[0], p.pos[2]]);
+  const mundo = crearMundo(scene, renderer, MOVIL, sunDir, evitar,
+    RES ? { ...(residencia as any).mundo, poligono: (residencia as any).lote } as ConfigMundo : undefined, base);
 
   const centro = RES ? new THREE.Vector3(...(residencia as any).centro as [number, number, number]) : new THREE.Vector3(15, 0, -42);
   const sun = new THREE.DirectionalLight(0xffd6a0, 3.2);
@@ -114,7 +129,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   sun.shadow.camera.near = 20; sun.shadow.camera.far = 320;
   sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03;
   scene.add(sun, sun.target);
-  scene.add(new THREE.HemisphereLight(0xdcc8ff, 0x6a5a3a, 0.5));
+  scene.add(new THREE.HemisphereLight(0xdcc8ff, 0x6a5a3a, 0.18));
   // luz de relleno que acompaña a la cámara dentro de los edificios
   const relleno = new THREE.PointLight(0xfff4e0, 0, 14, 1.6);
   scene.add(relleno);
@@ -197,7 +212,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
           } else if (m.transparent && m.opacity < 1) {
             m.depthWrite = false;
           }
-          if (m.name.startsWith('vidrio')) { m.transparent = true; m.opacity = 0.28; m.roughness = 0.05; m.metalness = 0.1; m.depthWrite = false; o.castShadow = false; }
+          if (m.name.startsWith('vidrio')) { m.transparent = true; m.opacity = 0.5; m.roughness = 0.04; m.metalness = 0.1; m.envMapIntensity = 1.8; m.depthWrite = false; o.castShadow = false; }
           if (m.name.startsWith('led')) { m.emissiveIntensity = 1.6; }
           if (m.name.startsWith('agua')) { m.transparent = true; m.opacity = 0.75; m.roughness = 0.05; }
         }
@@ -208,6 +223,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
       if (/^(entorno|vecino_|arbol_|palma_|garage_palma|calle$|acera$|acera2$)/.test(o.name)) o.visible = false;
       objetos.push(o);
     });
+    aplicarAlModelo(gltf.scene, texturas(base, renderer));
     scene.add(gltf.scene);
     gltf.scene.updateMatrixWorld(true);
     for (const a of aguas) (mundo as any).crearAgua(a);
