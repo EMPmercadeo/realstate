@@ -282,7 +282,7 @@ html.p360-on, html.p360-on body { overflow: hidden; }
 .v360-grid button { all: unset; cursor: pointer; display: block; border-radius: var(--radius); overflow: hidden; background: var(--bg-2);
   box-shadow: 0 1px 0 var(--line); }
 .v360-grid button:focus-visible { outline: 3px solid var(--ocre); outline-offset: 3px; }
-.v360-grid .v360-img { position: relative; aspect-ratio: 600 / 340; background: #22302a center / cover no-repeat; }
+.v360-grid .v360-img { display: block; position: relative; aspect-ratio: 600 / 340; background: #22302a center / cover no-repeat; }
 .v360-grid .v360-img::after { content: '360°'; position: absolute; right: .6rem; top: .6rem; padding: .2rem .5rem; border-radius: 999px;
   background: rgba(10, 18, 15, .65); color: #fff; font-size: .75rem; font-weight: 600; }
 .v360-grid strong { display: block; padding: .75rem .9rem .9rem; color: var(--ink); font-weight: 600; }

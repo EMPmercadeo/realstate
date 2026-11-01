@@ -1,1 +1,10 @@
-[]
+[
+ {
+  "id": "hosp@gris",
+  "nombre": "Personas encamadas",
+  "archivo": "/pano/hosp-gris.jpg",
+  "mini": "/pano/hosp-gris_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ }
+]
