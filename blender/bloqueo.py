@@ -161,7 +161,7 @@ def cercas(g):
     portones = [(sitio.local_a_m(sitio.CASA, 23.5, 0.5), 'vehicular', 2.6),
                 (sitio.local_a_m(sitio.GRIS, 3.0, -0.6), 'vehicular_arco', 3.3),     # ocupa todo el frente del estacionamiento
                 (sitio.local_a_m(sitio.GRIS, 7.4, -0.55), 'peatonal', 1.4),      # frente a la puerta de acceso
-                (sitio.local_a_m(sitio.GRIS, -23.5, -8.5), 'vehicular', 2.6)]
+                (sitio.local_a_m(sitio.GRIS, -23.5, -1.15), 'vehicular', 2.6)]    # patio de grava (en la cerca recta)
     corte = g.get('corte')
     borde_corte = corte.exterior if corte is not None else None
     from muebles3d import Malla
@@ -171,11 +171,13 @@ def cercas(g):
         a, b = pts[i], pts[i + 1]
         mid = Point((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
         d_corte = mid.distance(borde_corte) if borde_corte is not None else 99
-        if min(mid.distance(ca), mid.distance(oe), d_corte) > 4:
-            continue
         A, Bm = sitio.m(*a), sitio.m(*b)
         L = math.hypot(Bm[0] - A[0], Bm[1] - A[1])
         if L < 0.5:
+            continue
+        if min(mid.distance(ca), mid.distance(oe), d_corte) > 4:
+            # lindero hacia los vecinos: muro de bloques (la cerca rodea todo el lote, boceto de Ernesto 01-11-2026)
+            EX.muro_bloques(mp, A, Bm)
             continue
         ang = math.atan2(Bm[1] - A[1], Bm[0] - A[0])
         npan = max(1, round(L / 3.0))
@@ -198,15 +200,15 @@ def cercas(g):
             # tramos de la calle de tierra según Street View (8,41245 N 82,44374 O): frente al tramo sur del gris no
             # hay muro (la fachada da a la orilla con palmas); al norte del portón vehicular, murete con baranda
             # de tubo y macetas (el jardín queda más alto que la calle)
-            sin_muro = d_corte < 4 and gx > 8.4
+            # (01-11-2026: la cerca es una sola; ya no se deja sin muro el tramo sur del gris)
             murete = d_corte < 4 and -9.0 < gx < -0.4
-            if tipo is None and sin_muro:
-                continue
             if tipo is None and murete:
                 EX.tramo(mp, P0, P1, 0.22, 0.0, 0.7, 'murete_gris')
                 EX.baranda_tubo(mp, P0, P1, alto=0.95, paso=1.5, mat='metal_blanco', base=False, z0=0.7)
                 continue
-            if tipo is None:
+            if tipo is None and mat_m == 'amarillo_muro':
+                EX.panel_curvo(mp, P0, P1, 0.2, 1.75, 1.05, mat_m)       # remate cóncavo como en las fotos
+            elif tipo is None:
                 EX.tramo(mp, P0, P1, 0.2, 0.0, 1.55, mat_m)
             elif tipo == 'peatonal':
                 um = min(max(u_p, u0 + 0.9), u1 - 0.9)
@@ -226,9 +228,10 @@ def cercas(g):
                 EX.tramo(mp, P0, P1, 0.2, 0.0, 0.4 if tipo == 'vehicular_arco' else 0.05, mat_m)
                 EX.porton_negro(mp, P0, P1, alto=1.85, arco=0.3 if tipo == 'vehicular_arco' else 0.0,
                                 celosia=tipo == 'vehicular_arco')
+            remate = 'teja' if mat_m == 'amarillo_muro' else 'blanco'        # pilares de la casa: tapa y bola color teja
             mp.cc(P0[0], P0[1], 0.0, 0.42, 0.42, 1.95, mat_m)
-            mp.cc(P0[0], P0[1], 1.95, 0.5, 0.5, 0.08, 'blanco')
-            mp.esfera(P0[0], P0[1], 2.2, 0.16, 'blanco', seg=10)
+            mp.cc(P0[0], P0[1], 1.95, 0.5, 0.5, 0.08, remate)
+            mp.esfera(P0[0], P0[1], 2.2, 0.16, remate, seg=10)
     ob = mp.objeto('cercas_lote', M, C_CERCA)
     from lib import box_uv
     box_uv(ob, 1.0)

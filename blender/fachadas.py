@@ -430,10 +430,12 @@ def casa_amarilla(M, c, origen, ang):
     K.B('garaje', gx0, gy0, 0, gx1, gy1, 2.8, Y)
     K.B('garaje_piedra', gx1, gy0, 0, gx1 + 0.05, gy1, 2.8, 'piedra')
     hip(K, 'garaje_techo', gx0, gy0, gx1, gy1, 2.8, 22, 0.55, 'teja')
-    K.B('garaje_vano', gx1 + 0.05, gy0 + 0.5, 0.05, gx1 + 0.08, gy1 - 0.5, 2.4, 'vidrio_osc')
+    # la reja del garaje da hacia adentro, al patio de baldosa junto a la casa (foto del garaje y boceto de
+    # Ernesto del 01-11-2026: antes miraba hacia la calle); la cara de afuera es la de piedra
+    K.B('garaje_vano', gx0 - 0.08, gy0 + 0.5, 0.05, gx0 - 0.05, gy1 - 0.5, 2.4, 'vidrio_osc')
     k = gy0 + 0.6
     while k < gy1 - 0.5:
-        K.B('garaje_reja', gx1 + 0.08, k, 0.05, gx1 + 0.11, k + 0.03, 2.4, 'hierro'); k += 0.16
+        K.B('garaje_reja', gx0 - 0.11, k, 0.05, gx0 - 0.08, k + 0.03, 2.4, 'hierro'); k += 0.16
     # pisos de baldosa: frente y entrada del garaje
     K.B('piso_frente', -1.6, -12.5, 0, 12.6, -0.6, 0.03, 'ceramica')
     K.B('piso_garaje', 12.6, -2.0, 0, 24.0, 3.5, 0.03, 'ceramica')

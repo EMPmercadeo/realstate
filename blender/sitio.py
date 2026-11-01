@@ -36,7 +36,9 @@ CA_ANCHO = 44          # px (incluye cunetas/orillas)
 # muestra 3-4 m más al este que la lectura anterior, pegada al gris. Junto al gris se acercó ~2 m más con
 # Street View: desde la cámara de la panorámica de la calle (que circula por el eje), el gris y el portón se
 # ven del mismo tamaño que en el modelo solo si el eje pasa a ~5,8 m de la fachada (ver docs/fase-mapa.md)
-OESTE = [(300, 92), (266, 145), (238, 215), (207, 290), (185, 360), (181, 428), (164, 501), (140, 560), (108, 629),
+# 01-11-2026 (boceto de Ernesto): la cerca de la calle de tierra es una sola, casi recta, del gris a la C.A; frente
+# a la casa la calle se acercó ~5 m para que corra paralela a esa cerca (antes la cerca hacía un quiebre de ~6 m)
+OESTE = [(333, 108), (310, 166), (281, 236), (251, 311), (224, 379), (199, 436), (164, 501), (140, 560), (108, 629),
          (79, 693), (47, 733), (-10, 740)]
 OESTE_ANCHO = 32
 
@@ -54,7 +56,8 @@ def _shapely():
 # calle de tierra corre a ~1 u al oeste del tramo sur del gris (el pilar del portón peatonal toca la
 # fachada) y el muro amarillo del jardín queda a ~4 m del camino de baldosa. El trazo, menos la calle,
 # lo dejaba ~10 m más afuera. Polígono a recortar, en unidades de diseño del marco del gris.
-CORTE_OESTE_GRIS = [(-19.6, -0.9), (16.5, -0.4), (16.5, -40.0), (-19.6, -40.0)]
+# 01-11-2026: se prolonga hasta la C.A con un ángulo suave (cerca casi recta, sin quiebre; boceto de Ernesto).
+CORTE_OESTE_GRIS = [(-66.0, -3.6), (-52.0, -2.9), (-19.6, -0.9), (16.5, -0.4), (16.5, -40.0), (-66.0, -40.0)]
 
 
 def geometria_px(cortar=True):

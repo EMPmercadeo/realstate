@@ -117,6 +117,32 @@ def descanso(m, x0, y0, x1, y1, simbolo=True):
         m.caja(cx - 0.15, cy - 0.05, 0.065, cx + 0.18, cy + 0.01, 0.07, 'blanco')
 
 
+def panel_curvo(m, p, q, grueso, alto_ext, alto_min, mat, remate='teja', n=12):
+    """Paño de muro con el remate cóncavo entre pilares (muro amarillo de la casa, fotos 114821 y del garaje):
+    alto en los extremos, baja en el centro, con canto de color teja."""
+    p, q = Vector((p[0], p[1], 0)), Vector((q[0], q[1], 0))
+    d = q - p; L = d.length
+    g = math.degrees(math.atan2(d.y, d.x))
+    with m.at(p.x, p.y, 0, g=g):
+        for i in range(n):
+            u0, u1 = L * i / n, L * (i + 1) / n
+            t = (u0 + u1) / (2 * L)
+            h = alto_min + (alto_ext - alto_min) * (2 * t - 1) ** 2
+            m.caja(u0, -grueso / 2, 0.0, u1, grueso / 2, h, mat)
+            m.caja(u0, -grueso / 2 - 0.03, h, u1, grueso / 2 + 0.03, h + 0.06, remate)
+
+
+def muro_bloques(m, p, q, alto=2.1, grueso=0.15, paso=3.0):
+    """Muro de bloques de concreto con columnas (lindero hacia los vecinos; indicación de Ernesto del 01-11-2026)."""
+    tramo(m, p, q, grueso, 0.0, alto, 'bloque')
+    pp = Vector((p[0], p[1], 0)); qq = Vector((q[0], q[1], 0))
+    L = (qq - pp).length
+    n = max(1, round(L / paso))
+    for i in range(n + 1):
+        c = pp + (qq - pp) * (i / n)
+        m.cc(c.x, c.y, 0.0, 0.25, 0.25, alto + 0.05, 'bloque')
+
+
 def muro(m, p, q, alto=1.55, grueso=0.18, mat='amarillo_muro', pilares=3.0, mat_pilar=None, bola=True):
     """Muro con pilares cada `pilares` m y bola blanca (como los del lote)."""
     tramo(m, p, q, grueso, 0.0, alto, mat)
@@ -348,7 +374,7 @@ def construir(M, C):
     muro(m, P(-19.6, 3.8), P(-19.6, 9.5), alto=1.5)
     porton_negro(m, P(-19.6, 2.3), P(-19.6, 3.8), alto=1.55)
     # ---- patio de grava detrás de la casa (foto casa-amarilla-patio y video 114626)
-    gx0, gy0 = P(-27.0, -7.6); gx1, gy1 = P(-19.8, 11.5)
+    gx0, gy0 = P(-27.0, -1.0); gx1, gy1 = P(-19.8, 11.5)          # hasta la cerca de la calle (casi recta desde el 01-11)
     m.caja(gx0, gy0, 0.0, gx1, gy1, 0.035, 'grava')
     objs.append(cerrar(m, 'ext_caminos_rampas', M, C))
 
@@ -425,6 +451,7 @@ def materiales(mat, neutro):
         rojo_interior=neutro('rojo_interior', (0.33, 0.04, 0.04), 0.8),
         verde_borde=neutro('verde_borde', (0.10, 0.30, 0.10), 0.7),
         grava=neutro('grava', (0.40, 0.39, 0.37), 0.95),
+        bloque=neutro('bloque', (0.50, 0.50, 0.48), 0.93),
         madera_deck=neutro('madera_deck', (0.30, 0.17, 0.08), 0.7),
         piedra_clara=neutro('piedra_clara', (0.62, 0.60, 0.55), 0.7),
         agua=mat('ex_agua', color=(0.06, 0.32, 0.40, 1), rough=0.12),

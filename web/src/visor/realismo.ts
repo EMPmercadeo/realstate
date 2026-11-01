@@ -176,7 +176,7 @@ export function clasificar(nombre: string): Detalle | null {
   if (/cubierta|remate_lamina/.test(n)) return LAMINA;
   if (/toldo/.test(n)) return TELA;
   if (/piedra/.test(n)) return PIEDRA;
-  if (/concreto|murete|rampa|grava|baldosa|banda/.test(n)) return CONCRETO;
+  if (/concreto|murete|rampa|grava|baldosa|banda|bloque/.test(n)) return CONCRETO;
   if (/muro|pintura|blanco|amarill|pilar|cielo|alero|rojo_interior|azul_accesible|verde_borde/.test(n)) return ESTUCO;
   return null;
 }
