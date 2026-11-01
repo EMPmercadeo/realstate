@@ -89,5 +89,16 @@ Las vistas, sus puntos de cámara y su exposición están en `PANOS` dentro de `
 manifiesto `web/src/data/panoramas.json` se reescribe solo. Para agregar una vista, se suma una línea a
 `PANOS` con el id del espacio (el mismo de `/recorrido`, p. ej. `salonB@gris`).
 
-Pendiente para la portada: el sobrevuelo v2 (`clips/sobrevuelo-v2.mp4`) con el modelo amueblado. Hoy
-`cine_render.py` abre `build/escena.blend` (la maqueta anterior); hay que apuntarlo a `bloqueo.blend`.
+## 7. Sobrevuelo v2 de la portada con el modelo amueblado
+
+`cine_render.py --modelo bloqueo` abre `build/bloqueo/bloqueo.blend` (no la maqueta vieja), pone césped hasta
+el horizonte (solo la propiedad, sin barrio), calles de asfalto y tierra y los árboles del jardín, y sigue la
+ruta de `web/src/data/cine.ts`. Escribe `web/public/clips/sobrevuelo-v2.mp4`, `sobrevuelo-v2-m.mp4` y
+`poster-v2.jpg`; la portada los usa apenas existen (si no, muestra el 3D en vivo).
+
+```
+& $b -b -P blender\cine_render.py -- --modelo bloqueo --preview                    # 60 cuadros de 640 px
+& $b -b -P blender\cine_render.py -- --modelo bloqueo --w 1920 --samples 128       # final (≈ 1 h)
+```
+
+Si existen `assets/pbr` (ambientCG) se usan para césped, concreto, repello, grava, asfalto y láminas.

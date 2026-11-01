@@ -1,14 +1,24 @@
 ---
 import Base from '@/layouts/Base.astro';
 import Cine from '@/components/Cine.astro';
+import panos from '@/data/panoramas.json';
+import { listarPublicos } from '@/data/existentes';
+// tarjetas del avance: solo las que ya tienen render (al cambiar la distribución se re-renderizan)
+const hay = new Set(listarPublicos('avances'));
+const tarjetas = [
+  ['int_gris_hosp', 'edificio-gris', 'Personas encamadas en el modelo 3D', 'Personas encamadas', '10 camas y estación de enfermería'],
+  ['int_gris_salon2', 'edificio-gris', 'Salón amarillo en el modelo 3D', 'Salón amarillo', 'Personas con movilidad reducida'],
+  ['int_gris_salonA', 'edificio-gris', 'Salón grande 1 en el modelo 3D', 'Salones de abajo', '4 + 4 camas, personas que deambulan'],
+  ['int_casa_comedor', 'casa-amarilla', 'Comedor de la casa amarilla en el modelo 3D', 'Casa amarilla', 'Comedor, terapia y cuartos privados'],
+].filter(([f]) => hay.has(`/avances/${f}.jpg`)).slice(0, 3);
 const comparar = [
   ['hospitalizacion', 'Personas encamadas · 10 camas'],
   ['comedor', 'Comedor y TV'],
   ['salon-2', 'Salón amarillo · movilidad reducida'],
-  ['refrigerios', 'Área de coffee break'],
+  ['refrigerios', 'Área recreativa y de coffee break'],
   ['terraza', 'Terraza al aire libre'],
   ['cocina', 'Cocineta del edificio gris'],
-  ['bano-accesible', 'Baño accesible para usuarios'],
+  ['bano-accesible', 'Baño accesible para huéspedes o usuarios'],
 ];
 ---
 <Base title="Residencia de retiro en David, Chiriquí · Altos de San Cristóbal" full sinHeader>
@@ -41,13 +51,13 @@ const comparar = [
     <section class="seccion" id="avance-3d">
       <div class="container">
         <h2>Avance del modelo 3D</h2>
-        <p class="lead">Los dos edificios ya tienen sus interiores amueblados en el modelo: personas encamadas con estación de enfermería, salón amarillo, área de coffee break, cuartos privados, comedor, terapia y más.</p>
+        <p class="lead">Los dos edificios ya tienen sus interiores amueblados en el modelo: personas encamadas con estación de enfermería, salón amarillo, área recreativa y de coffee break, cuartos privados, comedor, terapia y más.</p>
         <div class="espacios">
-          <a class="espacio" href="/avances#edificio-gris"><img src="/avances/int_gris_hosp.jpg" alt="Personas encamadas en el modelo 3D" loading="lazy" /><div><h3>Personas encamadas</h3><p>10 camas y estación de enfermería</p></div></a>
-          <a class="espacio" href="/avances#edificio-gris"><img src="/avances/int_gris_salon2.jpg" alt="Salón amarillo en el modelo 3D" loading="lazy" /><div><h3>Salón amarillo</h3><p>Personas con movilidad reducida</p></div></a>
-          <a class="espacio" href="/avances#casa-amarilla"><img src="/avances/int_casa_comedor.jpg" alt="Comedor de la casa amarilla en el modelo 3D" loading="lazy" /><div><h3>Casa amarilla</h3><p>Comedor, terapia y cuartos privados</p></div></a>
+          {tarjetas.map(([f, ancla, alt, t, d]) => (
+            <a class="espacio" href={`/avances#${ancla}`}><img src={`/avances/${f}.jpg`} alt={alt} loading="lazy" /><div><h3>{t}</h3><p>{d}</p></div></a>
+          ))}
         </div>
-        <p style="margin-top:1.4rem"><a class="btn" href="/avances">Ver todo el avance</a></p>
+        <p style="margin-top:1.4rem"><a class="btn" href="/avances">Ver todo el avance</a>{panos.length > 0 && <a class="btn claro" href="/360" style="margin-left:.6rem">Recorrer en 360°</a>}</p>
       </div>
     </section>
 

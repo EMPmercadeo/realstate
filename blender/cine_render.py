@@ -10,6 +10,12 @@ Uso (desde la carpeta realstate, con Blender instalado):
   blender -b -P blender/cine_render.py -- --video                   # solo arma el video con los PNG
 Opciones de look: --hdri <nombre en assets/hdri>  --exposure -0.4  --sun-elev 14  --sun-az 246  --crf 20
 Si existen assets/pbr/<Set>/ (ambientCG) se usan esas texturas; si no, las generadas.
+
+Sobrevuelo v2 con el modelo amueblado (el mismo del recorrido y de las vistas 360°):
+  blender -b -P blender/cine_render.py -- --modelo bloqueo --preview
+  blender -b -P blender/cine_render.py -- --modelo bloqueo --w 1920 --samples 128
+Abre build/bloqueo/bloqueo.blend, pone césped hasta el horizonte (sin barrio: solo la propiedad), calles con
+asfalto y tierra, los árboles del jardín y escribe clips/sobrevuelo-v2.mp4, sobrevuelo-v2-m.mp4 y poster-v2.jpg.
 """
 import os, sys, math, re, glob, argparse, subprocess, shutil, random
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -37,11 +43,15 @@ ap.add_argument('--crf', type=int, default=26)
 ap.add_argument('--gop', type=int, default=16, help='cuadros entre keyframes (menor = scrub más rápido, archivo más grande)')
 ap.add_argument('--video', action='store_true', help='no renderiza: solo arma el video con los cuadros existentes')
 ap.add_argument('--solo-escena', action='store_true', help='solo prepara la escena y la guarda (build/cine.blend)')
+ap.add_argument('--modelo', choices=('maqueta', 'bloqueo'), default='maqueta',
+                help='bloqueo = modelo amueblado (build/bloqueo/bloqueo.blend) → sobrevuelo-v2')
 args = ap.parse_args(argv)
 if args.preview:
     args.w, args.samples, args.frames = 640, 16, 60
 
-OUT = os.path.abspath(args.out) if args.out else os.path.join(ROOT, 'build', 'cine'); os.makedirs(OUT, exist_ok=True)
+V2 = args.modelo == 'bloqueo'
+SUF = '-v2' if V2 else ''
+OUT = os.path.abspath(args.out) if args.out else os.path.join(ROOT, 'build', 'cine_v2' if V2 else 'cine'); os.makedirs(OUT, exist_ok=True)
 PBR = os.path.join(ROOT, 'assets', 'pbr')
 HDRI_DIR = os.path.join(ROOT, 'assets', 'hdri')
 
@@ -61,7 +71,7 @@ def armar_video(fps):
     if not ff:
         print('sin ffmpeg: no se arma el video'); return
     clips = os.path.join(ROOT, 'web', 'public', 'clips'); os.makedirs(clips, exist_ok=True)
-    salida = os.path.join(clips, 'sobrevuelo.mp4')
+    salida = os.path.join(clips, f'sobrevuelo{SUF}.mp4')
     # escritorio 16:9 (1080p máx.) — GOP corto para que el scrub por scroll sea instantáneo
     subprocess.run([ff, '-y', '-loglevel', 'error', '-framerate', str(fps), '-i', os.path.join(OUT, 'f%04d.png'),
                     '-vf', 'scale=min(1920\\,iw):-2', '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow', '-pix_fmt', 'yuv420p',
@@ -69,10 +79,10 @@ def armar_video(fps):
     # móvil 9:16: recorte central y 720 px de ancho
     subprocess.run([ff, '-y', '-loglevel', 'error', '-i', salida, '-vf', 'crop=ih*9/16:ih,scale=720:-2', '-c:v', 'libx264', '-profile:v', 'high', '-preset', 'slow',
                     '-pix_fmt', 'yuv420p', '-crf', str(args.crf + 1), '-g', str(args.gop), '-keyint_min', str(args.gop), '-sc_threshold', '0', '-movflags', '+faststart', '-an',
-                    os.path.join(clips, 'sobrevuelo-m.mp4')], check=False)
+                    os.path.join(clips, f'sobrevuelo{SUF}-m.mp4')], check=False)
     # póster (primer cuadro) para que la portada muestre algo antes de que cargue el video
-    subprocess.run([ff, '-y', '-loglevel', 'error', '-i', os.path.join(OUT, 'f0000.png'), '-vf', 'scale=1600:-2', '-q:v', '4', os.path.join(clips, 'poster.jpg')], check=False)
-    for n in ('sobrevuelo.mp4', 'sobrevuelo-m.mp4', 'poster.jpg'):
+    subprocess.run([ff, '-y', '-loglevel', 'error', '-i', os.path.join(OUT, 'f0000.png'), '-vf', 'scale=1600:-2', '-q:v', '4', os.path.join(clips, f'poster{SUF}.jpg')], check=False)
+    for n in (f'sobrevuelo{SUF}.mp4', f'sobrevuelo{SUF}-m.mp4', f'poster{SUF}.jpg'):
         p = os.path.join(clips, n)
         if os.path.exists(p): print(f'{n}: {os.path.getsize(p) / 1e6:.1f} MB')
 
@@ -80,7 +90,8 @@ def armar_video(fps):
 if args.video:
     armar_video(args.fps); sys.exit(0)
 
-bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT, 'build', 'escena.blend'))
+bpy.ops.wm.open_mainfile(filepath=os.path.join(ROOT, 'build', 'bloqueo', 'bloqueo.blend') if V2
+                         else os.path.join(ROOT, 'build', 'escena.blend'))
 scene = bpy.context.scene
 
 # ---------------- ruta de cámara: leída de web/src/data/cine.ts ----------------
@@ -379,6 +390,131 @@ def preparar_entorno():
     # los vecinos construidos se quedan (dan vida al barrio); su arboleda también
 
 
+
+# ---------------- modelo amueblado (v2): solo la propiedad sobre césped ----------------
+def cesped_procedural(nombre, base=(0.20, 0.32, 0.075), seco=(0.42, 0.40, 0.17), tierra=(0.30, 0.22, 0.13)):
+    """Césped sin texturas descargadas: dos escalas de ruido para el tono, manchas secas, parches de tierra y relieve."""
+    m = bpy.data.materials.get(nombre) or bpy.data.materials.new(nombre)
+    m.use_nodes = True; nt = m.node_tree; nt.nodes.clear()
+    out = nt.nodes.new('ShaderNodeOutputMaterial'); b = nt.nodes.new('ShaderNodeBsdfPrincipled')
+    nt.links.new(b.outputs['BSDF'], out.inputs['Surface'])
+    geo = nt.nodes.new('ShaderNodeNewGeometry')
+    def ruido(esc, det=4.0, rough=0.55):
+        n = nt.nodes.new('ShaderNodeTexNoise'); n.inputs['Scale'].default_value = esc
+        n.inputs['Detail'].default_value = det; n.inputs['Roughness'].default_value = rough
+        nt.links.new(geo.outputs['Position'], n.inputs['Vector']); return n
+    def rampa(fac, p0, p1, c0, c1):
+        r = nt.nodes.new('ShaderNodeValToRGB'); e = r.color_ramp.elements
+        e[0].position, e[1].position = p0, p1; e[0].color = (*c0, 1); e[1].color = (*c1, 1)
+        nt.links.new(fac, r.inputs['Fac']); return r
+    def mezclar(f, a, c):
+        x = nt.nodes.new('ShaderNodeMix'); x.data_type = 'RGBA'
+        nt.links.new(f, x.inputs['Factor']); nt.links.new(a, x.inputs[6]); nt.links.new(c, x.inputs[7]); return x.outputs[2]
+    claro = tuple(min(1.0, v * 1.35) for v in base); oscuro = tuple(v * 0.7 for v in base)
+    tono = rampa(ruido(0.08).outputs['Fac'], 0.35, 0.68, oscuro, claro).outputs['Color']
+    fino = rampa(ruido(3.5, 6.0, 0.7).outputs['Fac'], 0.3, 0.75, tuple(v * 0.85 for v in base), tuple(v * 1.15 for v in base)).outputs['Color']
+    mf = nt.nodes.new('ShaderNodeMix'); mf.data_type = 'RGBA'; mf.blend_type = 'MULTIPLY'; mf.inputs['Factor'].default_value = 0.6
+    nt.links.new(tono, mf.inputs[6]); nt.links.new(fino, mf.inputs[7]); col = mf.outputs[2]
+    fs = rampa(ruido(0.025, 3.0).outputs['Fac'], 0.58, 0.72, (0, 0, 0), (1, 1, 1)).outputs['Color']
+    rs = nt.nodes.new('ShaderNodeRGB'); rs.outputs[0].default_value = (*seco, 1)
+    col = mezclar(fs, col, rs.outputs[0])
+    ft = rampa(ruido(0.12, 5.0).outputs['Fac'], 0.71, 0.76, (0, 0, 0), (1, 1, 1)).outputs['Color']
+    rt = nt.nodes.new('ShaderNodeRGB'); rt.outputs[0].default_value = (*tierra, 1)
+    col = mezclar(ft, col, rt.outputs[0])
+    nt.links.new(col, b.inputs['Base Color'])
+    b.inputs['Roughness'].default_value = 0.92
+    bp = nt.nodes.new('ShaderNodeBump'); bp.inputs['Strength'].default_value = 0.35; bp.inputs['Distance'].default_value = 0.02
+    nt.links.new(ruido(60.0, 2.0).outputs['Fac'], bp.inputs['Height']); nt.links.new(bp.outputs['Normal'], b.inputs['Normal'])
+    return m
+
+
+def calle_procedural(nombre, color, rough=0.85, grano=40.0, manchas=0.25):
+    m = bpy.data.materials.new(nombre); m.use_nodes = True; nt = m.node_tree; nt.nodes.clear()
+    out = nt.nodes.new('ShaderNodeOutputMaterial'); b = nt.nodes.new('ShaderNodeBsdfPrincipled')
+    nt.links.new(b.outputs['BSDF'], out.inputs['Surface'])
+    geo = nt.nodes.new('ShaderNodeNewGeometry')
+    n = nt.nodes.new('ShaderNodeTexNoise'); n.inputs['Scale'].default_value = 0.4; n.inputs['Detail'].default_value = 5
+    nt.links.new(geo.outputs['Position'], n.inputs['Vector'])
+    r = nt.nodes.new('ShaderNodeValToRGB'); e = r.color_ramp.elements
+    e[0].color = (*(v * (1 - manchas) for v in color), 1); e[1].color = (*(min(1, v * (1 + manchas)) for v in color), 1)
+    nt.links.new(n.outputs['Fac'], r.inputs['Fac']); nt.links.new(r.outputs['Color'], b.inputs['Base Color'])
+    b.inputs['Roughness'].default_value = rough
+    g = nt.nodes.new('ShaderNodeTexNoise'); g.inputs['Scale'].default_value = grano; nt.links.new(geo.outputs['Position'], g.inputs['Vector'])
+    bp = nt.nodes.new('ShaderNodeBump'); bp.inputs['Strength'].default_value = 0.25; bp.inputs['Distance'].default_value = 0.01
+    nt.links.new(g.outputs['Fac'], bp.inputs['Height']); nt.links.new(bp.outputs['Normal'], b.inputs['Normal'])
+    return m
+
+
+# árboles grandes que solo dibuja la web (export_web.py, CURADOS): (edificio, x, y en unidades de diseño, alto)
+ARBOLES_V2 = [('gris', -8.4, 4.05, 4.5), ('gris', -15.6, 1.2, 5.5), ('gris', -17.8, 0.2, 6.0), ('gris', -6.5, 0.4, 5.0),
+              ('casa', 14.2, -4.2, 7.5)]
+
+
+def preparar_entorno_v2():
+    import bmesh, sitio, vegetacion as VG
+    for o in bpy.data.objects:
+        if o.name.startswith('satelite'):
+            o.hide_render = True
+    # césped hasta el horizonte (sin barrio: Ernesto pidió solo la propiedad); la bruma lo funde con el cielo
+    me = bpy.data.meshes.new('suelo_v2'); bm = bmesh.new()
+    bmesh.ops.create_circle(bm, cap_ends=True, radius=3000, segments=96); bm.to_mesh(me); bm.free()
+    ob = bpy.data.objects.new('suelo_v2', me); scene.collection.objects.link(ob); ob.location = (5, 0, -0.26)
+    ces = cesped_procedural('cesped_v2'); me.materials.append(ces)
+    for nombre, mat in (('n_entorno', ces), ('n_lote', cesped_procedural('cesped_lote_v2', base=(0.19, 0.31, 0.07)))):
+        for o in bpy.data.objects:
+            if o.type == 'MESH':
+                for k, sl in enumerate(o.material_slots):
+                    if sl.material and sl.material.name == nombre:
+                        o.material_slots[k].link = 'OBJECT'; o.material_slots[k].material = mat
+    # calles: la C.A con asfalto, la del oeste de tierra (la web las dibuja por su cuenta)
+    for o in bpy.data.objects:
+        if o.name.startswith('via_') and o.type == 'MESH':
+            m = (calle_procedural('tierra_v2', (0.36, 0.27, 0.18), 0.95, 25, 0.3) if 'oeste' in o.name
+                 else calle_procedural('asfalto_v2', (0.10, 0.10, 0.105), 0.8, 60, 0.2))
+            for k in range(len(o.material_slots)):
+                o.material_slots[k].link = 'OBJECT'; o.material_slots[k].material = m
+    # árboles grandes del jardín (en la web son tarjetas; aquí copas de tarjetas con la misma textura de hojas)
+    col = bpy.data.collections.new('ArbolesV2'); scene.collection.children.link(col)
+    hojas = os.path.join(ROOT, 'web', 'public', 'tex', 'hojas.png')
+    for k, (ed, x, y, h) in enumerate(ARBOLES_V2):
+        E = sitio.GRIS if ed == 'gris' else sitio.CASA
+        X, Y = sitio.local_a_m(E, x, y)
+        if not os.path.exists(hojas):
+            break
+        a = VG.arbol(f'arbol_v2_{k}', col, alto=h * 1.25, copa=h * 0.42, tarjetas=900, seed=11 + k, imagen=hojas,
+                     verde=(0.85, 1.0, 0.75))
+        a.location = (X, Y, 0.0); a.rotation_euler = (0, 0, k * 1.3)
+    print('entorno v2: césped, calles y', len(ARBOLES_V2), 'árboles')
+
+
+def materiales_v2():
+    """Con texturas de ambientCG en assets/pbr se reemplazan los materiales de fachada; sin ellas quedan los del modelo."""
+    ok = []
+    for nm in ('cesped_v2', 'cesped_lote_v2'):
+        if rehacer_pbr(nm, 'Grass004', 2.4, tint=(0.66, 1.0, 0.52), mezcla=('Ground037', 3.0, 0.035), variacion=(0.012, 0.15), bump=0.25): ok.append(nm)
+    for nm, st, tile, tint in (('n_muro_gris', 'Concrete034', 2.2, (0.78, 0.84, 0.92)), ('n_concreto', 'Concrete034', 2.0, None),
+                               ('n_concreto_claro', 'Concrete034', 2.0, (1.1, 1.1, 1.06)), ('n_grava', 'Gravel022', 1.6, None),
+                               ('n_muro_casa', 'Plaster001', 2.0, (1.0, 0.78, 0.36)), ('n_amarillo_muro', 'Plaster001', 2.0, (1.0, 0.78, 0.36)),
+                               ('asfalto_v2', 'Asphalt012', 4.0, (0.75, 0.75, 0.76))):
+        if rehacer_pbr(nm, st, tile, tint=tint, bump=0.2): ok.append(nm)
+    cs = next((s for s in ('CorrugatedSteel005', 'CorrugatedSteel004', 'CorrugatedSteel002') if pbr_set(s)), None)
+    if cs:
+        for nm, c in (('n_cubierta_gris', (0.74, 0.75, 0.77)), ('n_remate_lamina', (0.80, 0.81, 0.82))):
+            if rehacer_pbr(nm, cs, 1.0, color=c, rough=0.42, metal=0.55, bump=0.5): ok.append(nm)
+    print('PBR v2 aplicado a:', ok or 'ninguno (sin assets/pbr: materiales del modelo)')
+
+
+def orientar_sol():
+    """El sol del modelo (objeto 'sol') con la elevación y el acimut del cielo."""
+    so = bpy.data.objects.get('sol')
+    if not so or so.type != 'LIGHT':
+        return
+    so.data.energy = 3.4; so.data.angle = math.radians(0.9); so.data.color = (1.0, 0.86, 0.70)
+    el = math.radians(args.sun_elev); azr = math.radians(args.sun_az + 90)
+    d = Vector((math.cos(el) * math.cos(azr), math.cos(el) * math.sin(azr), math.sin(el)))
+    so.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
+
+
 # ---------------- mundo / luz ----------------
 def hdri_elegido():
     if args.hdri.lower() == 'none': return None
@@ -524,9 +660,15 @@ def render_settings():
     scene.render.use_persistent_data = True
 
 
-preparar_entorno()
-materiales_render()
+if V2:
+    preparar_entorno_v2()
+    materiales_v2()
+else:
+    preparar_entorno()
+    materiales_render()
 preparar_mundo()
+if V2:
+    orientar_sol()
 preparar_compositor()
 co = preparar_camara()
 render_settings()

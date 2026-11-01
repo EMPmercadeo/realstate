@@ -291,3 +291,8 @@ html.p360-on, html.p360-on body { overflow: hidden; }
 @media (max-width: 560px) { .v360-grid { grid-template-columns: 1fr; } }
 .btn-360 { display: inline-flex; align-items: center; gap: .35rem; margin-left: .5rem; padding: .2rem .6rem; border-radius: 999px;
   border: 1px solid currentColor; background: none; color: inherit; font: inherit; font-size: .78rem; cursor: pointer; }
+.p360-giro { position: absolute; right: 1rem; bottom: 7rem; padding: .5rem .9rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .4);
+  background: rgba(10, 18, 15, .6); color: #fff; font: inherit; font-size: .82rem; cursor: pointer; }
+.p360-giro.on { background: var(--ocre); border-color: var(--ocre); color: #1b1a12; }
+@media (max-width: 640px) { .p360-giro { bottom: 6.2rem; } .p360-ayuda { left: 1rem; transform: none; } }
+@media (max-width: 640px) { .p360-ayuda { white-space: normal; max-width: calc(100% - 13rem); } }

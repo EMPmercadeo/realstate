@@ -21,6 +21,7 @@ export function abrir360(p: Pano, lista: Pano[] = [], base = '/') {
     </div>
     <div class="p360-carga"><span></span>Cargando la vista…</div>
     <p class="p360-ayuda">Arrastra para mirar alrededor · rueda o pellizco para acercar</p>
+    <button class="p360-giro" type="button" hidden>Mover con el celular</button>
     <nav class="p360-lista" aria-label="Otras vistas 360°"></nav>`;
   document.body.appendChild(raiz);
   document.documentElement.classList.add('p360-on');
@@ -28,6 +29,7 @@ export function abrir360(p: Pano, lista: Pano[] = [], base = '/') {
   const carga = raiz.querySelector('.p360-carga') as HTMLElement;
   const ayuda = raiz.querySelector('.p360-ayuda') as HTMLElement;
   const nav = raiz.querySelector('.p360-lista') as HTMLElement;
+  const btnGiro = raiz.querySelector('.p360-giro') as HTMLButtonElement;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -81,6 +83,7 @@ export function abrir360(p: Pano, lista: Pano[] = [], base = '/') {
   const tocar = () => { auto = false; ayuda.classList.add('fuera'); };
   el.addEventListener('pointerdown', (e) => {
     arrastrando = true; tocar(); px = e.clientX; py = e.clientY; plon = lon; plat = lat; el.setPointerCapture(e.pointerId);
+    if (giro) a0 = null;              // al soltar, el giroscopio sigue desde donde quedó el dedo
   });
   el.addEventListener('pointermove', (e) => {
     if (!arrastrando) return;
@@ -99,6 +102,24 @@ export function abrir360(p: Pano, lista: Pano[] = [], base = '/') {
       fov = THREE.MathUtils.clamp(fovPinza * distPinza / d, 30, 95);
     }
   }, { passive: true });
+  // giroscopio (celular): mirar moviendo el teléfono; en iOS pide permiso con un toque
+  let giro = false, a0: number | null = null, b0 = 0, lon0 = 0, lat0 = 0;
+  const orientar = (e: DeviceOrientationEvent) => {
+    if (!giro || e.alpha == null || e.beta == null) return;
+    if (a0 === null) { a0 = e.alpha; b0 = e.beta; lon0 = lon; lat0 = lat; }
+    let da = e.alpha - a0; if (da > 180) da -= 360; if (da < -180) da += 360;
+    lon = lon0 - da; lat = lat0 + (e.beta - b0);
+  };
+  const DOE = (window as any).DeviceOrientationEvent;
+  if (DOE && matchMedia('(pointer: coarse)').matches) {
+    btnGiro.hidden = false;
+    btnGiro.addEventListener('click', async () => {
+      if (giro) { giro = false; btnGiro.classList.remove('on'); btnGiro.textContent = 'Mover con el celular'; return; }
+      try { if (typeof DOE.requestPermission === 'function' && (await DOE.requestPermission()) !== 'granted') return; } catch { return; }
+      giro = true; a0 = null; tocar(); btnGiro.classList.add('on'); btnGiro.textContent = 'Dejar de mover';
+    });
+    addEventListener('deviceorientation', orientar);
+  }
   const teclas = (e: KeyboardEvent) => {
     if (e.key === 'Escape') cerrar();
     else if (e.key === 'ArrowLeft') { tocar(); lon -= 6; }
@@ -126,7 +147,7 @@ export function abrir360(p: Pano, lista: Pano[] = [], base = '/') {
 
   function cerrar() {
     vivo = false;
-    removeEventListener('resize', tamano); removeEventListener('keydown', teclas);
+    removeEventListener('resize', tamano); removeEventListener('keydown', teclas); removeEventListener('deviceorientation', orientar);
     mat.map?.dispose(); mat.dispose(); geo.dispose(); renderer.dispose();
     raiz.remove(); document.documentElement.classList.remove('p360-on');
     abierto = null;

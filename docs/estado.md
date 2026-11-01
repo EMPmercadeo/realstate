@@ -1,4 +1,17 @@
-# Estado del proyecto (29-10-2026, mañana)
+# Estado del proyecto (29-10-2026, mañana; al día 01-11-2026)
+
+## 01-11-2026 (tarde)
+- **Edificio gris** con la distribución que describió Ernesto (ver `docs/contexto-proyecto.md`, sección del
+  gris): entrada única por la puerta café, vestíbulo en L, salones 4 + 4 abajo, encamados al frente arriba,
+  galería en L con verjas como área recreativa. Código: `blender/interiores.py` (GRIS), `amueblado.py`,
+  `acabados.py`, `fachadas.py`, `vistas_interiores.py`. Prueba de recorrido de los dos edificios: 0 problemas.
+- **Hiperrealismo:** lo de calidad foto son renders previos, no el 3D en vivo.
+  - Vistas 360°: `blender/panoramas.py` → `web/public/pano/` + `web/src/data/panoramas.json`; visor
+    `web/src/visor/pano360.ts`; página `/360` y botón "Ver en 360°" por espacio en `/recorrido`.
+  - Sobrevuelo v2 con el modelo amueblado: `blender/cine_render.py --modelo bloqueo` →
+    `clips/sobrevuelo-v2.mp4` (la portada lo usa apenas existe). Calidad final en la RTX 3080 (`PLAN-GPU.md` §6).
+- `/avances` solo muestra las vistas que ya tienen render en `web/public/avances/`.
+
 
 ## Dirección actual
 La portada (`/`) es un **sobrevuelo cinematográfico renderizado con Cycles (GPU)** que la web reproduce

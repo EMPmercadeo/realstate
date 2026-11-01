@@ -574,7 +574,7 @@ def edificio_gris(M, c, origen, ang):
         ventana(K, 'y', a, b, zz, zz + 1.4, XL - ov, 1)
     for xx in (5.4, 7.4, 9.4, 11.6):
         ventana(K, 'x', xx, xx + 1.2, 0.8, 2.4, YE - ov - 0.3, 1)
-    ventana(K, 'x', 1.6, 2.8, 0.8, 2.4, YN, 1)
+    ventana(K, 'x', 1.6, 2.8, 1.5, 2.25, YN, 1)                                  # baño accesible: ventana alta
     # ---- escalera metálica exterior al sur, sube a la galería este
     n = 17
     y_ini = 5.4
