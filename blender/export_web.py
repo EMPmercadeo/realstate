@@ -73,8 +73,9 @@ def bbox_de(prefijos):
 
 
 zonas = {
-    'galeria': bbox_de(('gr_gal_e_piso', 'gr_piso_galeria')),
-    'terraza_n': bbox_de(('gr_gal_n_piso',)),
+    # galería en L con verjas (brazo oeste, brazo norte y porche): área recreativa y de coffee break
+    'galeria': bbox_de(('gr_gal_n_piso', 'gr_gal_o_piso', 'gr_gal_porche_piso')),
+    'terraza_e': bbox_de(('gr_gal_e_piso', 'gr_piso_galeria')),
     'parqueo': bbox_de(('gr_parqueo',)),
     'garaje': bbox_de(('ca_piso_garaje',)),
     'porton_casa': max((wbb(o) for o in bpy.data.objects if o.type == 'MESH' and o.name.startswith('ca_porton_')),
@@ -339,7 +340,7 @@ for (ed, cu), v in list(VISTA_DE.items()):
         VISTA_DE[(ed, ALIAS[(ed, cu)])] = v
 VISTA_DE[('amarilla', 'bano1')] = VISTA_DE.pop(('amarilla', 'bano'))
 
-CIRC = {'pasillo', 'escalera', 'hall', 'pasillo_alto', 'closet'}
+CIRC = {'pasillo', 'escalera', 'hall', 'pasillo_alto', 'closet', 'acceso', 'estar'}
 TIPO = {'hosp': 'hospital', 'salon2': 'hospital', 'salonA': 'hospital', 'salonB': 'hospital'}
 
 
@@ -376,9 +377,9 @@ for pref, ed, nom in (('gr_', 'gris', 'Edificio gris'), ('ca_', 'amarilla', 'Cas
         rooms = [cuarto(ed, E, nivel, c, camas) for c in nivel['cuartos']]
         if ed == 'gris' and n == 2:
             v = VISTA_DE[('gris', 'galeria')]
-            rooms.append(zona_cuarto('galeria', 'Área de coffee break', 'terraza', zonas['galeria'], nivel['z0'],
+            rooms.append(zona_cuarto('galeria', 'Área recreativa y de coffee break', 'terraza', zonas['galeria'], nivel['z0'],
                                      cam=L(E, v[1][0], v[1][1], v[1][2] + 0.35), mira=L(E, *v[2])))
-            rooms.append(zona_cuarto('terraza', 'Terraza', 'terraza', zonas['terraza_n'], nivel['z0']))
+            rooms.append(zona_cuarto('terraza', 'Terraza al aire libre', 'terraza', zonas['terraza_e'], nivel['z0']))
         if ed == 'amarilla' and n == 2:
             rooms.append(zona_cuarto('balcon', 'Balcón', 'terraza', zonas['balcon'], nivel['z0']))
         usados = {r['id'] for p in pisos for r in p['rooms']}

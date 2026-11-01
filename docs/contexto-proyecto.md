@@ -1,6 +1,6 @@
 # Contexto del proyecto — Residencia Altos de San Cristóbal
 
-> **Fuente de verdad del proyecto** (actualizado 30-10-2026; medidas y mapa del 01-11-2026 en `fase-mapa.md`). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, 3 notas de voz adicionales y las indicaciones de Ernesto del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
+> **Fuente de verdad del proyecto** (actualizado 30-10-2026; medidas y mapa del 01-11-2026 en `fase-mapa.md`; distribución del edificio gris según Ernesto, 01-11-2026). Consolida la grabación con la propietaria del 28-10-2026 (39 min), las 5 notas de voz y los mensajes de WhatsApp del 29-10-2026, 3 notas de voz adicionales y las indicaciones de Ernesto del 30-10-2026. Donde otro archivo de `docs/` diga algo distinto, manda este. Versión editable: https://claude.ai/artifact/WpLpcQfg4Nyxor81pnca69
 
 La propietaria vende la propiedad (2.500 m², casa amarilla + edificio gris) en US$600.000 tal como está. La propuesta es ofrecerla a un inversionista lista para operar como residencia de 26 adultos mayores, con pasadía y estadías temporales, por unos US$800.000 con unos US$200.000 de adecuaciones incluidos.
 
@@ -54,9 +54,9 @@ La última cuenta de la propietaria (nota de voz del 29-10) da **26 residentes**
 | **Total** | | | **26** |
 
 **Medidas (01-11-2026).** Con la escala del satélite medida (Google, Esri y Bing coinciden) los dos
-edificios son ~21 % más grandes en planta de lo que se había estimado: el gris mide ~17,4 × 16,3 m y la
-sala de personas encamadas ~51 m². Las 10 camas caben con mesita entre camas y un pasillo central de
-~2,1 m; ya no quedan "justas". Ver `docs/fase-mapa.md`.
+edificios son ~21 % más grandes en planta de lo que se había estimado: el gris mide ~17,4 × 16,3 m. Con la
+distribución del 01-11 (abajo), la sala de personas encamadas mide ~53 m²: las 10 camas caben con mesita entre
+camas y un pasillo central de ~1,8 m. Los dos salones de abajo miden ~46 m² cada uno. Ver `docs/fase-mapa.md`.
 
 En la grabación del 28-10 la cuenta era otra: 10 encamados ("8 mínimo para que no queden apretadas"), 4 (o 3) en el salón amarillo y 5 + 4 en los salones de abajo. Sumó 23, "ampliable a 25", más 3 cuartos privados: 28 en total. El 30-10 la propietaria confirmó los 4 cuartos privados: 2 semiprivados que comparten baño y 2 privados con baño propio.
 
@@ -84,6 +84,15 @@ La suite está pensada para alguien que camina pero no quiere vivir solo: ahí e
 
 El edificio gris es la parte asistencial: aquí van los 22 residentes con cuidados, y aquí están casi todas las obras.
 
+**Cómo está distribuido (Ernesto, 01-11-2026), visto desde la calle de tierra.** La única entrada es la puerta
+café del tramo norte, bajo la galería con verjas (frente al estacionamiento). Adentro hay un vestíbulo en L: el
+baño accesible a la izquierda, las dos oficinas al frente y, a la derecha, el pasillo con la escalera al frente
+(del lado de la calle) y el depósito al lado. Los dos salones grandes ocupan el resto, mitad y mitad. Arriba,
+desde la escalera: el salón amarillo y el antiguo salón de conferencias (al frente, del lado de la calle, donde
+van las personas encamadas); después la biblioteca y la cocineta, que dan a la galería en L con verjas "de canto
+a canto": esa galería es el área recreativa y de coffee break. La galería del lado del jardín queda como terraza
+al aire libre. El modelo 3D sigue esta distribución; las medidas de cada cuarto son aproximadas.
+
 **Planta alta**
 
 | Espacio actual | Uso propuesto | Qué hay que hacer |
@@ -92,8 +101,8 @@ El edificio gris es la parte asistencial: aquí van los 22 residentes con cuidad
 | Salón amarillo (al lado) | Sala de personas con movilidad reducida (4 camas). Pueden bajarse de la cama e ir a la terraza y otras áreas | Camas con mesita; no lleva estación de enfermería |
 | Dentro del salón amarillo, al lado de la biblioteca | Baño para las personas del salón amarillo | Construir baño nuevo |
 | Biblioteca | Área de estudio y lectura, o depósito y cuarto de ropa (la propietaria dijo las dos cosas) | Definir uso |
-| Área de refrigerios (tipo cafetería) | Área de coffee break o área del té | Nada |
-| Terraza | Terraza al aire libre para personas que deambulan o caminan | Nada |
+| Área de refrigerios (tipo cafetería): la galería en L con verjas, de canto a canto entre la cocineta y la biblioteca | Área recreativa y de coffee break (área del té) | Nada |
+| Terraza (galería del lado del jardín, a la que salen el salón amarillo) | Terraza al aire libre para personas que deambulan o caminan | Nada |
 | Servicio de la terraza (solo inodoro) | Servicio para los que usan la terraza | Nada, queda igual |
 | Cocineta (con granito) | Apoyo para servir la comida que se cocina en la casa amarilla | Nada: el granito se acepta |
 
@@ -101,7 +110,8 @@ El edificio gris es la parte asistencial: aquí van los 22 residentes con cuidad
 
 | Espacio actual | Uso propuesto | Qué hay que hacer |
 | --- | --- | --- |
-| Dos salones grandes | Habitaciones para los que deambulan (4 camas cada uno) | Camas y mobiliario |
+| Dos salones grandes (mitad y mitad, al fondo del pasillo) | Habitaciones para los que deambulan (4 camas cada uno) | Camas y mobiliario |
+| Depósito (al lado de la escalera, al frente del pasillo) | Depósito | Nada |
 | Oficina 1 | Oficina del supervisor del área | Nada |
 | Oficina 2 | Oficina administrativa | Nada |
 | Baño grande para discapacitados (hoy es solo servicio) | Baño para huéspedes o usuarios (los que deambulan y los que bajan la escalera) | Agregar regadera (cabe) |
@@ -246,8 +256,10 @@ Estos puntos se contradicen entre audios o no quedan claros, y conviene cerrarlo
 - [ ] **Oficina del gerente:** la recámara de arriba ahora es cuarto privado. ¿Dónde va el gerente?
 - [ ] **Pasadía y estadías temporales:** ¿cuánto se cobra la hora extra después de las 5:00 p. m.? ¿Las estadías usan solo los 4 cuartos privados?
 - [ ] **Recepción:** falta la foto correcta de la recepción.
-- [ ] **Área del lote:** con la escala medida, el trazo del lote da ~3.260 m² (no 2.500). Pedir el plano
-  catastral o la escritura para fijar el lindero real.
+- [ ] **Área del lote:** con la escala medida y la cerca corregida según el boceto de Ernesto (01-11), el lote da
+  ~2.875 m² (no 2.500). Pedir el plano catastral o la escritura para fijar el lindero real.
+- [ ] **Edificio gris, planta alta:** ¿hay puerta del pasillo a la galería con verjas? ¿El porche de arriba del
+  tramo norte tiene piso (une la galería con la terraza del jardín)? El modelo supone que sí a las dos.
 - [ ] **Huerto:** ¿la "oficinita de abajo" es la casita blanca con puerta de vidrio junto al bananal, y el
   bananal es "donde están los tallos"?
 - [ ] **Desnivel:** ¿cuánto sube el jardín del gris a la casa? (las rampas lo indican; se estima ~1 m).

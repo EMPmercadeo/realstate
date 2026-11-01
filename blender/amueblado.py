@@ -148,50 +148,62 @@ CASA_PA = {
                     W('escritorio_simple', '+y', 13.60, 8.30), W('librero', '+x', 9.50, 12.80, d=0.32)],
 }
 # Edificio gris, planta baja ---------------------------------------------------------------
+# (distribución de Ernesto, 01-11-2026: vestíbulo en L, oficinas al frente, escalera al frente del pasillo)
 GRIS_PB = {
-    'acceso': [W('banca', '+x', 9.04, 2.10), W('planta', '+x', 9.04, 0.98), W('dispensador', '+x', 9.04, 3.10)],
-    'bano_acc': [W('ducha', '-y', 2.60, 5.33, w=1.06, d=1.10), W('inodoro', '+x', 6.64, 3.05), W('lavamanos', '-x', 4.80, 4.20)],
-    'oficina1': [W('escritorio', '-y', 0.70, 10.30), W('archivador', '+x', 11.44, 3.30), W('archivador', '+x', 11.44, 3.80),
-                 W('librero', '-x', 9.16, 3.30, d=0.32)],
-    'oficina2': [W('escritorio', '-y', 0.70, 12.60), W('archivador', '-x', 11.56, 3.10), W('estante', '+x', 13.70, 3.75, d=0.40)],
-    'pasillo': [W('butaca_cuero', '-y', 5.00, 2.35, sep=0.05), W('butaca_cuero', '-y', 5.00, 3.75, sep=0.05),
-                W('portagarrafon', '-y', 5.00, 3.05, sep=0.05), W('planta', '+y', 7.34, 1.62), W('banca', '+y', 6.14, 11.70)],
-    'estar': [W('sofa2', '+x', 9.04, 8.15), P('butaca', 7.30, 9.30, 180), P('mesa_centro', 7.92, 8.25, 90, w=0.80, d=0.46)],
-    'salonA': fila('cama', '+y', 12.50, 5.05, 2, 0.55, mesa='mesita') +
-              [W('ropero_doble', '+x', 9.04, 11.70), W('mesita', '+y', 12.50, 7.82)],
-    'salonB': fila('cama', '+y', 12.50, 9.40, 3, 0.45, mesa='mesita') +
-              fila('cama', '-y', 6.26, 10.55, 2, 0.45, mesa='mesita') +
-              [W('cama', '+x', 13.70, 9.38), W('mesita', '-y', 6.26, 13.30),
-               W('ropero', '-x', 9.16, 7.95), W('ropero', '-x', 9.16, 8.87), W('ropero', '-x', 9.16, 9.79),
-               P('butaca', 10.45, 9.35, 300)],
-    'huerto': [W('escritorio_simple', '-x', 1.30, 8.85, w=0.95), W('estante', '+y', 10.00, 1.95, d=0.40, w=1.20)],
+    'acceso': [W('banca', '-y', 5.00, 3.30, sep=0.02), W('planta', '-y', 5.00, 4.28, sep=0.02)],
+    'bano_acc': [W('ducha', '+y', 10.00, 2.07, w=1.50, d=1.20), W('inodoro', '-x', 1.30, 8.00),
+                 W('lavamanos', '+x', 2.84, 7.60)],
+    'oficina1': [W('escritorio', '+y', 10.00, 3.75), W('archivador', '-x', 2.96, 7.90),
+                 W('librero', '+x', 4.54, 7.90, d=0.32)],
+    'oficina2': [W('escritorio', '+y', 12.50, 5.72), P('mesa_reunion', 5.65, 8.95, 0),
+                 W('archivador', '-x', 4.66, 7.80), W('estante', '+x', 6.64, 7.90, d=0.40)],
+    'deposito': [W('estante', '-y', 2.60, 5.30), W('estante', '-y', 2.60, 6.15), W('estante', '-x', 4.80, 3.60, d=0.40)],
+    'pasillo': [W('banca', '-x', 6.76, 8.20, sep=0.02), W('planta_med', '-x', 6.76, 9.25, sep=0.02),
+                W('portagarrafon', '+x', 8.64, 7.25, sep=0.03)],
+    'estar': [W('sofa2', '-x', 6.76, 11.10), P('mesa_centro_red', 7.92, 11.0, 0, w=0.55, d=0.55),
+              W('butaca', '+x', 8.64, 11.85, sep=0.03), W('planta', '+x', 8.64, 10.05, sep=0.02)],
+    # salones mitad y mitad, 4 camas cada uno: cabecera contra el muro de la calle (salón 1) o contra el muro
+    # entre los dos salones (salón 2); roperos al frente y paso libre a la puerta
+    'salonA': fila('cama', '-y', 0.70, 8.91, 4, 0.45, mesa='mesita') +
+              [W('ropero_doble', '+y', 6.54, 11.00), W('ropero_doble', '+y', 6.54, 12.75),
+               W('butaca', '+x', 13.70, 4.30, sep=0.05)],
+    'salonB': fila('cama', '-y', 6.66, 8.91, 4, 0.45, mesa='mesita') +
+              [W('ropero', '+y', 12.50, 11.10), W('ropero', '+y', 12.50, 13.25), W('ropero', '+y', 12.50, 9.12, w=0.80),
+               W('ropero', '+x', 13.70, 9.80), P('butaca', 10.6, 10.4, 200)],
 }
 GRIS_PA = {
-    'pasillo': [W('planta', '-y', 0.70, 7.75), W('banca', '-x', 6.90, 1.75)],
-    'bano': [W('inodoro', '+y', 4.74, 5.20), W('lavamanos', '+y', 4.74, 6.12)],      # servicio: sin regadera
-    'bano_s2': [W('ducha', '+y', 2.19, 9.02, w=1.00, d=1.00), W('inodoro', '-y', 0.70, 8.85),
-                W('lavamanos', '-y', 0.70, 9.78)],
-    'cocina': [W('granito_fregadero', '-y', 4.87, 5.37), W('granito_plano', '-y', 4.87, 6.30, w=0.66),
-               W('refri_chico', '+y', 7.34, 4.98), W('granito_plano', '+y', 7.34, 5.45, w=0.38)],
-    'deposito': [W('estante', '+y', 7.34, 3.20), W('estante', '+y', 7.34, 4.10)],
-    'closet': [W('estante', '+y', 10.80, 5.20, d=0.40, w=0.70)],
-    'salon2': fila('cama_hosp', '+y', 4.14, 9.45, 4, 0.40, mesa='mesita_hosp') +
-              [W('reclinable', '-y', 0.70, 12.95, sep=0.05), W('silla_ruedas', '-y', 0.70, 11.80, sep=0.05)],
-    # 10 encamados: cabecera contra los muros largos y pasillo central de ~2,1 m (escala medida). La puerta
-    # del pasillo queda entre la 2.ª y la 3.ª cama del lado norte; la estación de enfermería, a la cabeza
-    # del pasillo central (donde estaba el podio), mira a las 10 camas. Mesita entre camas en los dos lados.
-    'hosp': fila('cama_hosp', '+x', 13.70, 4.32, 5, 0.40, mesa='mesita_hosp') +
-            [W('cama_hosp', '-x', 8.46, yc) for yc in (4.70, 5.86, 7.88, 9.04, 10.20)] +
-            [W('mesita_hosp', '-x', 8.46, yc) for yc in (5.28, 8.46, 9.62)] +
-            [W('estacion', '-y', 4.26, 11.09, sep=0.02, w=1.0)],
+    'pasillo': [W('planta', '+y', 7.34, 8.35, sep=0.02), W('banca', '+y', 7.34, 6.35, sep=0.02)],
+    'bano': [W('inodoro', '-y', 2.60, 5.30), W('lavamanos', '-x', 4.80, 3.90)],      # servicio: sin regadera
+    'bano_s2': [W('ducha', '+y', 10.80, 5.50, w=1.00, d=1.00), W('inodoro', '-x', 4.66, 9.60),
+                W('lavamanos', '-x', 4.66, 8.95)],
+    'cocina': [W('granito_fregadero', '-y', 6.00, 3.55), W('granito_plano', '-x', 2.70, 7.30, w=0.90),
+               W('refri_chico', '+y', 7.94, 4.10), W('dispensador', '+y', 7.94, 3.55, sep=0.02)],
+    'biblioteca': [W('librero', '+x', 4.54, 8.60, d=0.32), W('librero', '+x', 4.54, 9.45, d=0.32),
+                   W('butaca', '+y', 10.00, 3.35, sep=0.02), P('mesa_centro_red', 3.65, 8.80, 0, w=0.55, d=0.55),
+                   W('planta_med', '-y', 8.06, 3.00, sep=0.02)],
+    'salon2': fila('cama_hosp', '-y', 7.46, 9.00, 4, 0.45, mesa='mesita_hosp') +
+              [W('ropero_doble', '-y', 7.46, 5.50), W('ropero', '-x', 6.46, 10.20), W('ropero', '+x', 13.70, 10.30),
+               W('reclinable', '+y', 10.80, 9.30, sep=0.03), P('silla_ruedas', 8.45, 10.20, 180)],
+    # 10 encamados: cabecera contra los muros largos (norte y sur) y pasillo central de ~1,8 m. La puerta del
+    # pasillo queda en la esquina noreste; la estación de enfermería, a la cabeza del pasillo central junto a la
+    # puerta (donde estaba el podio), mira a las 10 camas. Mesita entre camas en los dos lados.
+    'hosp': fila('cama_hosp', '+x', 13.70, 0.80, 5, 0.40, mesa='mesita_hosp') +
+            fila('cama_hosp', '-x', 8.76, 0.80, 5, 0.40, mesa='mesita_hosp') +
+            [W('estacion', '+y', 7.34, 11.23, sep=0.02, w=1.0), W('reclinable', '+x', 13.70, 6.75, sep=0.03)],
 }
-# galería este de la planta alta (terraza cerrada con verjas): refrigerios + estar
-GALERIA = [W('barra_buffet', '-y', 11.00, 5.68, sep=0.02), W('dispensador', '-y', 11.00, 6.78, sep=0.02),
-           P('pizarra', 4.95, 11.85, 60),
-           P('mesa_redonda', 6.15, 12.40, 0), P('mesa_redonda', 9.20, 12.40, 0),
-           W('butaca', '+y', 13.15, 12.25, sep=0.02), W('butaca', '+y', 13.15, 13.20, sep=0.02),
-           P('mesa_centro_red', 12.72, 12.05, 0, w=0.55, d=0.55),
-           W('planta', '+y', 13.15, 4.95), W('planta', '+y', 13.15, 10.75), W('planta_med', '-y', 11.00, 13.55)]
+# galería en L con verjas de la planta alta (brazo oeste sobre la calle + brazo norte + porche): área
+# recreativa y de coffee break, de canto a canto entre la cocineta y la biblioteca. La galería este queda
+# como terraza al aire libre.
+GALERIA = [W('barra_buffet', '+x', 2.48, 7.70, sep=0.02, w=1.40), W('dispensador', '+x', 2.48, 6.00, sep=0.02),
+           P('mesa_redonda', 1.32, 9.95, 0), P('mesa_redonda', 1.32, 11.95, 0), P('mesa_redonda', 3.60, 11.75, 0),
+           W('butaca', '-y', 4.50, 0.95, sep=0.04), W('butaca', '-y', 4.50, 2.05, sep=0.04),
+           P('mesa_centro_red', 1.50, 5.30, 0, w=0.55, d=0.55), W('butaca', '-y', 4.50, 3.35, sep=0.04),
+           W('planta', '-x', 0.25, 12.95, sep=0.02), W('planta', '+x', 2.48, 5.25, sep=0.02),
+           W('planta_med', '+y', 13.15, 2.45, sep=0.02),
+           # terraza este: un par de mesas y estar al sol de la tarde
+           P('mesa_redonda', 9.25, 12.15, 0), W('butaca', '+y', 13.15, 12.40, sep=0.02),
+           W('butaca', '+y', 13.15, 13.35, sep=0.02), P('mesa_centro_red', 12.85, 12.05, 0, w=0.55, d=0.55),
+           W('planta', '+y', 13.15, 5.40), W('planta', '+y', 13.15, 10.75), W('planta_med', '-y', 11.00, 13.55)]
 
 DIST = {('casa', 'pb'): CASA_PB, ('casa', 'pa'): CASA_PA, ('gris', 'pb'): GRIS_PB, ('gris', 'pa'): GRIS_PA}
 EXTRA = {('gris', 'pa'): {'galeria': GALERIA}}

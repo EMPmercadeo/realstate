@@ -1,8 +1,12 @@
 ---
 import Base from '@/layouts/Base.astro';
 import { FECHA, GRIS, CASA, PARES, PLANOS, CAMAS } from '@/data/avances';
+import { listarPublicos } from '@/data/existentes';
+// solo las vistas cuyo render ya está en public/avances (se re-renderizan cuando cambia la distribución)
+const hay = new Set(listarPublicos('avances'));
+const existe = (f: string) => hay.has(`/avances/${f}.jpg`);
 const galerias = [
-  { id: 'edificio-gris', titulo: 'Edificio gris', texto: 'Personas encamadas y salón amarillo en la planta alta, con el área de coffee break en la terraza. Abajo, los salones de las personas que deambulan, oficinas y servicios.', vistas: GRIS },
+  { id: 'edificio-gris', titulo: 'Edificio gris', texto: 'Se entra por la puerta café, bajo la galería. Abajo: baño accesible, dos oficinas y los dos salones de las personas que deambulan, mitad y mitad. Arriba: personas encamadas en el antiguo salón de conferencias, salón amarillo con baño propio, biblioteca, cocineta y la galería en L con verjas como área recreativa y de coffee break.', vistas: GRIS },
   { id: 'casa-amarilla', titulo: 'Casa amarilla', texto: 'Recepción 24 h, comedor, terapia con familiares, talleres, consultorio y los cuatro cuartos privados.', vistas: CASA },
 ];
 ---
@@ -41,7 +45,7 @@ const galerias = [
         <h2>{g.titulo}</h2>
         <p class="lead">{g.texto}</p>
         <div class="av-galeria">
-          {g.vistas.map((v) => (
+          {g.vistas.filter((v) => existe(v.f)).map((v) => (
             <figure class="av-fig">
               <a href={`/avances/${v.f}.jpg`} data-lb data-t={v.t} data-d={v.d}>
                 <img src={`/avances/${v.f}.jpg`} alt={`${v.t}: ${v.d}`} loading="lazy" width="1280" height="720" />
@@ -59,7 +63,7 @@ const galerias = [
       <h2>La idea y el modelo</h2>
       <p class="lead">A la izquierda, la propuesta sobre la foto real; a la derecha, el mismo espacio en el modelo 3D. Arrastra la línea para comparar.</p>
       <div class="antes-despues">
-        {PARES.map(([idea, vista, t]) => (
+        {PARES.filter(([, vista]) => existe(vista)).map(([idea, vista, t]) => (
           <div class="ad">
             <img src={`/avances/${vista}.jpg`} alt={`${t}, modelo 3D`} loading="lazy" />
             <div class="ad-antes"><img src={`/fotos-despues/${idea}.jpg`} alt={`${t}, propuesta`} loading="lazy" /></div>

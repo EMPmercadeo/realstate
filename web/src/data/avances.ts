@@ -5,17 +5,19 @@ export interface Vista { f: string; t: string; d: string }
 export const FECHA = '1 de noviembre de 2026';
 
 export const GRIS: Vista[] = [
-  { f: 'int_gris_hosp', t: 'Personas encamadas', d: '10 camas de hospital con barandales, mesita entre camas, luz sobre cada cama y estación de enfermería al fondo. Pasillo central de unos 2 m.' },
-  { f: 'int_gris_hosp2', t: 'Personas encamadas', d: 'Vista desde la puerta del pasillo, hacia las ventanas del jardín.' },
-  { f: 'int_gris_salon2', t: 'Salón amarillo', d: '4 camas para personas con movilidad reducida, con mesita, silla de ruedas y baño propio nuevo.' },
-  { f: 'int_gris_bano_s2', t: 'Baño nuevo del salón amarillo', d: 'Obra nueva dentro del salón, del lado de la biblioteca: regadera, inodoro y lavamanos.' },
-  { f: 'int_gris_refrigerios', t: 'Área de coffee break', d: 'Terraza de arriba, cerrada con verjas: mesas, barra de café y frutas.' },
-  { f: 'int_gris_salonB', t: 'Salón grande 2', d: '6 camas para personas que deambulan, con roperos y mesitas.' },
-  { f: 'int_gris_salonA', t: 'Salón grande 1', d: '2 camas para personas que deambulan.' },
-  { f: 'int_gris_bano_acc', t: 'Baño accesible para usuarios', d: 'Regadera a ras de piso con asiento abatible y barras de apoyo.' },
-  { f: 'int_gris_deposito', t: 'Depósito y ropería', d: 'La antigua biblioteca, con estantes para ropa de cama e insumos.' },
-  { f: 'int_gris_cocina', t: 'Cocineta del área de coffee break', d: 'Meseta de granito sobre base de bloque, como la actual.' },
-  { f: 'int_gris_acceso', t: 'Acceso y pasillo', d: 'Entrada del edificio gris, pasillo y escalera interior.' },
+  { f: 'int_gris_acceso', t: 'Entrada', d: 'Por la puerta café, bajo la galería: vestíbulo en L con el baño a la izquierda, las oficinas al frente y el pasillo a la derecha.' },
+  { f: 'int_gris_vestibulo', t: 'Pasillo', d: 'La escalera al frente del pasillo, el depósito al lado y las puertas de los dos salones grandes.' },
+  { f: 'int_gris_salonA', t: 'Salón grande 1', d: '4 camas para personas que deambulan, con mesita, roperos y butaca. Mitad y mitad con el salón 2.' },
+  { f: 'int_gris_salonB', t: 'Salón grande 2', d: '4 camas para personas que deambulan, con ventanas al jardín y al sur.' },
+  { f: 'int_gris_bano_acc', t: 'Baño accesible para huéspedes o usuarios', d: 'Regadera a ras de piso con asiento abatible y barras de apoyo. Abre hacia el vestíbulo.' },
+  { f: 'int_gris_oficina2', t: 'Oficina administrativa', d: 'Escritorio frente a la ventana del jardín y mesa de reuniones.' },
+  { f: 'int_gris_hosp', t: 'Personas encamadas', d: 'El antiguo salón de conferencias, al frente: 10 camas de hospital con barandales, mesita entre camas y luz sobre cada cama. Pasillo central de ~1,8 m.' },
+  { f: 'int_gris_hosp2', t: 'Personas encamadas', d: 'Desde el fondo, lado de la calle, hacia la estación de enfermería junto a la puerta.' },
+  { f: 'int_gris_salon2', t: 'Salón amarillo', d: '4 camas para personas con movilidad reducida, con baño propio nuevo y dos puertas a la terraza.' },
+  { f: 'int_gris_bano_s2', t: 'Baño nuevo del salón amarillo', d: 'Obra nueva dentro del salón, al lado de la biblioteca: regadera, inodoro y lavamanos.' },
+  { f: 'int_gris_refrigerios', t: 'Área recreativa y de coffee break', d: 'La galería en L con verjas, de canto a canto entre la cocineta y la biblioteca: mesas, barra de café y estar.' },
+  { f: 'int_gris_cocina', t: 'Cocineta del área de coffee break', d: 'Meseta de granito; sale directo a la galería.' },
+  { f: 'int_gris_biblioteca', t: 'Biblioteca', d: 'Área de lectura que abre a la galería (o depósito y cuarto de ropa, por confirmar).' },
 ];
 
 export const CASA: Vista[] = [
@@ -36,7 +38,7 @@ export const CASA: Vista[] = [
 export const PARES: [string, string, string][] = [
   ['hospitalizacion', 'int_gris_hosp', 'Personas encamadas'],
   ['salon-2', 'int_gris_salon2', 'Salón amarillo'],
-  ['refrigerios', 'int_gris_refrigerios', 'Área de coffee break'],
+  ['refrigerios', 'int_gris_refrigerios', 'Área recreativa y de coffee break'],
   ['bano-accesible', 'int_gris_bano_acc', 'Baño accesible'],
   ['comedor', 'int_casa_comedor', 'Comedor'],
   ['terapia', 'int_casa_terapia', 'Terapia'],
@@ -53,6 +55,6 @@ export const PLANOS: [string, string][] = [
 export const CAMAS: [string, string][] = [
   ['Personas encamadas (edificio gris, arriba)', '10'],
   ['Salón amarillo · movilidad reducida', '4'],
-  ['Salones grandes de abajo · personas que deambulan', '2 + 6'],
+  ['Salones grandes de abajo · personas que deambulan', '4 + 4'],
   ['Casa amarilla · 4 cuartos privados', '4'],
 ];

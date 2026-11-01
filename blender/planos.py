@@ -39,7 +39,8 @@ EXTRAS = {   # elementos exteriores de referencia (marco local), solo contorno p
                      ((1.2, 13.8, 4.4, 15.4), 'Porche en arco')],
     ('casa', 'pa'): [((4.4, -0.7, 10.0, 1.4), 'Balcón')],
     ('gris', 'pb'): [((14.45, 5.4, 15.55, 11.6), 'Esc. metálica'), ((1.0, -1.8, 6.3, 3.6), 'Estacionamientos')],
-    ('gris', 'pa'): [((0.15, 4.8, 2.5, 13.0), 'Galería cerrada'), ((4.6, 11.0, 13.9, 13.4), 'Terraza con verjas · área de coffee break'),
+    ('gris', 'pa'): [((0.15, 4.4, 2.5, 13.4), 'Galería en L con verjas · área recreativa y coffee break'),
+                     ((4.6, 11.0, 13.9, 13.4), 'Terraza al aire libre'),
                      ((14.45, 5.4, 15.55, 11.6), 'Esc. metálica')],
 }
 ORIENT = {

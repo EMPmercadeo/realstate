@@ -12,44 +12,44 @@
      "rooms": [
       {
        "id": "acceso",
-       "nombre": "Acceso",
-       "tipo": "cuarto",
+       "nombre": "Entrada",
+       "tipo": "circulacion",
        "camas": 0,
        "centro": [
-        -18.966,
+        -12.999,
         1.2,
-        28.795
+        24.865
        ],
        "cam": [
-        -21.088,
+        -13.027,
         1.95,
-        28.32
+        23.375
        ],
        "mira": [
-        -12.102,
-        1.3,
-        30.861
+        -15.57,
+        1.2,
+        30.817
        ]
       },
       {
        "id": "bano_acc",
-       "nombre": "Baño accesible para usuarios",
+       "nombre": "Baño accesible para huéspedes o usuarios",
        "tipo": "cuarto",
        "camas": 0,
        "centro": [
-        -16.755,
+        -9.604,
         1.2,
-        26.831
+        25.343
        ],
        "cam": [
-        -15.279,
+        -11.241,
         1.95,
-        27.535
+        24.697
        ],
        "mira": [
-        -17.608,
-        0.9,
-        26.088
+        -7.964,
+        0.8,
+        26.125
        ]
       },
       {
@@ -58,19 +58,19 @@
        "tipo": "cuarto",
        "camas": 0,
        "centro": [
-        -20.218,
+        -10.517,
         1.2,
-        31.419
+        27.256
        ],
        "cam": [
-        -21.685,
+        -11.784,
         2.1,
-        29.712
+        26.115
        ],
        "mira": [
-        -20.218,
+        -10.517,
         0.6,
-        31.419
+        27.256
        ]
       },
       {
@@ -79,19 +79,19 @@
        "tipo": "cuarto",
        "camas": 0,
        "centro": [
-        -21.469,
+        -10.141,
         1.2,
-        34.042
+        29.985
        ],
        "cam": [
-        -22.936,
-        2.1,
-        32.336
+        -13.431,
+        1.95,
+        29.288
        ],
        "mira": [
-        -21.469,
-        0.6,
-        34.042
+        -7.061,
+        0.8,
+        30.984
        ]
       },
       {
@@ -100,19 +100,61 @@
        "tipo": "circulacion",
        "camas": 0,
        "centro": [
-        -14.71,
+        -14.049,
         1.2,
-        29.165
+        30.095
        ],
        "cam": [
-        -12.813,
+        -14.638,
         2.1,
-        23.209
+        27.035
        ],
        "mira": [
-        -14.71,
+        -14.049,
         0.6,
-        29.165
+        30.095
+       ]
+      },
+      {
+       "id": "estar",
+       "nombre": "Estar al final del pasillo",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        -9.57,
+        1.2,
+        33.008
+       ],
+       "cam": [
+        -10.486,
+        2.1,
+        31.833
+       ],
+       "mira": [
+        -9.57,
+        0.6,
+        33.008
+       ]
+      },
+      {
+       "id": "deposito",
+       "nombre": "Depósito (junto a la escalera)",
+       "tipo": "cuarto",
+       "camas": 0,
+       "centro": [
+        -16.755,
+        1.2,
+        26.831
+       ],
+       "cam": [
+        -17.262,
+        2.1,
+        25.784
+       ],
+       "mira": [
+        -16.755,
+        0.6,
+        26.831
        ]
       },
       {
@@ -121,103 +163,61 @@
        "tipo": "circulacion",
        "camas": 0,
        "centro": [
-        -10.793,
+        -18.862,
         1.2,
-        28.399
+        28.576
        ],
        "cam": [
-        -10.805,
+        -20.434,
         2.1,
-        26.314
+        27.089
        ],
        "mira": [
-        -10.793,
+        -18.862,
         0.6,
-        28.399
-       ]
-      },
-      {
-       "id": "estar",
-       "nombre": "Estar y espera",
-       "tipo": "cuarto",
-       "camas": 0,
-       "centro": [
-        -12.462,
-        1.2,
-        31.897
-       ],
-       "cam": [
-        -12.891,
-        2.1,
-        30.686
-       ],
-       "mira": [
-        -12.462,
-        0.6,
-        31.897
+        28.576
        ]
       },
       {
        "id": "salonA",
        "nombre": "Salón grande 1 · personas que deambulan",
        "tipo": "hospital",
-       "camas": 2,
+       "camas": 4,
        "centro": [
-        -9.017,
+        -19.755,
         1.2,
-        32.131
+        32.981
        ],
        "cam": [
-        -10.812,
+        -15.763,
         2.0,
-        33.221
+        32.067
        ],
        "mira": [
-        -6.962,
-        0.8,
-        30.495
+        -23.002,
+        0.7,
+        33.177
        ]
       },
       {
        "id": "salonB",
        "nombre": "Salón grande 2 · personas que deambulan",
        "tipo": "hospital",
-       "camas": 6,
+       "camas": 4,
        "centro": [
-        -13.41,
+        -13.087,
         1.2,
-        36.276
+        36.162
        ],
        "cam": [
-        -13.067,
+        -9.175,
         2.0,
-        34.292
+        35.276
        ],
        "mira": [
-        -11.722,
+        -16.542,
         0.7,
-        39.631
-       ]
-      },
-      {
-       "id": "huerto",
-       "nombre": "Oficina del huerto y bodega",
-       "tipo": "cuarto",
-       "camas": 0,
-       "centro": [
-        -9.057,
-        1.2,
-        25.811
-       ],
-       "cam": [
-        -9.971,
-        2.1,
-        24.565
-       ],
-       "mira": [
-        -9.057,
-        0.6,
-        25.811
+        36.795
        ]
       }
      ]
@@ -228,14 +228,14 @@
      "z0": 3.2,
      "rooms": [
       {
-       "id": "pasillo_pa",
-       "nombre": "Pasillo y estar",
+       "id": "escalera_pa",
+       "nombre": "Escalera",
        "tipo": "circulacion",
        "camas": 0,
        "centro": [
-        -15.395,
+        -18.862,
         4.4,
-        30.029
+        28.576
        ],
        "cam": [
         -20.434,
@@ -243,9 +243,30 @@
         27.089
        ],
        "mira": [
-        -15.395,
+        -18.862,
         3.8,
-        30.029
+        28.576
+       ]
+      },
+      {
+       "id": "pasillo_pa",
+       "nombre": "Pasillo",
+       "tipo": "circulacion",
+       "camas": 0,
+       "centro": [
+        -14.543,
+        4.4,
+        29.227
+       ],
+       "cam": [
+        -14.638,
+        5.3,
+        27.035
+       ],
+       "mira": [
+        -14.543,
+        3.8,
+        29.227
        ]
       },
       {
@@ -270,87 +291,24 @@
        ]
       },
       {
-       "id": "cocina",
-       "nombre": "Cocineta del área de coffee break",
-       "tipo": "cuarto",
-       "camas": 0,
+       "id": "hosp",
+       "nombre": "Personas encamadas",
+       "tipo": "hospital",
+       "camas": 10,
        "centro": [
-        -14.022,
+        -19.318,
         4.4,
-        28.134
+        33.19
        ],
        "cam": [
-        -13.452,
-        5.25,
-        29.613
-       ],
-       "mira": [
-        -14.888,
-        4.0,
-        26.715
-       ]
-      },
-      {
-       "id": "deposito",
-       "nombre": "Depósito y ropería (antes biblioteca)",
-       "tipo": "cuarto",
-       "camas": 0,
-       "centro": [
-        -12.38,
-        4.4,
-        26.099
-       ],
-       "cam": [
-        -13.358,
-        5.1,
-        26.8
-       ],
-       "mira": [
-        -11.39,
-        4.0,
-        25.431
-       ]
-      },
-      {
-       "id": "escalera_pa",
-       "nombre": "Escalera",
-       "tipo": "circulacion",
-       "camas": 0,
-       "centro": [
-        -10.793,
-        4.4,
-        28.399
-       ],
-       "cam": [
-        -10.805,
+        -15.431,
         5.3,
-        26.314
+        33.903
        ],
        "mira": [
-        -10.793,
-        3.8,
-        28.399
-       ]
-      },
-      {
-       "id": "closet",
-       "nombre": "Clóset de limpieza",
-       "tipo": "circulacion",
-       "camas": 0,
-       "centro": [
-        -9.321,
-        4.4,
-        30.376
-       ],
-       "cam": [
-        -9.172,
-        5.3,
-        29.642
-       ],
-       "mira": [
-        -9.321,
-        3.8,
-        30.376
+        -22.814,
+        3.9,
+        31.657
        ]
       },
       {
@@ -359,19 +317,19 @@
        "tipo": "hospital",
        "camas": 4,
        "centro": [
-        -20.964,
+        -12.897,
         4.4,
-        32.675
+        34.247
        ],
        "cam": [
-        -23.718,
-        5.15,
-        33.976
+        -10.148,
+        5.2,
+        32.531
        ],
        "mira": [
-        -18.611,
+        -16.1,
         3.95,
-        30.441
+        37.274
        ]
       },
       {
@@ -380,82 +338,103 @@
        "tipo": "cuarto",
        "camas": 0,
        "centro": [
-        -21.116,
+        -9.899,
         4.4,
-        29.715
+        29.899
        ],
        "cam": [
-        -21.426,
-        5.1,
-        31.983
+        -11.193,
+        5.15,
+        30.221
        ],
        "mira": [
-        -21.078,
+        -8.711,
         4.0,
-        28.861
+        29.661
        ]
       },
       {
-       "id": "hosp",
-       "nombre": "Personas encamadas",
-       "tipo": "hospital",
-       "camas": 10,
+       "id": "cocina",
+       "nombre": "Cocineta del área de coffee break",
+       "tipo": "cuarto",
+       "camas": 0,
        "centro": [
-        -15.249,
+        -12.052,
         4.4,
-        34.929
+        26.256
        ],
        "cam": [
-        -12.032,
-        5.2,
-        36.061
+        -11.595,
+        5.25,
+        27.547
        ],
        "mira": [
-        -18.779,
+        -12.536,
+        4.0,
+        25.019
+       ]
+      },
+      {
+       "id": "biblioteca",
+       "nombre": "Biblioteca (o depósito y cuarto de ropa)",
+       "tipo": "cuarto",
+       "camas": 0,
+       "centro": [
+        -9.647,
+        4.4,
+        27.403
+       ],
+       "cam": [
+        -10.211,
+        5.2,
+        26.194
+       ],
+       "mira": [
+        -9.164,
         3.95,
-        33.044
+        28.64
        ]
       },
       {
        "id": "galeria",
-       "nombre": "Área de coffee break",
+       "nombre": "Área recreativa y de coffee break",
        "tipo": "terraza",
        "camas": 0,
        "centro": [
-        -9.23,
+        -9.253,
         4.4,
-        35.25
+        26.014
        ],
        "cam": [
-        -10.845,
+        -5.647,
         5.15,
-        40.183
+        29.847
        ],
        "mira": [
-        -7.675,
-        4.1,
-        30.021
+        -12.8,
+        4.0,
+        22.477
        ]
       },
       {
        "id": "terraza",
-       "nombre": "Terraza",
+       "nombre": "Terraza al aire libre",
        "tipo": "terraza",
        "camas": 0,
        "centro": [
-        -8.706,
+        -9.353,
         4.4,
-        24.866
+        31.165
        ],
        "cam": [
-        -13.5,
+        -14.946,
         5.8,
-        27.988
+        40.659
        ],
        "mira": [
-        -8.706,
+        -9.353,
         3.7,
-        24.866
+        31.165
        ]
       }
      ]

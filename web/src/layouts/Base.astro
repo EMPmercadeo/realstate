@@ -9,6 +9,7 @@ const {
   sinHeader = false,
   noindex = false,
 } = Astro.props;
+import panos from '@/data/panoramas.json';
 ---
 <!doctype html>
 <html lang={lang}>
@@ -30,6 +31,7 @@ const {
           <ul>
             <li><a href="/#proyecto">El proyecto</a></li>
             <li><a href="/#espacios">Espacios</a></li>
+            {panos.length > 0 && <li><a href="/360">Vista 360°</a></li>}
             <li><a href="/avances">Avances</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a class="btn" href="/#recorrido">Recorrido</a></li>

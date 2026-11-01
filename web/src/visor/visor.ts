@@ -18,6 +18,8 @@ import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRe
 import vistasMaqueta from '../data/vistas.json';
 import residencia from '../data/residencia.json';
 import fotos from '../data/fotos.json';
+import panoramas from '../data/panoramas.json';
+import { abrir360, type Pano } from './pano360';
 
 type Modo = 'orbita' | 'recorrido' | 'cine';
 type Vista = { edificio: string | null; piso: number };
@@ -31,10 +33,10 @@ const F = fotos as Record<string, Foto>;
 const FOTOS_RES: Record<string, Foto> = {
   'hosp@gris': { ...F['hospitalizacion@gris'], nombre: 'Personas encamadas' },
   'salon2@gris': { ...F['salon_2@gris'], nombre: 'Salón amarillo' },
-  'galeria@gris': { ...F['refrigerios@gris'], nombre: 'Área de coffee break' },
+  'galeria@gris': { ...F['refrigerios@gris'], nombre: 'Área recreativa y de coffee break' },
   'cocina@gris': { ...F['cocina@gris'], nombre: 'Cocineta del área de coffee break' },
-  'terraza@gris': { ...F['terraza@gris'], nombre: 'Terraza' },
-  'bano_acc@gris': { ...F['bano_acc@gris'], nombre: 'Baño accesible para usuarios' },
+  'terraza@gris': { ...F['terraza@gris'], nombre: 'Terraza al aire libre' },
+  'bano_acc@gris': { ...F['bano_acc@gris'], nombre: 'Baño accesible para huéspedes o usuarios' },
   'comedor@amarilla': { ...F['comedor@amarilla'], nombre: 'Comedor y TV' },
   'terapia@amarilla': { ...F['terapia@amarilla'], nombre: 'Terapia con familiares' },
 };
@@ -433,8 +435,26 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
 
   // ---------- comparador antes / después ----------
   const comp = $('#comparador');
+  const PANOS = (RES ? panoramas : []) as Pano[];
+  const pano = (id: string) => PANOS.find((p) => p.id === id);
+  // botón "Ver en 360°" en la cabecera del comparador cuando el espacio tiene panorámica renderizada
+  function boton360(id: string) {
+    const p = pano(id); const cab = comp.querySelector('.comp-cab');
+    if (!p || !cab) return;
+    const b = document.createElement('button'); b.className = 'btn-360'; b.type = 'button'; b.textContent = 'Ver en 360°';
+    b.addEventListener('click', () => abrir360(p, PANOS, base));
+    cab.insertBefore(b, cab.querySelector('.cerrar'));
+  }
   function mostrarFoto(id: string) {
     const f = FOTOS[id];
+    if (!f && pano(id)) {
+      const p = pano(id)!;
+      comp.innerHTML = `<div class="comp-cab"><strong>${p.nombre}</strong><span>Render del proyecto</span><button class="cerrar" aria-label="Cerrar">×</button></div><div class="comp-img"><img src="${base.replace(/\/$/, '')}${p.mini}" alt="${p.nombre}, vista 360°"></div>`;
+      comp.classList.add('on');
+      comp.querySelector('.cerrar')!.addEventListener('click', () => comp.classList.remove('on'));
+      boton360(id);
+      return;
+    }
     if (!f) { comp.classList.remove('on'); return; }
     const antes = `${base}fotos-antes/${f.antes}.jpg`;
     const nombreD = f.despues || f.antes;
@@ -443,6 +463,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
       comp.innerHTML = `<div class="comp-cab"><strong>${f.nombre}</strong><span>Foto actual</span><button class="cerrar" aria-label="Cerrar">×</button></div><div class="comp-img"><img src="${antes}" alt="${f.nombre}, hoy"></div>`;
       comp.classList.add('on');
       comp.querySelector('.cerrar')!.addEventListener('click', () => comp.classList.remove('on'));
+      boton360(id);
     };
     const conDespues = () => {
       comp.innerHTML = `<div class="comp-cab"><strong>${f.nombre}</strong><span>Hoy → así quedará</span><button class="cerrar" aria-label="Cerrar">×</button></div>
@@ -451,6 +472,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
       comp.querySelector('.cerrar')!.addEventListener('click', () => comp.classList.remove('on'));
       const r = comp.querySelector('input'); const a = comp.querySelector('.comp-antes') as HTMLElement | null; const ln = comp.querySelector('.comp-linea') as HTMLElement | null;
       if (r && a) r.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - +r.value}% 0 0)`; if (ln) ln.style.left = `${r.value}%`; });
+      boton360(id);
     };
     // detecta en tiempo de ejecución si ya existe la foto "así quedará"
     const probe = new Image();
@@ -461,7 +483,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
   const panel = $('#panel-lista');
   function li(id: string, nombre: string, detalle?: string) {
     const f = FOTOS[id];
-    const tag = f ? `<i class="tag">${f.despues ? 'foto' : 'foto actual'}</i>` : '';
+    const tag = (f ? `<i class="tag">${f.despues ? 'foto' : 'foto actual'}</i>` : '') + (pano(id) ? '<i class="tag">360°</i>' : '');
     return `<li data-id="${id}"><span>${nombre}${tag}</span>${detalle ? `<em>${detalle}</em>` : ''}</li>`;
   }
   let html = `<h3>Terreno</h3><ul>${li('sitio', 'Vista general', '2.500 m²')}${li('calle', 'Desde la calle', 'Entrada')}${li('gris-ext', RES ? 'Edificio gris' : 'Edificio de hospitalización', 'Exterior')}`;
@@ -513,11 +535,11 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
     { id: 'comedor@amarilla', texto: 'Comedor y TV: el área social de la casa amarilla.', espera: 4 },
     { id: 'terapia@amarilla', texto: 'Terapia con familiares y, detrás, los talleres de pintura, acuarela y costura.', espera: 4 },
     { id: 'suite@amarilla', texto: 'Cuatro cuartos privados, un huésped en cada uno. La suite tiene baño y clóset propios.', espera: 4 },
-    { id: 'gris-ext', texto: 'El edificio gris es la parte asistencial: 22 camas en dos niveles.', espera: 4 },
+    { id: 'gris-ext', texto: 'El edificio gris es la parte asistencial: 22 camas en dos niveles. Se entra por la puerta café, bajo la galería con verjas.', espera: 5 },
     { id: 'hosp@gris', texto: 'Personas encamadas: 10 camas de hospital con barandales, luz sobre cada cama y estación de enfermería.', espera: 6 },
-    { id: 'salon2@gris', texto: 'Salón amarillo: 4 camas para personas con movilidad reducida.', espera: 4 },
-    { id: 'galeria@gris', texto: 'Área de coffee break en la terraza con verjas del piso alto.', espera: 5 },
-    { id: 'salonB@gris', texto: 'Abajo, los salones de las personas que deambulan: 6 camas en este y 2 en el otro.', espera: 4 },
+    { id: 'salon2@gris', texto: 'Salón amarillo: 4 camas para personas con movilidad reducida, con baño propio y salida a la terraza.', espera: 5 },
+    { id: 'galeria@gris', texto: 'La galería en L con verjas, de canto a canto entre la cocineta y la biblioteca: área recreativa y de coffee break.', espera: 5 },
+    { id: 'salonB@gris', texto: 'Abajo, los dos salones de las personas que deambulan, mitad y mitad: 4 camas en cada uno.', espera: 4 },
     { id: 'sitio', texto: 'Una residencia lista para operar. Solicita el expediente completo para inversionistas.', espera: 5 },
   ];
   const TOUR_MAQUETA: { id: string; texto: string; espera: number }[] = [

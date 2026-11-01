@@ -404,10 +404,11 @@ RUTAS = {
     'casa': (sitio.CASA, 'Casa amarilla: calle → recepción → comedor → escalera → recámara alta → balcón',
              [(9.575, -1.5), (9.575, 0.6), (8.6, 1.55), (6.4, 2.1), (6.38, 7.7), (t_c[0][0], 7.7)] + t_c +
              [(6.0, 7.7), (6.0, 6.4), (7.1, 5.6), (7.1, 2.4), (7.2, 0.0)]),
-    'gris': (sitio.GRIS, 'Edificio gris: calle → acceso → escalera → personas encamadas → área de coffee break',
-             [(7.4, -1.0), (7.4, 1.5), (7.4, 6.0), (t_g[0][0], 6.6)] + t_g +
-             [(7.6, t_g[-1][1]), (7.6, 6.95), (9.9, 6.95), (11.1, 6.95), (11.1, 9.0), (11.1, 6.95), (7.6, 6.95),
-              (7.6, 10.5), (7.5, 12.2)]),
+    'gris': (sitio.GRIS, 'Edificio gris: calle → puerta café → pasillo → escalera → personas encamadas → salón amarillo → '
+                         'terraza → galería en L (coffee break)',
+             [(1.83, 2.6), (1.83, 4.4), (1.83, 5.75), (t_g[0][0], 5.75)] + t_g +
+             [(t_g[-1][0], 6.1), (8.2, 6.78), (9.6, 6.78), (11.2, 6.2), (11.2, 3.5), (11.2, 6.2), (9.6, 6.78),
+              (8.2, 6.78), (7.6, 7.0), (7.6, 9.6), (7.5, 10.4), (7.5, 12.2), (4.5, 12.75), (2.2, 12.75), (2.2, 9.0)]),
 }
 REC = [prueba(nombre, E, pts) for (E, nombre, pts) in RUTAS.values()]
 json.dump(REC, open(os.path.join(OUT, 'recorrido.json'), 'w'), ensure_ascii=False, indent=1)

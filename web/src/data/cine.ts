@@ -21,7 +21,7 @@ export const RUTA: PuntoRuta[] = [
   { pos: [21.8, 18.2, -3.6], target: [7.3, 1.5, 10.9] },         // sobre la casa hacia el jardín
   { pos: [18.2, 12, -0.3], target: [-4.9, 0.8, 8.8] },     // 0.60 jardín interno: rampas, gazebo, tina, huerto
   { pos: [18.2, 7, 43.6], target: [-13.3, 3.5, 29.1] },       // 0.70 edificio gris desde el jardín
-  { pos: [8.5, 6.2, 42.4], target: [-7.3, 4.3, 33.3] },     // 0.80 área de coffee break (terraza con verjas)
+  { pos: [4.0, 6.8, 22.5], target: [-9.5, 4.4, 25.5] },     // 0.80 área recreativa: galería en L con verjas (desde el jardín, lado norte)
   { pos: [14.5, 26.6, 58.1], target: [-3.6, 2, 17] },         // subiendo
   { pos: [77.5, 63, 70.2], target: [3.6, 2, 2.4] },           // vista final
 ];
@@ -32,6 +32,6 @@ export const PARADAS_CINE: ParadaCine[] = [
   { u: 0.4, id: 'casa', etiqueta: 'Casa amarilla', eyebrow: 'Casa amarilla · dos niveles', titulo: 'Recepción 24 h, comedor y terapia.', texto: 'Recepción, comedor y TV, terapia con familiares, talleres, consultorio de salud y cuatro cuartos privados para huéspedes.', tags: ['Recepción 24 h', 'Consultorio', '4 cuartos privados'], foto: '/fotos-despues/comedor.jpg', fotoAntes: '/fotos-antes/comedor.jpg' },
   { u: 0.6, id: 'jardin', etiqueta: 'Jardín', eyebrow: 'Jardín interno', titulo: 'Gazebo, huerto y tina de hidroterapia.', texto: 'Entre los dos edificios: gazebo de juegos, huerto con surcos y cerca, y una tina de hidroterapia con agua tibia en movimiento.', tags: ['Gazebo', 'Huerto', 'Hidroterapia'], foto: '/fotos-despues/gazebo.jpg', fotoAntes: '/fotos-antes/gazebo.jpg' },
   { u: 0.7, id: 'gris', etiqueta: 'Edificio gris', eyebrow: 'Edificio gris · cuidado continuo', titulo: '22 camas en dos niveles.', texto: 'Personas encamadas con estación de enfermería, salón amarillo para personas con movilidad reducida y salones para las que deambulan.', tags: ['22 camas', 'Enfermería', 'Baño accesible'], foto: '/fotos-despues/hospitalizacion.jpg', fotoAntes: '/fotos-antes/hospitalizacion.jpg' },
-  { u: 0.8, id: 'terraza', etiqueta: 'Coffee break', eyebrow: 'Planta alta', titulo: 'Área de coffee break con vista al jardín.', texto: 'En la terraza con verjas del piso alto: mesas, barra de café y frutas para residentes y visitas.', tags: ['Terraza', 'Coffee break'], foto: '/fotos-despues/refrigerios.jpg', fotoAntes: '/fotos-antes/refrigerios.jpg' },
+  { u: 0.8, id: 'terraza', etiqueta: 'Coffee break', eyebrow: 'Planta alta', titulo: 'Área recreativa y de coffee break.', texto: 'En la galería en L con verjas del piso alto, junto a la cocineta y la biblioteca: mesas, barra de café y estar para residentes y visitas.', tags: ['Galería con verjas', 'Coffee break'], foto: '/fotos-despues/refrigerios.jpg', fotoAntes: '/fotos-antes/refrigerios.jpg' },
   { u: 1.0, id: 'final', etiqueta: 'Inversión', eyebrow: 'Proyecto llave en mano', titulo: 'Lista para operar. Lista para invertir.', texto: 'La propiedad se entrega adecuada y equipada según el programa de espacios. Solicita el expediente completo.', cta: { principal: { label: 'Solicitar expediente', href: '#inversionistas' }, secundaria: { label: 'Explorar libremente en 3D', href: '/recorrido' } } },
 ];

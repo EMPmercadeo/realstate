@@ -1,0 +1,38 @@
+---
+import Base from '@/layouts/Base.astro';
+import panos from '@/data/panoramas.json';
+---
+<Base title="Vista 360° · Residencia Altos de San Cristóbal"
+      description="Recorre en 360° los espacios de la Residencia Altos de San Cristóbal ya adecuada: renders esféricos del proyecto.">
+  <section class="seccion av-intro">
+    <div class="container">
+      <p class="av-sup">Vista 360° · render del proyecto</p>
+      <h1>Párate adentro y mira alrededor</h1>
+      <p class="lead">Cada vista es una foto esférica del proyecto ya adecuado, renderizada con luz calculada rayo por rayo. Arrastra para mirar hacia cualquier lado; en el celular, desliza con el dedo.</p>
+      {panos.length === 0 && <p class="muted">Las vistas 360° se están renderizando. Vuelve pronto.</p>}
+      <div class="v360-grid" data-base={import.meta.env.BASE_URL}>
+        {panos.map((p) => (
+          <button type="button" data-id={p.id} aria-label={`Abrir la vista 360° de ${p.nombre}`}>
+            <span class="v360-img" style={`background-image:url('${p.mini}')`}></span>
+            <strong>{p.nombre}</strong>
+          </button>
+        ))}
+      </div>
+      <p class="muted" style="margin-top:1.6rem">Muebles, equipos y acabados son de referencia para mostrar el uso de cada espacio. Las medidas salen del terreno y de las fotos; falta medir en sitio.</p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { abrir360 } from '@/visor/pano360';
+  import panos from '@/data/panoramas.json';
+  const grid = document.querySelector('.v360-grid') as HTMLElement;
+  const base = grid?.dataset.base || '/';
+  grid?.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => {
+    const p = panos.find((x) => x.id === b.dataset.id);
+    if (p) { abrir360(p, panos, base); history.replaceState(null, '', `#${p.id}`); }
+  }));
+  const h = decodeURIComponent(location.hash.slice(1));
+  const ini = panos.find((x) => x.id === h);
+  if (ini) abrir360(ini, panos, base);
+</script>

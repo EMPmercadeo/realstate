@@ -525,19 +525,20 @@ def edificio_gris(M, c, origen, ang):
     ventana(K, 'y', 8.2, 9.4, 0.9, 2.3, xpb, -1)
     # planta alta: puerta del depósito (antes biblioteca) a la galería norte, ventana de la escalera y
     # ventana del depósito hacia la galería oeste
-    puerta(K, 'y', 6.15, 6.95, Z1, Z1 + 2.1, ov + GN, -1)
-    ventana(K, 'y', 8.3, 9.3, Z1 + 0.9, Z1 + 2.1, ov + GN, -1, rejas=False)
-    ventana(K, 'x', 3.0, 4.0, Z1 + 0.9, Z1 + 2.1, 5.8, -1, rejas=False)
+    puerta(K, 'y', 6.15, 6.95, Z1, Z1 + 2.1, ov + GN, -1)                  # cocineta → galería
+    puerta(K, 'y', 8.5, 9.3, Z1, Z1 + 2.1, ov + GN, -1)                    # biblioteca → galería
+    ventana(K, 'x', 3.0, 4.0, Z1 + 0.9, Z1 + 2.1, 5.8, -1, rejas=False)   # cocineta → brazo oeste
+    puerta(K, 'y', 4.9, 5.7, Z1, Z1 + 2.1, 4.6, -1)                        # pasillo alto → brazo oeste de la galería
+    # jardinera bajo las dos ventanas, junto a la puerta café (fotos del 01-11-2026)
+    K.B('jardinera', 2.4, y0n - 0.5, 0, 4.05, y0n, 0.5, 'concreto')
 
     # ---- fachada oeste: ventanitas de bloque de vidrio, aire acondicionado, puerta
-    bloques = [(5.65, 2.4, 1.3), (8.6, 0.5, 1.3), (10.3, 0.5, 1.3), (12.7, 0.5, 1.3),
+    bloques = [(5.65, 2.4, 1.3), (9.4, 0.5, 1.3), (10.3, 0.5, 1.3), (12.7, 0.5, 1.3),
                (5.65, 2.4, Z1 + 1.3), (5.65, 2.4, Z1 + 0.35), (7.55, 0.5, Z1 + 1.3), (11.15, 0.5, Z1 + 1.3)]
     for (mid, yw, zz) in bloques:
         ventana(K, 'x', mid - 0.35, mid + 0.35, zz, zz + 0.7, yw, -1, rejas=False, vidrio='bloque')
     K.B('ac', 5.2, 1.9 + ov - 0.35, Z1 + 1.6, 6.0, 1.9 + ov, Z1 + 2.15, 'blanco')
-    puerta(K, 'x', 6.9, 7.9, 0, 2.2, ov, -1, m='puerta_roja')
-    K.B('alero_acceso', 6.45, -0.25, 2.55, 8.35, ov, 2.62, 'blanco')            # alerito de lámina sobre el acceso
-    K.B('jardinera_azul', 8.15, ov - 0.55, 0, 9.6, ov, 0.45, 'pintura_azul')   # jardinera pintada de azul (foto 114245)
+    # la única entrada del gris es la puerta café del tramo norte (Ernesto, 01-11-2026): esta fachada no tiene puerta
     # estacionamientos con pintura (frente al acceso)
     # bolsillo de estacionamiento entre el muro de la calle y los tramos norte y medio (fotos del 31-10-2026):
     # piso de concreto y un puesto accesible pintado de azul frente a la puerta café
@@ -552,13 +553,18 @@ def edificio_gris(M, c, origen, ang):
     K.B('gal_e_piso', 4.6, yE, Z1 - 0.25, XL - ov, YE - 0.1, Z1, 'concreto')
     for xx in (4.6, 7.7, 10.8, XL - ov - 0.15):
         K.B('gal_e_poste', xx, YE - 0.35, Z1, xx + 0.12, YE - 0.23, Z2 - 0.2, 'metal_gris')
-    baranda(K, 4.6, YE - 0.3, XL - ov, YE - 0.3, Z1, h=Z2 - 0.2 - Z1, paso=0.13, m='metal_gris')
-    baranda(K, 4.6, YE - 0.3, 4.6, yE, Z1, h=Z2 - 0.2 - Z1, paso=0.13, m='metal_gris')
+    # el porche del tramo norte en planta alta une la galería norte con la terraza este (área continua)
+    K.B('gal_porche_piso', 2.5, YN, Z1 - 0.25, 4.6, YE - 0.1, Z1, 'concreto')
+    K.B('gal_porche_piso', 0.15, y1n, Z1 - 0.25, 2.5, YE - 0.1, Z1, 'concreto')
+    baranda(K, 0.22, YE - 0.3, XL - ov, YE - 0.3, Z1, h=Z2 - 0.2 - Z1, paso=0.13, m='metal_gris')
     baranda(K, XL - ov, YE - 0.3, XL - ov, yE + 1.2, Z1, h=Z2 - 0.2 - Z1, paso=0.13, m='metal_gris')
-    K.B('gal_e_travesano', 4.6, YE - 0.33, Z1 + 1.0, XL - ov, YE - 0.27, Z1 + 1.06, 'metal_gris')
+    K.B('gal_e_travesano', 0.22, YE - 0.33, Z1 + 1.0, XL - ov, YE - 0.27, Z1 + 1.06, 'metal_gris')
     for xx in (ov + 0.05, 4.45):                                     # porche cubierto del tramo norte
         K.B('porche_n_poste', xx, YE - 0.4, 0, xx + 0.15, YE - 0.25, Z2 - 0.2, 'metal_gris')
-    K.B('ac_e', 2.2, YN, Z1 + 1.4, 3.0, YN + 0.35, Z1 + 1.95, 'blanco')
+    K.B('ac_e', 3.75, YN, Z1 + 1.4, 4.45, YN + 0.35, Z1 + 1.95, 'blanco')
+    ventana(K, 'x', 3.2, 4.3, 0.9, 2.2, YN, 1)                                  # oficina 1
+    ventana(K, 'x', 2.75, 3.55, Z1 + 0.9, Z1 + 2.2, YN, 1, rejas=False)         # biblioteca
+    ventana(K, 'x', 5.0, 5.8, Z1 + 1.5, Z1 + 2.15, yE, 1, rejas=False)          # baño nuevo del salón amarillo
     puerta(K, 'x', 7.0, 8.0, Z1, Z1 + 2.2, yE, 1)
     puerta(K, 'x', 10.5, 11.5, Z1, Z1 + 2.2, yE, 1, bisagra='a1')     # hoja hacia el pasillo central
     for xx in (9.0, 12.2):

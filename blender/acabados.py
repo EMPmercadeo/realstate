@@ -43,24 +43,25 @@ CORTINAS = {   # cuartos con cortinas en sus ventanas: material
              'recepcion': 'cortina_blanca', 'consultorio': 'cortina_blanca', 'psicologia': 'cortina_blanca',
              'recamara': 'cortina_blanca', 'talleres': 'cortina_blanca', 'terapia': 'cortina_blanca'},
     'gris': {'hosp': 'cortina_beige', 'salon2': 'cortina_beige', 'salonA': 'cortina_blanca', 'salonB': 'cortina_blanca',
-             'oficina1': 'cortina_blanca', 'oficina2': 'cortina_blanca'},
+             'oficina1': 'cortina_blanca', 'oficina2': 'cortina_blanca', 'biblioteca': 'cortina_blanca',
+             'estar': 'cortina_blanca'},
 }
 # abanicos de techo (con luz): (cuarto, x, y)
 ABANICOS = {
     ('casa', 'pb'): [('comedor', 5.0, 2.4), ('terapia', 10.9, 2.6), ('talleres', 10.9, 5.6), ('suite', 11.0, 11.0)],
     ('casa', 'pa'): [('recamara', 7.2, 4.2)],
-    ('gris', 'pb'): [('salonA', 6.85, 11.2), ('salonB', 11.4, 7.8), ('salonB', 11.4, 10.9)],
-    ('gris', 'pa'): [('hosp', 11.1, 5.9), ('hosp', 11.1, 9.2), ('salon2', 11.1, 2.4)],
+    ('gris', 'pb'): [('salonA', 11.3, 3.55), ('salonB', 11.3, 9.65)],
+    ('gris', 'pa'): [('hosp', 11.23, 2.2), ('hosp', 11.23, 4.9), ('salon2', 10.4, 9.6)],
 }
-ABANICOS_GALERIA = [(6.2, 12.2), (9.4, 12.2), (12.5, 12.2)]
+ABANICOS_GALERIA = [(6.2, 12.2), (9.4, 12.2), (12.5, 12.2), (1.32, 8.2), (1.32, 10.95), (3.55, 11.75)]
 # aires acondicionados (split): (cuarto, lado del muro, cara, posición a lo largo)
 AIRES = {
     ('casa', 'pb'): [('vip', '+y', 6.94, 7.9), ('suite', '-x', 9.56, 10.9), ('semipriv', '-x', 2.46, 12.3),
                      ('consultorio', '-y', 0.20, 2.8), ('recepcion', '+y', 3.54, 7.6)],
     ('casa', 'pa'): [('recamara', '-x', 4.90, 4.3)],
-    ('gris', 'pb'): [('salonA', '-x', 4.80, 11.2), ('salonB', '-x', 9.16, 11.4), ('oficina1', '-y', 0.70, 9.7),
-                     ('oficina2', '-y', 0.70, 11.9)],
-    ('gris', 'pa'): [('hosp', '-y', 4.26, 8.9), ('hosp', '-y', 4.26, 12.6), ('salon2', '-y', 0.70, 12.9)],
+    ('gris', 'pb'): [('salonA', '+x', 13.70, 4.60), ('salonB', '+x', 13.70, 7.30), ('oficina1', '-x', 2.96, 9.20),
+                     ('oficina2', '+x', 6.64, 10.80)],
+    ('gris', 'pa'): [('hosp', '-y', 0.70, 10.0), ('hosp', '-y', 0.70, 12.5), ('salon2', '+x', 13.70, 10.40)],
 }
 # cuadros: (cuarto, lado, cara, u, z centro, ancho, alto)
 CUADROS = {
@@ -71,12 +72,11 @@ CUADROS = {
                      ('consultorio', '-x', 0.20, 1.2, 1.65, 0.45, 0.6), ('talleres', '-x', 9.46, 6.0, 1.55, 0.6, 0.45),
                      ('psicologia', '-x', 0.20, 12.9, 1.6, 0.5, 0.4)],
     ('casa', 'pa'): [('recamara', '+x', 9.50, 4.30, 1.75, 0.9, 0.6), ('hall', '-y', 7.06, 7.5, 1.6, 0.8, 0.55)],
-    ('gris', 'pb'): [('salonA', '-y', 9.86, 5.8, 1.6, 0.7, 0.5), ('salonB', '+x', 13.70, 7.4, 1.6, 0.6, 0.45),
-                     ('salonB', '+x', 13.70, 11.4, 1.6, 0.6, 0.45), ('estar', '+x', 9.04, 8.15, 1.6, 0.9, 0.55),
-                     ('pasillo', '+y', 7.34, 4.6, 1.6, 0.8, 0.55), ('acceso', '-x', 6.76, 2.2, 1.6, 0.6, 0.8)],
-    ('gris', 'pa'): [('hosp', '+x', 13.70, 7.4, 1.75, 0.55, 0.40), ('hosp', '-x', 8.46, 9.75, 1.75, 0.5, 0.40),
-                     ('salon2', '-y', 0.70, 11.6, 1.7, 0.7, 0.5), ('salon2', '+x', 13.70, 2.4, 1.6, 0.6, 0.45),
-                     ('pasillo', '+x', 8.34, 9.3, 1.6, 0.7, 0.5), ('pasillo', '-x', 6.70, 8.6, 1.6, 0.6, 0.8)],
+    ('gris', 'pb'): [('salonA', '+y', 6.54, 9.55, 1.6, 0.6, 0.45), ('salonB', '-x', 8.76, 11.2, 1.6, 0.7, 0.5),
+                     ('estar', '-x', 6.76, 11.1, 1.55, 0.9, 0.55), ('pasillo', '+x', 8.64, 7.2, 1.6, 0.8, 0.55),
+                     ('oficina2', '-x', 4.66, 9.0, 1.6, 0.6, 0.45), ('acceso', '+y', 6.54, 4.42, 1.6, 0.3, 0.45)],
+    ('gris', 'pa'): [('hosp', '+y', 7.34, 11.23, 1.75, 0.7, 0.5), ('salon2', '+x', 13.70, 7.95, 1.6, 0.6, 0.45),
+                     ('pasillo', '+y', 7.34, 5.8, 1.6, 0.7, 0.5), ('biblioteca', '-y', 8.06, 3.9, 1.6, 0.6, 0.45)],
 }
 ESPEJOS = {('casa', 'pb'): [('terapia', '+y', 4.14, 9.85, 1.2, 0.6, 1.5)]}
 
@@ -341,6 +341,9 @@ def construir(K, E, clave, C_LUZ):
     # galería este del gris: piso de baldosa, abanicos
     if clave == 'gris':
         K.B('piso_galeria', 4.62, 11.02, 3.2, 13.88, 13.18, 3.208, 'piso_terraza')
+        # galería en L (área recreativa): brazo oeste con la franja delante de la cocineta, brazo norte y porche
+        for (a, b, c, d) in ((0.24, 4.47, 4.58, 5.78), (0.24, 5.78, 2.48, 13.18), (2.48, 10.22, 4.62, 13.18)):
+            K.B('piso_galeria_l', a, b, 3.2, c, d, 3.208, 'piso_terraza')
         for (x, y) in ABANICOS_GALERIA:
             m = Malla(); abanico(m, 0.35)
             poner('abanico_gal', m, x, y, 6.15)

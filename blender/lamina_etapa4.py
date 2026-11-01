@@ -17,16 +17,16 @@ def F(sz, b=False):
         return ImageFont.load_default()
 
 
-GRIS = [('int_gris_hosp', 'Personas encamadas · 10 camas, estación de enfermería al fondo'),
-        ('int_gris_hosp2', 'Personas encamadas · desde la puerta del pasillo'),
-        ('int_gris_salon2', 'Salón amarillo · 4 camas, personas con movilidad reducida'),
-        ('int_gris_salonB', 'Salón grande 2 · 6 camas, personas que deambulan'),
-        ('int_gris_salonA', 'Salón grande 1 · 2 camas, personas que deambulan'),
-        ('int_gris_refrigerios', 'Terraza de arriba · área de coffee break'),
-        ('int_gris_bano_acc', 'Baño accesible para usuarios (planta baja)'),
-        ('int_gris_deposito', 'Depósito y ropería (antes biblioteca)'),
+GRIS = [('int_gris_hosp', 'Personas encamadas · 10 camas y estación de enfermería junto a la puerta'),
+        ('int_gris_hosp2', 'Personas encamadas · desde el fondo, lado de la calle'),
+        ('int_gris_salon2', 'Salón amarillo · 4 camas, personas con movilidad reducida, salida a la terraza'),
+        ('int_gris_salonB', 'Salón grande 2 · 4 camas, personas que deambulan'),
+        ('int_gris_salonA', 'Salón grande 1 · 4 camas, personas que deambulan'),
+        ('int_gris_refrigerios', 'Galería en L con verjas · área recreativa y de coffee break'),
+        ('int_gris_bano_acc', 'Baño accesible para huéspedes o usuarios (planta baja)'),
+        ('int_gris_biblioteca', 'Biblioteca, abre a la galería'),
         ('int_gris_cocina', 'Cocineta del área de coffee break'),
-        ('int_gris_acceso', 'Acceso, pasillo y escalera')]
+        ('int_gris_acceso', 'Entrada: oficinas al frente, pasillo y escalera a la derecha')]
 CASA = [('int_casa_recepcion', 'Recepción 24 h'),
         ('int_casa_comedor', 'Comedor y TV (a la izquierda, puertas de vidrio del semiprivado 2)'),
         ('int_casa_vip', 'Cuarto semiprivado 2 (el de puertas de vidrio)'),

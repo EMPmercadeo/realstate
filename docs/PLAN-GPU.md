@@ -69,3 +69,25 @@ celular. Pasos, en bucle hasta que quede bien:
   (aquí en la nube corren con `python3` porque Blender está instalado como módulo).
 - `blender/export.py` → GLB para el 3D en vivo (`escena.glb` completo, `exterior.glb` ligero para la portada).
 - `web/src/components/Cine.astro` → portada: usa `clips/sobrevuelo.mp4` si existe; si no, 3D en vivo.
+
+## 6. Vistas 360° en calidad de foto (01-11-2026)
+
+Lo hiperrealista en la web sale de renders hechos antes, no del 3D en vivo. Las vistas 360° son fotos
+esféricas renderizadas con Cycles desde el modelo amueblado (`build/bloqueo/bloqueo.blend`, el mismo del
+recorrido). La web las muestra en `/360` y con el botón "Ver en 360°" de cada espacio en `/recorrido`
+(visor: `web/src/visor/pano360.ts`). Pesan ~1–3 MB cada una.
+
+En la nube se renderizan a 2048 px con pocas muestras (CPU, ~10 min cada una). En la 3080, calidad final:
+
+```
+& $b -b -P blender\bloqueo.py -- --solo ninguno                                  # modelo amueblado (si cambió)
+& $b -b -P blender\panoramas.py -- --ids todas --ancho 6144 --muestras 256 --gpu  # ≈ 1–2 min por vista
+cd web; npm run build
+```
+
+Las vistas, sus puntos de cámara y su exposición están en `PANOS` dentro de `blender/panoramas.py`; el
+manifiesto `web/src/data/panoramas.json` se reescribe solo. Para agregar una vista, se suma una línea a
+`PANOS` con el id del espacio (el mismo de `/recorrido`, p. ej. `salonB@gris`).
+
+Pendiente para la portada: el sobrevuelo v2 (`clips/sobrevuelo-v2.mp4`) con el modelo amueblado. Hoy
+`cine_render.py` abre `build/escena.blend` (la maqueta anterior); hay que apuntarlo a `bloqueo.blend`.
