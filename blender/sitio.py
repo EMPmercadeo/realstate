@@ -38,8 +38,11 @@ CA_ANCHO = 44          # px (incluye cunetas/orillas)
 # ven del mismo tamaño que en el modelo solo si el eje pasa a ~5,8 m de la fachada (ver docs/fase-mapa.md)
 # 01-11-2026 (boceto de Ernesto): la cerca de la calle de tierra es una sola, casi recta, del gris a la C.A; frente
 # a la casa la calle se acercó ~5 m para que corra paralela a esa cerca (antes la cerca hacía un quiebre de ~6 m)
-OESTE = [(333, 108), (310, 166), (281, 236), (251, 311), (224, 379), (199, 436), (164, 501), (140, 560), (108, 629),
-         (79, 693), (47, 733), (-10, 740)]
+# 01-11-2026 (noche, Ernesto): frente a la casa la cerca va sobre la línea blanca del mapa (el eje anterior de la
+# calle); la calle se corre ~2,5 m al oeste en ese tramo para quedar afuera de la cerca. Eje anterior:
+# (333,108) (310,166) (281,236) (251,311) (224,379)
+OESTE = [(316.3, 101.3), (293.3, 159.3), (264.3, 229.3), (234.3, 304.3), (215.6, 375.7), (199, 436), (164, 501),
+         (140, 560), (108, 629), (79, 693), (47, 733), (-10, 740)]
 OESTE_ANCHO = 32
 
 AREA_OBJETIVO = 2500.0          # área que dijo la propietaria (no se usa para la escala)
@@ -57,7 +60,10 @@ def _shapely():
 # fachada) y el muro amarillo del jardín queda a ~4 m del camino de baldosa. El trazo, menos la calle,
 # lo dejaba ~10 m más afuera. Polígono a recortar, en unidades de diseño del marco del gris.
 # 01-11-2026: se prolonga hasta la C.A con un ángulo suave (cerca casi recta, sin quiebre; boceto de Ernesto).
-CORTE_OESTE_GRIS = [(-66.0, -3.6), (-52.0, -2.9), (-19.6, -0.9), (16.5, -0.4), (16.5, -40.0), (-66.0, -40.0)]
+# 01-11-2026 (noche): frente a la casa la cerca corre sobre el eje anterior de la calle (línea blanca del mapa, donde
+# Ernesto dice que está), con el portón nuevo del parqueo de grava; del muro amarillo del jardín al gris no cambia.
+CORTE_OESTE_GRIS = [(-75.0, -7.6), (-58.02, -7.17), (-50.75, -6.68), (-41.91, -6.22), (-32.49, -5.61), (-19.6, -0.9),
+                    (16.5, -0.4), (16.5, -40.0), (-75.0, -40.0)]
 
 
 def geometria_px(cortar=True):

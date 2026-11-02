@@ -400,6 +400,9 @@ px_, py_ = centro_bb(zonas['parqueo']); gx, gy = centro_bb(zonas['garaje']); tx,
 exteriores = [
     dict(id='estacionamiento', nombre='Estacionamiento', centro=T(px_, py_, 0.6), cam=T(px_ - 9, py_ + 6, 3.5)),
     dict(id='garaje', nombre='Garaje', centro=T(gx, gy, 1.0), cam=T(gx + 8, gy + 7, 3.0)),
+    # parqueo de grava al costado noroeste de la casa, visto desde el portón nuevo de la calle de tierra
+    dict(id='parqueo_casa', nombre='Parqueo de grava de la casa', centro=L(sitio.CASA, 17.5, 9.0, 0.6),
+         cam=L(sitio.CASA, 31.0, 11.5, 5.5)),
 ]
 
 # lote y vistas generales

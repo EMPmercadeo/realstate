@@ -1,5 +1,12 @@
 # Estado del proyecto (29-10-2026, mañana; al día 01-11-2026)
 
+## 01-11-2026 (noche)
+- **Parqueo de grava de la casa** al costado noroeste (el que da a la calle de tierra), junto a la caseta del
+  carro, con el portón nuevo en la cerca; antes estaba detrás de la casa. Frente a la casa la cerca de la calle
+  de tierra va sobre la línea blanca del mapa (eje anterior) y la calle se corrió ~2,5 m al oeste.
+  Código: `sitio.py` (OESTE, CORTE_OESTE_GRIS), `exteriores.parqueo_casa()`, `bloqueo.cercas()`; marcador
+  "Parqueo de grava de la casa" en `/recorrido` con la foto actual. La casa no se movió ni cambió de medidas.
+
 ## 01-11-2026 (tarde)
 - **Edificio gris** con la distribución que describió Ernesto (ver `docs/contexto-proyecto.md`, sección del
   gris): entrada única por la puerta café, vestíbulo en L, salones 4 + 4 abajo, encamados al frente arriba,

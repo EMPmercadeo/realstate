@@ -4,13 +4,14 @@ satélite (Google, Esri y Bing). Ver docs/fase-mapa.md.
 
 Lo que EXISTE hoy (fotos):
   - Camino de baldosa de abanico con franjas antideslizantes, paralelo al muro de la calle de tierra,
-    desde la plazoleta del norte del gris hasta el muro con portón del patio de grava de la casa.
+    desde la plazoleta del norte del gris hasta el muro con portón entre el jardín y el fondo de la casa.
   - Rampas de concreto con muretes grises y barandas negras de tubo, descansos azules con el símbolo de
     accesibilidad (al lado este del camino).
   - Oficinita blanca con puerta corrediza de vidrio y techo de lámina (al noreste del gris; el satélite
     la muestra), con el bananal al lado ("donde están los tallos", probablemente).
   - Quiosco amarillo de dos vanos, muro amarillo, pilares color arena con bola blanca y portones negros
-    en la calle de tierra; palmas fénix junto a la galería norte del gris; patio de grava atrás de la casa.
+    en la calle de tierra; palmas fénix junto a la galería norte del gris; parqueo de grava al costado noroeste
+    de la casa, junto a la caseta del carro (01-11-2026).
 Lo PROPUESTO (contexto del proyecto, no existe hoy): gazebo de juegos con letrero, tina de hidroterapia
 donde estaba el mango (tocón en el césped al oeste del camino) y huerto de 4 surcos con cerca al lado
 de la oficinita.
@@ -350,6 +351,26 @@ def croton(m, x, y, h, rnd):
 
 
 # ------------------------------------------------------------------ armado
+def parqueo_casa(x0=12.8, y0=3.6, x1=40.0, y1=15.6, margen=0.3):
+    """Planta del parqueo de grava de la casa: rectángulo en unidades de la casa recortado por el lote (menos el
+    grueso de la cerca). Devuelve anillos en unidades de diseño del marco del gris (las que recibe Marco.P)."""
+    from shapely.geometry import Polygon
+    g = sitio.geometria_px()
+    lote = Polygon(sitio.poly_m(g['lote'])).buffer(-margen)
+    rect = Polygon([sitio.local_a_m(sitio.CASA, x, y) for x, y in ((x0, y0), (x1, y0), (x1, y1), (x0, y1))])
+    zona = rect.intersection(lote)
+    geoms = [zona] if zona.geom_type == 'Polygon' else list(zona.geoms)
+    out = []
+    for z in geoms:
+        z = z.simplify(0.05)
+        if not z.exterior.is_ccw:
+            z = Polygon(list(z.exterior.coords)[::-1])
+        pts = list(z.exterior.coords)[:-1]
+        # metros del modelo -> unidades del gris; el giro del marco no cambia el sentido antihorario
+        out.append([sitio.m_a_local(sitio.GRIS, X, Y) for X, Y in pts])
+    return out
+
+
 def construir(M, C):
     F = Marco()
     P = F.P
@@ -361,7 +382,7 @@ def construir(M, C):
     x0, y0 = P(-4.2, 1.6); x1, y1 = P(0.2, 13.0)
     m.caja(x0, y0, 0.0, x1, y1, 0.04, 'concreto_claro')
     descanso(m, *P(-4.6, 4.5), *P(-3.0, 6.0))
-    # ---- camino de baldosa paralelo al muro de la calle de tierra, hasta el portón del patio de grava
+    # ---- camino de baldosa paralelo al muro de la calle de tierra, hasta el portón del muro amarillo
     camino_baldosa(m, P(-4.2, 3.0), P(-19.2, 3.0))
     camino_baldosa(m, P(-12.8, 7.7), P(-12.8, 14.3), ancho=1.1)                    # a la oficinita
     # ---- rampas con murete y baranda; descansos azules
@@ -369,13 +390,15 @@ def construir(M, C):
     descanso(m, *P(-11.5, 4.5), *P(-10.0, 7.7))
     rampa(m, P(-11.5, 7.0), P(-17.2, 7.0))
     descanso(m, *P(-18.8, 3.6), *P(-17.2, 7.7))
-    # ---- muro amarillo con portón negro entre el jardín y el patio de grava de la casa (foto 113831)
+    # ---- muro amarillo con portón negro entre el jardín y el fondo de la casa (foto 113831)
     muro(m, P(-19.6, -0.6), P(-19.6, 2.3), alto=1.5)
     muro(m, P(-19.6, 3.8), P(-19.6, 9.5), alto=1.5)
     porton_negro(m, P(-19.6, 2.3), P(-19.6, 3.8), alto=1.55)
-    # ---- patio de grava detrás de la casa (foto casa-amarilla-patio y video 114626)
-    gx0, gy0 = P(-27.0, -1.0); gx1, gy1 = P(-19.8, 11.5)          # hasta la cerca de la calle (casi recta desde el 01-11)
-    m.caja(gx0, gy0, 0.0, gx1, gy1, 0.035, 'grava')
+    # ---- parqueo de grava al costado noroeste de la casa, junto a la caseta del carro y frente al portón nuevo de
+    # la calle de tierra (Ernesto, 01-11-2026: "va en la parte de al lado, no atrás"; fotos 114626, a9d743ec y
+    # patio-grava). Rectángulo en el marco de la casa recortado por el lote; del garaje a la línea del fondo.
+    for anillo in parqueo_casa():
+        m.prisma([P(*p) for p in anillo], 0.0, 0.035, 'grava')
     objs.append(cerrar(m, 'ext_caminos_rampas', M, C))
 
     # ---- construcciones pequeñas existentes

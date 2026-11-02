@@ -199,7 +199,7 @@ GALERIA = [W('barra_buffet', '+x', 2.48, 7.70, sep=0.02, w=1.40), W('dispensador
            W('butaca', '-y', 4.50, 0.95, sep=0.04), W('butaca', '-y', 4.50, 2.05, sep=0.04),
            P('mesa_centro_red', 1.50, 5.30, 0, w=0.55, d=0.55), W('butaca', '-y', 4.50, 3.35, sep=0.04),
            W('planta', '-x', 0.25, 12.95, sep=0.02), W('planta', '+x', 2.48, 5.25, sep=0.02),
-           W('planta_med', '+y', 13.15, 2.45, sep=0.02),
+           W('planta_med', '+y', 13.15, 1.60, sep=0.02),          # fuera del paso hacia el brazo oeste
            # terraza este: un par de mesas y estar al sol de la tarde
            P('mesa_redonda', 9.25, 12.15, 0), W('butaca', '+y', 13.15, 12.40, sep=0.02),
            W('butaca', '+y', 13.15, 13.35, sep=0.02), P('mesa_centro_red', 12.85, 12.05, 0, w=0.55, d=0.55),

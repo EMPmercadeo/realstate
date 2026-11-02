@@ -158,10 +158,12 @@ def cercas(g):
     s = sitio.s()
     lote = g['lote']
     ca, oe = g['ca'], g['oeste']
-    portones = [(sitio.local_a_m(sitio.CASA, 23.5, 0.5), 'vehicular', 2.6),
+    # 01-11-2026 (noche): el parqueo de grava de la casa va a su costado noroeste, junto a la caseta del carro;
+    # el portón nuevo abierto en la cerca de la calle de tierra queda frente a ese costado (fotos 114626 y a9d743ec)
+    portones = [(sitio.local_a_m(sitio.CASA, 27.4, 0.5), 'vehicular', 2.6),
                 (sitio.local_a_m(sitio.GRIS, 3.0, -0.6), 'vehicular_arco', 3.3),     # ocupa todo el frente del estacionamiento
                 (sitio.local_a_m(sitio.GRIS, 7.4, -0.55), 'peatonal', 1.4),      # frente a la puerta de acceso
-                (sitio.local_a_m(sitio.GRIS, -23.5, -1.15), 'vehicular', 2.6)]    # patio de grava (en la cerca recta)
+                (sitio.local_a_m(sitio.CASA, 23.9, 9.0), 'vehicular', 3.2)]      # parqueo de grava de la casa
     corte = g.get('corte')
     borde_corte = corte.exterior if corte is not None else None
     from muebles3d import Malla

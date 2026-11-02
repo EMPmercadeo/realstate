@@ -68,6 +68,18 @@ class Malla:
                 f.smooth = True
         return fs
 
+    def prisma(self, pts, z0, z1, mat):
+        """Losa de planta poligonal (pts en sentido antihorario) entre z0 y z1."""
+        bot = [self.bm.verts.new((x, y, z0)) for x, y in pts]
+        top = [self.bm.verts.new((x, y, z1)) for x, y in pts]
+        n = len(pts)
+        self.bm.faces.new(top)
+        self.bm.faces.new(bot[::-1])
+        for i in range(n):
+            j = (i + 1) % n
+            self.bm.faces.new((bot[i], bot[j], top[j], top[i]))
+        return self._fin(bot + top, mat)
+
     def cc(self, cx, cy, cz, sx, sy, sz, mat, **kw):
         """Caja por centro (z = base)."""
         return self.caja(cx - sx / 2, cy - sy / 2, cz, cx + sx / 2, cy + sy / 2, cz + sz, mat, **kw)

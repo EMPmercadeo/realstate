@@ -133,10 +133,15 @@ Los jardines internos llevan tres piezas nuevas: un gazebo de juegos, una tina d
 Lo demás no necesita nada: la propiedad ya tiene cerca perimetral, portones eléctricos y la parte de seguridad.
 
 **Lo que hay hoy en el jardín (fotos del 31-10-2026).** Camino de baldosa con rampas de concreto, barandas
-negras y descansos azules accesibles entre el gris y el patio de grava de la casa; una casita blanca con
+negras y descansos azules accesibles entre el gris y el fondo de la casa; una casita blanca con
 puerta de vidrio al noreste del gris y, a su lado, un bananal; un quiosco amarillo junto al muro de la
 calle de tierra; palmas fénix junto a la galería del gris; tocones en el césped. Probablemente la casita
 blanca es la "oficinita de abajo" y el bananal es "donde están los tallos" (por confirmar).
+
+**Parqueo de grava de la casa (Ernesto, 01-11-2026).** Va al costado de la casa amarilla que da a la calle de
+tierra, al lado de la caseta donde va el carro, no detrás. En la cerca de la calle de tierra se abrió un portón
+nuevo frente a ese parqueo (fotos 114626 y a9d743ec). Frente a la casa la cerca corre sobre la línea blanca del
+mapa (el eje anterior de la calle).
 
 ## Adecuaciones
 
@@ -256,8 +261,11 @@ Estos puntos se contradicen entre audios o no quedan claros, y conviene cerrarlo
 - [ ] **Oficina del gerente:** la recámara de arriba ahora es cuarto privado. ¿Dónde va el gerente?
 - [ ] **Pasadía y estadías temporales:** ¿cuánto se cobra la hora extra después de las 5:00 p. m.? ¿Las estadías usan solo los 4 cuartos privados?
 - [ ] **Recepción:** falta la foto correcta de la recepción.
-- [ ] **Área del lote:** con la escala medida y la cerca corregida según el boceto de Ernesto (01-11), el lote da
-  ~2.875 m² (no 2.500). Pedir el plano catastral o la escritura para fijar el lindero real.
+- [ ] **Área del lote:** con la escala medida y la cerca corregida según Ernesto (boceto y línea blanca del mapa,
+  01-11), el lote da ~3.040 m² (no 2.500). Pedir el plano catastral o la escritura para fijar el lindero real.
+- [ ] **Casa amarilla, costado del parqueo:** en las fotos 114626 y a9d743ec el porche de balaustres, la planta
+  alta con tres ventanas y el porche en arco miran al parqueo de grava; en el modelo esa fachada sigue en el fondo
+  de la casa y hacia el parqueo da el ala baja. ¿Se gira esa fachada hacia el parqueo?
 - [ ] **Edificio gris, planta alta:** ¿hay puerta del pasillo a la galería con verjas? ¿El porche de arriba del
   tramo norte tiene piso (une la galería con la terraza del jardín)? El modelo supone que sí a las dos.
 - [ ] **Huerto:** ¿la "oficinita de abajo" es la casita blanca con puerta de vidrio junto al bananal, y el

@@ -438,7 +438,8 @@ def casa_amarilla(M, c, origen, ang):
         K.B('garaje_reja', gx0 - 0.11, k, 0.05, gx0 - 0.08, k + 0.03, 2.4, 'hierro'); k += 0.16
     # pisos de baldosa: frente y entrada del garaje
     K.B('piso_frente', -1.6, -12.5, 0, 12.6, -0.6, 0.03, 'ceramica')
-    K.B('piso_garaje', 12.6, -2.0, 0, 24.0, 3.5, 0.03, 'ceramica')
+    K.B('piso_garaje', 12.6, -2.0, 0, 26.4, 3.5, 0.03, 'ceramica')
+    K.B('piso_garaje', 26.4, -1.0, 0, 27.5, 2.0, 0.03, 'ceramica')             # hasta el portón de la calle de tierra
     # cerca del frente, retirada de la calle (afuera queda la rampa de baldosa), con dos portones
     YF = -7.4
     portones = [(-0.6, 2.0), (2.6, 9.4)]

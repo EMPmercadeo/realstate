@@ -39,6 +39,7 @@ const FOTOS_RES: Record<string, Foto> = {
   'bano_acc@gris': { ...F['bano_acc@gris'], nombre: 'Baño accesible para huéspedes o usuarios' },
   'comedor@amarilla': { ...F['comedor@amarilla'], nombre: 'Comedor y TV' },
   'terapia@amarilla': { ...F['terapia@amarilla'], nombre: 'Terapia con familiares' },
+  'parqueo_casa': { nombre: 'Parqueo de grava de la casa', antes: 'parqueo-casa', despues: null },
 };
 const MOVIL = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) || window.innerWidth < 820;
 const RAPIDO = new URLSearchParams(location.search).has('rapido');   // capturas rápidas de depuración

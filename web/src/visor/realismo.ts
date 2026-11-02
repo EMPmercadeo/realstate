@@ -164,6 +164,7 @@ float rAlto; float rVidrio = 0.0;${ven ? '\nvarying vec3 vLoc; varying vec3 vLoc
 // Clasificación de los materiales del modelo exportado por Blender (w_n_*, w_pintura_*, …)
 export const ESTUCO: Detalle = { canal: [1, 0, 0, 0.35], escala: 1.1, color: 0.10, mancha: 0.10, relieve: 0.9, sucio: 0.22, lejos: 30 };
 const CONCRETO: Detalle = { canal: [0, 1, 0, 0.6], escala: 0.7, color: 0.22, mancha: 0.18, relieve: 0.8, sucio: 0.12, lejos: 30 };
+const GRAVA: Detalle = { canal: [0.3, 1, 0, 0.3], escala: 5.0, color: 0.30, mancha: 0.08, relieve: 2.0, sucio: 0.10, lejos: 22 };
 const PIEDRA: Detalle = { canal: [0.3, 1, 0, 0.3], escala: 1.6, color: 0.35, mancha: 0.12, relieve: 1.6, lejos: 25 };
 export const LAMINA: Detalle = { canal: [0, 0.4, 0, 0.6], escala: 0.6, color: 0.10, mancha: 0.16, relieve: 1.4, lejos: 45, onda: { paso: 0.19, eje: [1, 0, 0] } };
 export const TEJA: Detalle = { canal: [0, 0.5, 0, 0.5], escala: 0.8, color: 0.14, mancha: 0.20, relieve: 1.6, lejos: 45, onda: { paso: 0.24, eje: [1, 0, 0], teja: 0.36 } };
@@ -176,7 +177,8 @@ export function clasificar(nombre: string): Detalle | null {
   if (/cubierta|remate_lamina/.test(n)) return LAMINA;
   if (/toldo/.test(n)) return TELA;
   if (/piedra/.test(n)) return PIEDRA;
-  if (/concreto|murete|rampa|grava|baldosa|banda|bloque/.test(n)) return CONCRETO;
+  if (/grava/.test(n)) return GRAVA;
+  if (/concreto|murete|rampa|baldosa|banda|bloque/.test(n)) return CONCRETO;
   if (/muro|pintura|blanco|amarill|pilar|cielo|alero|rojo_interior|azul_accesible|verde_borde/.test(n)) return ESTUCO;
   return null;
 }
