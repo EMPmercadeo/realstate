@@ -24,6 +24,22 @@
   "muestras": 16
  },
  {
+  "id": "salonA@gris",
+  "nombre": "Salón grande 1",
+  "archivo": "/pano/salonA-gris.jpg",
+  "mini": "/pano/salonA-gris_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "acceso@gris",
+  "nombre": "Entrada del edificio gris",
+  "archivo": "/pano/acceso-gris.jpg",
+  "mini": "/pano/acceso-gris_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
   "id": "recepcion@amarilla",
   "nombre": "Recepción 24 h",
   "archivo": "/pano/recepcion-amarilla.jpg",
@@ -36,6 +52,22 @@
   "nombre": "Comedor y TV",
   "archivo": "/pano/comedor-amarilla.jpg",
   "mini": "/pano/comedor-amarilla_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "terapia@amarilla",
+  "nombre": "Terapia con familiares",
+  "archivo": "/pano/terapia-amarilla.jpg",
+  "mini": "/pano/terapia-amarilla_m.jpg",
+  "ancho": 2048,
+  "muestras": 16
+ },
+ {
+  "id": "suite@amarilla",
+  "nombre": "Suite",
+  "archivo": "/pano/suite-amarilla.jpg",
+  "mini": "/pano/suite-amarilla_m.jpg",
   "ancho": 2048,
   "muestras": 16
  }
