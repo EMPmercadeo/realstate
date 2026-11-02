@@ -415,10 +415,10 @@ def cesped_procedural(nombre, base=(0.20, 0.32, 0.075), seco=(0.42, 0.40, 0.17),
     fino = rampa(ruido(3.5, 6.0, 0.7).outputs['Fac'], 0.3, 0.75, tuple(v * 0.85 for v in base), tuple(v * 1.15 for v in base)).outputs['Color']
     mf = nt.nodes.new('ShaderNodeMix'); mf.data_type = 'RGBA'; mf.blend_type = 'MULTIPLY'; mf.inputs['Factor'].default_value = 0.6
     nt.links.new(tono, mf.inputs[6]); nt.links.new(fino, mf.inputs[7]); col = mf.outputs[2]
-    fs = rampa(ruido(0.025, 3.0).outputs['Fac'], 0.58, 0.72, (0, 0, 0), (1, 1, 1)).outputs['Color']
+    fs = rampa(ruido(0.025, 3.0).outputs['Fac'], 0.60, 0.80, (0, 0, 0), (0.45, 0.45, 0.45)).outputs['Color']
     rs = nt.nodes.new('ShaderNodeRGB'); rs.outputs[0].default_value = (*seco, 1)
     col = mezclar(fs, col, rs.outputs[0])
-    ft = rampa(ruido(0.12, 5.0).outputs['Fac'], 0.71, 0.76, (0, 0, 0), (1, 1, 1)).outputs['Color']
+    ft = rampa(ruido(0.12, 5.0).outputs['Fac'], 0.74, 0.79, (0, 0, 0), (0.8, 0.8, 0.8)).outputs['Color']
     rt = nt.nodes.new('ShaderNodeRGB'); rt.outputs[0].default_value = (*tierra, 1)
     col = mezclar(ft, col, rt.outputs[0])
     nt.links.new(col, b.inputs['Base Color'])
@@ -466,13 +466,7 @@ def preparar_entorno_v2():
                 for k, sl in enumerate(o.material_slots):
                     if sl.material and sl.material.name == nombre:
                         o.material_slots[k].link = 'OBJECT'; o.material_slots[k].material = mat
-    # calles: la C.A con asfalto, la del oeste de tierra (la web las dibuja por su cuenta)
-    for o in bpy.data.objects:
-        if o.name.startswith('via_') and o.type == 'MESH':
-            m = (calle_procedural('tierra_v2', (0.36, 0.27, 0.18), 0.95, 25, 0.3) if 'oeste' in o.name
-                 else calle_procedural('asfalto_v2', (0.10, 0.10, 0.105), 0.8, 60, 0.2))
-            for k in range(len(o.material_slots)):
-                o.material_slots[k].link = 'OBJECT'; o.material_slots[k].material = m
+    # calles: asfalto y calle de tierra de materiales_fachada.aplicar() (en materiales_v2)
     # árboles grandes del jardín (en la web son tarjetas; aquí copas de tarjetas con la misma textura de hojas)
     col = bpy.data.collections.new('ArbolesV2'); scene.collection.children.link(col)
     hojas = os.path.join(ROOT, 'web', 'public', 'tex', 'hojas.png')
@@ -488,14 +482,22 @@ def preparar_entorno_v2():
 
 
 def materiales_v2():
-    """Con texturas de ambientCG en assets/pbr se reemplazan los materiales de fachada; sin ellas quedan los del modelo."""
+    """Repello con desgaste, teja metálica, láminas y calles procedurales (materiales_fachada.py); con texturas de
+    ambientCG en assets/pbr se usan esas en su lugar."""
+    import materiales_fachada
+    materiales_fachada.aplicar(suelo=False)
+    E = materiales_fachada.estuco
+    E('n_bloque', (0.56, 0.56, 0.54), sucio=0.65, manchas=0.35)              # muro de bloques del fondo
+    E('n_amarillo_muro', (0.62, 0.42, 0.13), sucio=0.7, manchas=0.35)       # muro amarillo de la casa
+    E('n_pilar_arena', (0.58, 0.47, 0.32), sucio=0.5, manchas=0.3)          # pilares color arena de la cerca
+    E('n_murete_gris', (0.42, 0.43, 0.44), sucio=0.6, manchas=0.3)
     ok = []
     for nm in ('cesped_v2', 'cesped_lote_v2'):
         if rehacer_pbr(nm, 'Grass004', 2.4, tint=(0.66, 1.0, 0.52), mezcla=('Ground037', 3.0, 0.035), variacion=(0.012, 0.15), bump=0.25): ok.append(nm)
     for nm, st, tile, tint in (('n_muro_gris', 'Concrete034', 2.2, (0.78, 0.84, 0.92)), ('n_concreto', 'Concrete034', 2.0, None),
                                ('n_concreto_claro', 'Concrete034', 2.0, (1.1, 1.1, 1.06)), ('n_grava', 'Gravel022', 1.6, None),
                                ('n_muro_casa', 'Plaster001', 2.0, (1.0, 0.78, 0.36)), ('n_amarillo_muro', 'Plaster001', 2.0, (1.0, 0.78, 0.36)),
-                               ('asfalto_v2', 'Asphalt012', 4.0, (0.75, 0.75, 0.76))):
+                               ('n_via', 'Asphalt012', 4.0, (0.75, 0.75, 0.76))):
         if rehacer_pbr(nm, st, tile, tint=tint, bump=0.2): ok.append(nm)
     cs = next((s for s in ('CorrugatedSteel005', 'CorrugatedSteel004', 'CorrugatedSteel002') if pbr_set(s)), None)
     if cs:

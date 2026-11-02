@@ -101,4 +101,18 @@ ruta de `web/src/data/cine.ts`. Escribe `web/public/clips/sobrevuelo-v2.mp4`, `s
 & $b -b -P blender\cine_render.py -- --modelo bloqueo --w 1920 --samples 128       # final (≈ 1 h)
 ```
 
-Si existen `assets/pbr` (ambientCG) se usan para césped, concreto, repello, grava, asfalto y láminas.
+Sin `assets/pbr` usa los materiales procedurales de `blender/materiales_fachada.py` (repello con desgaste,
+teja metálica, lámina, baldosa, calle de tierra); con `assets/pbr` (ambientCG) usa esas texturas.
+En la nube, un cuadro de 640 px con 12 muestras tarda ~12 s en CPU (prueba: `--solo 0,300,500`).
+
+### Prompt para Claude Code en la PC (pegar en PowerShell dentro de `realstate`)
+
+```
+Lee docs/PLAN-GPU.md (secciones 6 y 7) y docs/estado.md. Tengo una RTX 3080 y Blender en <RUTA>.
+1. git pull. Reconstruye el modelo: & $b -b -P blender\bloqueo.py -- --solo ninguno
+2. Vistas 360° finales: & $b -b -P blender\panoramas.py -- --ids todas --ancho 6144 --muestras 256 --gpu
+   Revisa cada una (abre los JPG de web\public\pano). Si la del jardín se ve de juguete, quítala del manifiesto.
+3. Sobrevuelo v2: primero --modelo bloqueo --preview y revisa 6 cuadros; corrige encuadres o luz; luego
+   --modelo bloqueo --w 1920 --samples 128. Verifica que sobrevuelo-v2.mp4 pese < 25 MB.
+4. cd web; npm run build. Commit y push.
+```
