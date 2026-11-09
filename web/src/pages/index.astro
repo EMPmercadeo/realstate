@@ -4,7 +4,7 @@ import Cine from '@/components/Cine.astro';
 import panos from '@/data/panoramas.json';
 import { listarPublicos } from '@/data/existentes';
 import Pie from '@/components/Pie.astro';
-import { CONTACTO, hayContacto, enlaceContacto } from '@/data/sitio';
+import FormContacto from '@/components/FormContacto.astro';
 // tarjetas del avance: solo las que ya tienen render (al cambiar la distribución se re-renderizan)
 const hay = new Set(listarPublicos('avances'));
 const tarjetas = [
@@ -117,18 +117,8 @@ const comparar = [
         </div>
         <div class="inv-caja">
           <h3>Solicita el expediente completo</h3>
-          {hayContacto ? (
-            <>
-              <p>Escríbenos y te enviamos los planos, el programa de espacios y la proyección de operación.</p>
-              <div class="acciones">
-                {CONTACTO.whatsapp && <a class="btn" href={enlaceContacto()}>Escribir por WhatsApp</a>}
-                {CONTACTO.correo && <a class="btn claro" href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>}
-              </div>
-            </>
-          ) : (
-            <p>Te enviamos los planos, el programa de espacios y la proyección de operación.</p>
-          )}
-          <p class="small muted">Mientras tanto: <a href="/recorrido">recorrido 3D</a> · <a href="/360">vista 360°</a> · <a href="/interiores">interiores y planos</a>.</p>
+          <p>Planos, programa de espacios y personal mínimo, o coordina una videollamada o una visita.</p>
+          <FormContacto oscuro />
         </div>
       </div>
     </section>

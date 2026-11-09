@@ -12,19 +12,22 @@ export const MENU_PIE = [
   { href: '/blog', t: 'Blog' },
 ] as const;
 
-// Contacto para "Solicitar información". Se llena aquí y todo el sitio lo usa.
-//   whatsapp: solo dígitos con código de país, p. ej. '50760001234'
-//   correo:   p. ej. 'ventas@realstatepanama.com'
+// Contacto para "Solicitar información". Se cambia aquí y todo el sitio lo usa.
+//   whatsapp: solo dígitos con código de país, p. ej. '50760001234' (vacío = no se muestra)
+//   correo:   adonde llegan las solicitudes del formulario de /contacto
 export const CONTACTO = {
   whatsapp: '',
-  correo: '',
+  correo: 'empsignature@gmail.com',
   mensaje: 'Hola, me interesa la Residencia Altos de San Cristóbal (David, Chiriquí). ¿Me envían el expediente para inversionistas?',
 };
 
 export const hayContacto = !!(CONTACTO.whatsapp || CONTACTO.correo);
 
+// Todos los botones "Solicitar información" llevan a la página del formulario.
 export function enlaceContacto(): string {
-  if (CONTACTO.whatsapp) return `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(CONTACTO.mensaje)}`;
-  if (CONTACTO.correo) return `mailto:${CONTACTO.correo}?subject=${encodeURIComponent('Residencia Altos de San Cristóbal · expediente')}&body=${encodeURIComponent(CONTACTO.mensaje)}`;
-  return '/#inversionistas';
+  return '/contacto';
+}
+
+export function enlaceWhatsapp(texto = CONTACTO.mensaje): string {
+  return CONTACTO.whatsapp ? `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent(texto)}` : '';
 }

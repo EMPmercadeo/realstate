@@ -1,0 +1,36 @@
+---
+import Base from '@/layouts/Base.astro';
+import FormContacto from '@/components/FormContacto.astro';
+---
+<Base title="Solicitar información · Residencia Altos de San Cristóbal"
+      description="Solicita el expediente para inversionistas de la Residencia Altos de San Cristóbal (David, Chiriquí), agenda una videollamada o una visita a la propiedad.">
+  <section class="seccion ct">
+    <div class="container ct-in">
+      <div class="ct-txt">
+        <p class="ct-sup">Para inversionistas</p>
+        <h1>Solicita el expediente completo</h1>
+        <p class="lead">Una residencia de retiro lista para operar en Altos de San Cristóbal, David, Chiriquí: dos edificios, 26 camas, jardín y áreas comunes. Te enviamos los planos, el programa de espacios y el personal mínimo, o coordinamos una videollamada o una visita.</p>
+        <ul class="lista-plana">
+          <li><span>Capacidad</span><span>26 camas en dos edificios</span></li>
+          <li><span>Servicios</span><span>residencia, pasadía y estadías temporales</span></li>
+          <li><span>Entrega</span><span>adecuada y equipada, llave en mano</span></li>
+          <li><span>Licencias</span><span>las tramita el comprador</span></li>
+        </ul>
+        <p class="small muted ct-ver">Antes de escribir puedes ver el <a href="/recorrido">recorrido 3D</a>, las <a href="/360">vistas 360°</a> y los <a href="/interiores">interiores y planos</a>.</p>
+      </div>
+      <div class="ct-caja">
+        <FormContacto />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .ct { padding-top: 3.5rem; }
+  .ct-in { display: grid; grid-template-columns: 1fr 1.05fr; gap: 3rem; align-items: start; }
+  .ct-sup { color: var(--verde-2); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+  .ct h1 { font-size: clamp(2.1rem, 4.6vw, 3.4rem); max-width: 14ch; }
+  .ct-ver { margin-top: 1.4rem; }
+  .ct-caja { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: clamp(1.2rem, 3vw, 2rem); box-shadow: 0 24px 60px -40px rgba(0, 0, 0, 0.35); }
+  @media (max-width: 860px) { .ct-in { grid-template-columns: 1fr; gap: 2rem; } .ct { padding-top: 2rem; } }
+</style>

@@ -1,0 +1,96 @@
+---
+// Formulario de contacto sin servidor: arma el mensaje y abre el correo (o WhatsApp, si hay número)
+// ya redactado hacia el contacto de web/src/data/sitio.ts. No usa servicios externos.
+import { CONTACTO, enlaceWhatsapp } from '@/data/sitio';
+interface Props { oscuro?: boolean }
+const { oscuro = false } = Astro.props;
+---
+<form class:list={['fc', { oscuro }]} data-correo={CONTACTO.correo} data-whatsapp={CONTACTO.whatsapp} novalidate>
+  <div class="fc-fila">
+    <label><span class="fc-t">Nombre</span><input name="nombre" autocomplete="name" required /></label>
+    <label><span class="fc-t">Correo</span><input name="correo" type="email" autocomplete="email" required /></label>
+  </div>
+  <div class="fc-fila">
+    <label><span class="fc-t">País</span><input name="pais" autocomplete="country-name" /></label>
+    <label><span class="fc-t">Teléfono o WhatsApp <small>(opcional)</small></span><input name="telefono" type="tel" autocomplete="tel" /></label>
+  </div>
+  <fieldset>
+    <legend>Me interesa</legend>
+    <label class="fc-op"><input type="radio" name="interes" value="Recibir el expediente para inversionistas" checked />Recibir el expediente</label>
+    <label class="fc-op"><input type="radio" name="interes" value="Agendar una videollamada" />Agendar una videollamada</label>
+    <label class="fc-op"><input type="radio" name="interes" value="Visitar la propiedad en David, Chiriquí" />Visitar la propiedad</label>
+  </fieldset>
+  <label><span class="fc-t">Mensaje <small>(opcional)</small></span><textarea name="mensaje" rows="3"></textarea></label>
+  <p class="fc-error" role="alert" hidden>Escribe tu nombre y un correo válido.</p>
+  <div class="fc-botones">
+    {CONTACTO.correo && <button class="btn" type="submit" value="correo">Enviar por correo</button>}
+    {CONTACTO.whatsapp && <button class="btn claro" type="submit" value="whatsapp">Enviar por WhatsApp</button>}
+  </div>
+  <p class="fc-nota">Se abre tu correo{CONTACTO.whatsapp ? ' o WhatsApp' : ''} con el mensaje listo; solo falta enviarlo. También puedes escribir directo a <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>{CONTACTO.whatsapp && <> o por <a href={enlaceWhatsapp()}>WhatsApp</a></>}.</p>
+  <p class="fc-listo" role="status" hidden>Listo: se abrió tu correo con el mensaje. Si no se abrió, copia los datos y escribe a <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>.</p>
+</form>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form.fc').forEach((f) => {
+    f.addEventListener('input', () => { f.querySelector<HTMLElement>('.fc-error')!.hidden = true; });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const d = new FormData(f);
+      const v = (k: string) => String(d.get(k) || '').trim();
+      const correoOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('correo'));
+      const err = f.querySelector<HTMLElement>('.fc-error')!;
+      if (!v('nombre') || !correoOk) { err.hidden = false; (f.querySelector(!v('nombre') ? '[name=nombre]' : '[name=correo]') as HTMLElement).focus(); return; }
+      err.hidden = true;
+      const lineas = [
+        'Hola, me interesa la Residencia Altos de San Cristóbal (David, Chiriquí).',
+        '',
+        `Me interesa: ${v('interes')}`,
+        `Nombre: ${v('nombre')}`,
+        `Correo: ${v('correo')}`,
+      ];
+      if (v('pais')) lineas.push(`País: ${v('pais')}`);
+      if (v('telefono')) lineas.push(`Teléfono / WhatsApp: ${v('telefono')}`);
+      if (v('mensaje')) lineas.push('', v('mensaje'));
+      lineas.push('', '— Enviado desde realstatepanama.com');
+      const texto = lineas.join('\n');
+      const via = ((e as SubmitEvent).submitter as HTMLButtonElement | null)?.value || 'correo';
+      if (via === 'whatsapp' && f.dataset.whatsapp) {
+        window.open(`https://wa.me/${f.dataset.whatsapp}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+      } else {
+        const asunto = `Residencia Altos de San Cristóbal · ${v('interes')} · ${v('nombre')}`;
+        location.href = `mailto:${f.dataset.correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`;
+      }
+      f.querySelector<HTMLElement>('.fc-listo')!.hidden = false;
+    });
+  });
+</script>
+
+<style is:global>
+  .fc { display: grid; gap: 0.9rem; }
+  .fc-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .fc label { display: grid; gap: 0.3rem; font-size: 0.88rem; font-weight: 500; color: var(--ink); }
+  .fc label small { font-size: inherit; font-weight: 400; color: var(--muted); }
+  .fc input:not([type=radio]), .fc textarea { font: inherit; font-size: 1rem; padding: 0.7rem 0.85rem; min-height: 46px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); width: 100%; }
+  .fc input:focus, .fc textarea:focus { outline: 2px solid var(--ocre); outline-offset: 1px; border-color: transparent; }
+  .fc textarea { resize: vertical; }
+  .fc fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .fc legend { font-size: 0.88rem; font-weight: 500; margin-bottom: 0.4rem; padding: 0; }
+  .fc .fc-op { display: inline-flex; flex-direction: row; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.95rem; border-radius: 999px; border: 1px solid var(--line); background: #fff; cursor: pointer; font-weight: 400; }
+  .fc .fc-op:has(input:checked) { border-color: var(--verde); background: var(--cielo); font-weight: 500; }
+  .fc .fc-op input { accent-color: var(--verde); margin: 0; }
+  .fc-botones { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .fc-botones .btn { min-height: 48px; font-size: 1rem; }
+  .fc-error { margin: 0; color: #b3261e; font-size: 0.9rem; }
+  .fc-nota, .fc-listo { margin: 0; font-size: 0.84rem; color: var(--muted); }
+  .fc-listo { color: var(--verde); font-weight: 500; }
+  .fc.oscuro label, .fc.oscuro legend { color: #fff; }
+  .fc.oscuro label small, .fc.oscuro .fc-nota { color: rgba(255, 255, 255, 0.65); }
+  .fc.oscuro .fc-nota a, .fc.oscuro .fc-listo a { color: #fff; }
+  .fc.oscuro .fc-listo { color: var(--ocre); }
+  .fc.oscuro .fc-op { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
+  .fc.oscuro .fc-op:has(input:checked) { background: rgba(201, 154, 60, 0.22); border-color: var(--ocre); }
+  .fc.oscuro .fc-error { color: #ffb4a9; }
+  .fc.oscuro .fc-op input { accent-color: var(--ocre); color-scheme: dark; }
+  .fc.oscuro .btn { background: var(--ocre); color: #17140a !important; }
+  @media (max-width: 640px) { .fc-fila { grid-template-columns: 1fr; } }
+</style>
