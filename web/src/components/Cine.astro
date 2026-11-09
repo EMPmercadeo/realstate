@@ -3,6 +3,8 @@ import '@/styles/recorrido.css';
 // Portada cinematográfica: el scroll mueve la cámara por el mundo 3D.
 import { PARADAS_CINE } from '@/data/cine';
 import { listarPublicos } from '@/data/existentes';
+import MenuSitio from '@/components/MenuSitio.astro';
+import { MENU, enlaceContacto } from '@/data/sitio';
 const pad = (n: number) => String(n).padStart(2, '0');
 const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'fotos-reales');
 ---
@@ -23,10 +25,13 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
 
     <div class="rc-top">
       <a class="rc-marca" href="/"><i></i><span>Residencia Altos de San Cristóbal</span></a>
-      <nav class="rc-nav" aria-label="Paradas">
-        {PARADAS_CINE.map((p) => <button type="button" data-u={p.u}>{p.etiqueta}</button>)}
+      <nav class="rc-nav rc-sitio" aria-label="Principal">
+        {MENU.filter((m) => !m.href.startsWith('/#')).map((m) => <a href={m.href}>{m.t}</a>)}
       </nav>
-      <a class="rc-cta" href="#inversionistas">Solicitar expediente</a>
+      <div class="rc-der">
+        <a class="rc-cta" href={enlaceContacto()}>Solicitar información</a>
+        <div class="rc-menu"><MenuSitio /></div>
+      </div>
     </div>
 
     <div class="rc-copias">
@@ -77,7 +82,7 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
   const copias = Array.from(root.querySelectorAll<HTMLElement>('.rc-copy'));
   const fotos = Array.from(root.querySelectorAll<HTMLElement>('.cine-foto'));
   const puntos = Array.from(root.querySelectorAll<HTMLButtonElement>('.rc-ruta button'));
-  const navs = Array.from(root.querySelectorAll<HTMLButtonElement>('.rc-nav button'));
+  const navs: HTMLButtonElement[] = [];
   const barra = root.querySelector<HTMLElement>('.rc-barra span')!;
   const hint = root.querySelector<HTMLElement>('.rc-hint')!;
   const carga = document.getElementById('cine-carga')!;
@@ -223,6 +228,13 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
   .cine-foto-marco img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .cine-foto-pill { position: absolute; left: 12px; top: 12px; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; padding: 6px 10px; border-radius: 999px; background: var(--acento); color: #141008; }
   .cine-foto-pill.hoy { background: rgba(0, 0, 0, 0.55); color: #fff; }
+  .rc-sitio a { font-size: 0.84rem; color: var(--rc-ink-2); text-decoration: none; padding: 7px 14px; border-radius: 999px; transition: color 0.25s, background 0.25s; }
+  .rc-sitio a:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+  .rc-der { display: flex; align-items: center; gap: 10px; }
+  .rc-menu { display: none; }
+  .rc-menu .menu summary { background: rgba(255, 255, 255, 0.1); color: var(--rc-ink); border: 1px solid rgba(255, 255, 255, 0.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  @media (max-width: 1100px) { .rc-sitio { display: none; } .rc-menu { display: block; } }
+  @media (max-width: 860px) { .rc-der .rc-cta { display: none; } }
   .cine-foto figcaption { margin-top: 10px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rc-ink-2); }
   @media (max-width: 860px) {
     .cine-foto { right: 18px; left: auto; top: calc(70px + env(safe-area-inset-top)); transform: none; width: 42vw; }

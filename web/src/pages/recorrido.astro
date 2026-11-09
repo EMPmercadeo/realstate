@@ -1,82 +1,139 @@
 ---
 import Base from '@/layouts/Base.astro';
+import MenuSitio from '@/components/MenuSitio.astro';
+import { PARADAS_3D } from '@/data/paradas';
+import { enlaceContacto } from '@/data/sitio';
+const icono = {
+  maqueta: 'M12 3l8 4.5v9L12 21l-8-4.5v-9z M12 12l8-4.5 M12 12v9 M12 12L4 7.5',
+  caminar: 'M13 4.5a1.6 1.6 0 1 0 .01 0 M10 21l2-6-2.5-2.5 1.5-5 3 3 3 1 M9.5 8.5L7 12 M12 15l3 6',
+  planos: 'M4 4h16v16H4z M4 12h7 M11 4v16 M15 12h5',
+  espacios: 'M8 6h12 M8 12h12 M8 18h12 M4 6h.01 M4 12h.01 M4 18h.01',
+  capas: 'M12 3l9 5-9 5-9-5z M3 13l9 5 9-5',
+  etiqueta: 'M3 7h12l4 5-4 5H3z',
+  pantalla: 'M4 9V4h5 M20 9V4h-5 M4 15v5h5 M20 15v5h-5',
+};
 ---
-<Base title="Recorrido 3D · Residencia Altos de San Cristóbal" full sinHeader>
+<Base title="Recorrido 3D · Residencia Altos de San Cristóbal"
+      description="Recorre en 3D la Residencia Altos de San Cristóbal ya adecuada: los dos edificios, el jardín y cada espacio, con vistas 360°, renders y fotos reales."
+      full sinHeader>
   <div class="visor" id="visor">
-    <div id="pantalla-carga" class="pantalla-carga">
-      <div class="pc-caja">
-        <p class="pc-sup">Residencia Altos de San Cristóbal · David, Chiriquí</p>
-        <h1>Recorre la residencia terminada</h1>
-        <p>Maqueta digital navegable del terreno y sus dos edificios, con las fotos reales de cada espacio y la propuesta de cómo quedará.</p>
-        <div class="pc-barra"><div id="carga"></div></div>
-        <p class="pc-pct"><span id="carga-pct">Cargando el modelo…</span></p>
-        <button id="btn-entrar" class="btn" disabled>Cargando…</button>
-        <p class="pc-nota">Al entrar comienza un recorrido guiado. Puedes detenerlo en cualquier momento y moverte libremente.</p>
-        <p class="pc-nota"><a href="/avances">Ver los interiores amueblados (avance del {'30-10-2026'})</a></p>
+    <!-- portada de carga -->
+    <div id="pantalla-carga" class="vc">
+      <div class="vc-fondo" style="background-image:url('/avances/int_gris_hosp.jpg')"></div>
+      <div class="vc-caja">
+        <p class="vc-sup">Residencia Altos de San Cristóbal · David, Chiriquí</p>
+        <h1>Recorrido 3D</h1>
+        <p class="vc-txt">El terreno y sus dos edificios ya adecuados como residencia de retiro: 26 camas, jardín y áreas comunes. Recórrelo a tu ritmo o deja que te lo mostremos.</p>
+        <div class="vc-barra" aria-hidden="true"><div id="carga"></div></div>
+        <p class="vc-pct" id="carga-pct">Cargando el modelo…</p>
+        <div class="vc-botones">
+          <button id="btn-entrar" class="vbtn vbtn-p" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" /></svg>Recorrido guiado
+          </button>
+          <button id="btn-libre" class="vbtn vbtn-g" disabled>Explorar por mi cuenta</button>
+        </div>
+        <p class="vc-nota">¿Conexión lenta? <a href="/360">Ver las vistas 360°</a> · <a href="/interiores">Ver interiores y planos</a></p>
       </div>
     </div>
 
-    <!-- barra superior propia: en esta página no va el menú del sitio, el 3D ocupa toda la pantalla -->
-    <header class="v-top">
-      <a class="v-volver" href="/" aria-label="Volver al inicio">
+    <!-- barra superior -->
+    <header class="vt">
+      <a class="vt-marca" href="/" aria-label="Volver al inicio">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
         <span>Residencia Altos</span>
       </a>
-      <a class="v-avance" href="/avances"><span class="solo-escritorio">Interiores amueblados</span><span class="solo-movil-i">Interiores</span></a>
+      <p class="vt-lugar" id="vt-lugar" aria-live="polite">Vista general</p>
+      <div class="vt-der">
+        <button id="btn-etiquetas" class="vt-ico on" aria-pressed="true" title="Nombres de los espacios">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.etiqueta} /></svg><span class="sr">Nombres de los espacios</span>
+        </button>
+        <button id="btn-pantalla" class="vt-ico" title="Pantalla completa" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.pantalla} /></svg><span class="sr">Pantalla completa</span>
+        </button>
+        <MenuSitio claro />
+        <a class="vt-cta" href={enlaceContacto()}><span class="solo-escritorio">Solicitar información</span><span class="solo-movil-i">Info</span></a>
+      </div>
     </header>
 
-    <div class="visor-ui">
-      <!-- escritorio: botones arriba a la izquierda · celular: barra de pestañas abajo -->
-      <nav class="dock" aria-label="Modo de recorrido">
-        <button id="btn-tour" class="tab">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" /></svg>
-          <span class="tab-t"><span class="solo-escritorio">Recorrido guiado</span><span class="solo-movil-i">Guiado</span></span>
-        </button>
-        <button data-modo="orbita" class="tab on">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z M12 12l8-4.5 M12 12v9 M12 12L4 7.5" /></svg>
-          <span>Maqueta</span>
-        </button>
-        <button data-modo="recorrido" class="tab">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="1.8" /><path d="M10 21l2-6-2.5-2.5 1.5-5 3 3 3 1 M9.5 8.5L7 12 M12 15l3 6" /></svg>
-          <span>Caminar</span>
-        </button>
-        <button id="btn-panel" class="tab solo-movil" aria-expanded="false" aria-controls="panel">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12 M8 12h12 M8 18h12 M4 6h.01 M4 12h.01 M4 18h.01" /></svg>
-          <span>Espacios</span>
-        </button>
-      </nav>
-      <div class="rail" role="group" aria-label="Nivel que se ve">
-        <button id="btn-etiquetas" class="on" aria-pressed="true" title="Mostrar u ocultar los nombres de los espacios">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h12l4 5-4 5H3z" /></svg>
-          <span>Nombres</span>
-        </button>
+    <!-- niveles -->
+    <div class="niveles" id="niveles">
+      <button class="niv-btn" id="btn-niveles" aria-expanded="false" aria-controls="niv-lista">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.capas} /></svg>
+        <span id="niv-actual">Todo</span>
+      </button>
+      <div class="niv-lista" id="niv-lista" role="group" aria-label="Nivel que se ve">
         <button data-vista="sitio:99" class="on">Todo</button>
-        <button data-vista="amarilla:1"><b>Casa</b> <span>PB</span></button>
-        <button data-vista="amarilla:2"><b>Casa</b> <span>PA</span></button>
-        <button data-vista="gris:1"><b>Gris</b> <span>PB</span></button>
-        <button data-vista="gris:2"><b>Gris</b> <span>PA</span></button>
+        <p>Casa amarilla</p>
+        <button data-vista="amarilla:2">Planta alta</button>
+        <button data-vista="amarilla:1">Planta baja</button>
+        <p>Edificio gris</p>
+        <button data-vista="gris:2">Planta alta</button>
+        <button data-vista="gris:1">Planta baja</button>
       </div>
-      <div id="hint" class="hint">Arrastra para girar · rueda para acercar · toca una etiqueta o elige un espacio en el panel</div>
     </div>
 
-    <aside class="panel" id="panel" aria-label="Espacios de la residencia">
+    <!-- ficha del lugar actual -->
+    <section class="ficha" id="ficha" aria-live="polite">
+      <button class="ficha-img" id="ficha-img" type="button" hidden aria-label="Ampliar imagen"><img alt="" /></button>
+      <div class="ficha-cuerpo">
+        <p class="ficha-lugar" id="ficha-lugar"></p>
+        <h2 id="ficha-titulo">Vista general</h2>
+        <p class="ficha-texto" id="ficha-texto"></p>
+        <ul class="ficha-datos" id="ficha-datos"></ul>
+      </div>
+      <div class="ficha-acciones" id="ficha-acciones"></div>
+      <button class="ficha-cerrar" id="ficha-cerrar" aria-label="Ocultar la ficha">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12 M18 6L6 18" /></svg>
+      </button>
+    </section>
+
+    <!-- barra inferior: modos · paradas · índice -->
+    <nav class="vb" aria-label="Navegación del recorrido">
+      <div class="vb-modos" role="group" aria-label="Modo de vista">
+        <button data-modo="orbita" class="on" title="Maqueta 3D: gira y acerca"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.maqueta} /></svg><span>Maqueta</span></button>
+        <button data-modo="recorrido" title="Caminar adentro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.caminar} /></svg><span>Caminar</span></button>
+        <button id="btn-planos" title="Planos de cada piso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.planos} /></svg><span>Planos</span></button>
+        <button id="btn-panel" class="solo-movil" aria-expanded="false" aria-controls="panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.espacios} /></svg><span>Espacios</span></button>
+      </div>
+      <div class="reel">
+        <button class="reel-play" id="btn-tour" aria-label="Reproducir el recorrido guiado" title="Recorrido guiado">
+          <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" /></svg>
+          <svg class="i-pausa" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14 M16 5v14" /></svg>
+        </button>
+        <button class="reel-abrir" id="btn-reel" type="button">Paradas del recorrido</button>
+        <ol class="reel-lista" id="reel">
+          {PARADAS_3D.map((p, i) => (
+            <li>
+              <button type="button" data-id={p.id} data-i={i} title={p.nombre}>
+                <img src={p.mini} alt="" loading="lazy" width="400" height="250" />
+                <span>{p.nombre}</span>
+                <i class="reel-prog"></i>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <button class="vb-indice solo-escritorio-f" id="btn-panel-d" aria-controls="panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={icono.espacios} /></svg><span>Todos los espacios</span></button>
+    </nav>
+
+    <!-- índice de espacios -->
+    <aside class="panel" id="panel" aria-label="Todos los espacios" aria-hidden="true">
       <div class="panel-cab">
         <span class="panel-asa" aria-hidden="true"></span>
         <div>
-          <h2>Espacios</h2>
-          <p class="muted">2.500 m² · dos edificios · 26 camas</p>
+          <h2>Todos los espacios</h2>
+          <p>2.500 m² · dos edificios · 26 camas</p>
         </div>
-        <button id="panel-cerrar" class="panel-cerrar" aria-label="Cerrar la lista de espacios">
+        <button id="panel-cerrar" class="panel-cerrar" aria-label="Cerrar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12 M18 6L6 18" /></svg>
         </button>
       </div>
       <div id="panel-lista" class="panel-lista"></div>
-      <p class="muted small">Modelo amueblado al 01-11-2026: medidas tomadas del satélite, de Street View y de las fotos, pendientes de medir en sitio. Las fotos "así quedará" son propuestas sobre la foto real.</p>
+      <p class="panel-nota">Medidas tomadas del satélite, de Street View y de las fotos, pendientes de medir en sitio. Muebles y equipos de referencia. Las fotos "así quedará" son propuestas sobre la foto real.</p>
     </aside>
 
-    <div id="subtitulo" class="subtitulo" aria-live="polite"></div>
-    <div id="joy" class="joy" aria-label="Joystick para caminar"><span></span></div>
-    <div id="comparador" class="comparador"></div>
+    <div id="ayuda" class="ayuda" aria-hidden="true"></div>
+    <div id="vmodal" class="vmodal" role="dialog" aria-modal="true" aria-label="Imagen" hidden></div>
   </div>
   <script>
     import { iniciarVisor } from '@/visor/visor';

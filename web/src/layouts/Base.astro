@@ -1,23 +1,41 @@
 ---
 import '@/styles/global.css';
-interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; noindex?: boolean; }
+import '@/styles/visor.css';
+import MenuSitio from '@/components/MenuSitio.astro';
+import Pie from '@/components/Pie.astro';
+import { MENU, enlaceContacto } from '@/data/sitio';
+interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; noindex?: boolean; imagen?: string; }
 const {
   title,
-  description = 'Residencia de retiro y cuidado para adultos mayores en Altos de San Cristóbal, David, Chiriquí. Recorrido cinematográfico del proyecto terminado.',
+  description = 'Residencia de retiro y cuidado para adultos mayores en Altos de San Cristóbal, David, Chiriquí: dos edificios, 26 camas y jardín, lista para operar. Recorrido 3D, vistas 360° y planos.',
   lang = 'es',
   full = false,
   sinHeader = false,
   noindex = false,
+  imagen = '/avances/int_gris_hosp.jpg',
 } = Astro.props;
-import panos from '@/data/panoramas.json';
+const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
+const canonica = new URL(Astro.url.pathname, Astro.site);
+const og = new URL(imagen, Astro.site);
 ---
 <!doctype html>
 <html lang={lang}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonica} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#17352a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_PA" />
+    <meta property="og:site_name" content="Residencia Altos de San Cristóbal" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,25 +43,18 @@ import panos from '@/data/panoramas.json';
   </head>
   <body>
     {!sinHeader && (
-      <header class="container">
-        <nav class="nav">
-          <a class="brand" href="/">Residencia Altos de San Cristóbal</a>
-          <ul>
-            <li><a href="/#proyecto">El proyecto</a></li>
-            <li><a href="/#espacios">Espacios</a></li>
-            {panos.length > 0 && <li><a href="/360">Vista 360°</a></li>}
-            <li><a href="/avances">Avances</a></li>
-            <li><a href="/blog">Blog</a></li>
-            <li><a class="btn" href="/#recorrido">Recorrido</a></li>
+      <header class="cabecera">
+        <nav class="nav container" aria-label="Principal">
+          <a class="brand" href="/"><i aria-hidden="true"></i>Residencia Altos de San Cristóbal</a>
+          <ul class="nav-links">
+            {MENU.map((m) => <li><a href={m.href} aria-current={actual === m.href ? 'page' : undefined}>{m.t}</a></li>)}
+            <li><a class="btn" href={enlaceContacto()}>Solicitar información</a></li>
           </ul>
+          <div class="nav-movil"><MenuSitio /></div>
         </nav>
       </header>
     )}
     {full ? <slot /> : <main><slot /></main>}
-    {!full && (
-      <footer>
-        <div class="container">Residencia Altos de San Cristóbal · David, Chiriquí, Panamá. Proyecto en comercialización.</div>
-      </footer>
-    )}
+    {!full && <Pie />}
   </body>
 </html>

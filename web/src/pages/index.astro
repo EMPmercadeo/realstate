@@ -3,13 +3,15 @@ import Base from '@/layouts/Base.astro';
 import Cine from '@/components/Cine.astro';
 import panos from '@/data/panoramas.json';
 import { listarPublicos } from '@/data/existentes';
+import Pie from '@/components/Pie.astro';
+import { CONTACTO, hayContacto, enlaceContacto } from '@/data/sitio';
 // tarjetas del avance: solo las que ya tienen render (al cambiar la distribución se re-renderizan)
 const hay = new Set(listarPublicos('avances'));
 const tarjetas = [
-  ['int_gris_hosp', 'edificio-gris', 'Personas encamadas en el modelo 3D', 'Personas encamadas', '10 camas y estación de enfermería'],
-  ['int_gris_salon2', 'edificio-gris', 'Salón amarillo en el modelo 3D', 'Salón amarillo', 'Personas con movilidad reducida'],
-  ['int_gris_salonA', 'edificio-gris', 'Salón grande 1 en el modelo 3D', 'Salones de abajo', '4 + 4 camas, personas que deambulan'],
-  ['int_casa_comedor', 'casa-amarilla', 'Comedor de la casa amarilla en el modelo 3D', 'Casa amarilla', 'Comedor, terapia y cuartos privados'],
+  ['int_gris_hosp', 'hosp@gris', 'Personas encamadas en el modelo 3D', 'Personas encamadas', '10 camas y estación de enfermería'],
+  ['int_gris_salon2', 'salon2@gris', 'Salón amarillo en el modelo 3D', 'Salón amarillo', 'Personas con movilidad reducida'],
+  ['int_gris_salonA', 'salonA@gris', 'Salón grande 1 en el modelo 3D', 'Salones de abajo', '4 + 4 camas, personas que deambulan'],
+  ['int_casa_comedor', 'comedor@amarilla', 'Comedor de la casa amarilla en el modelo 3D', 'Casa amarilla', 'Comedor, terapia y cuartos privados'],
 ].filter(([f]) => hay.has(`/avances/${f}.jpg`)).slice(0, 3);
 const comparar = [
   ['hospitalizacion', 'Personas encamadas · 10 camas'],
@@ -50,14 +52,14 @@ const comparar = [
 
     <section class="seccion" id="avance-3d">
       <div class="container">
-        <h2>Avance del modelo 3D</h2>
-        <p class="lead">Los dos edificios ya tienen sus interiores amueblados en el modelo: personas encamadas con estación de enfermería, salón amarillo, área recreativa y de coffee break, cuartos privados, comedor, terapia y más.</p>
+        <h2>Por dentro</h2>
+        <p class="lead">Los dos edificios con sus interiores amueblados: personas encamadas con estación de enfermería, salón amarillo, área recreativa y de coffee break, cuartos privados, comedor, terapia y más. Cada imagen abre ese espacio en el recorrido 3D.</p>
         <div class="espacios">
           {tarjetas.map(([f, ancla, alt, t, d]) => (
-            <a class="espacio" href={`/avances#${ancla}`}><img src={`/avances/${f}.jpg`} alt={alt} loading="lazy" /><div><h3>{t}</h3><p>{d}</p></div></a>
+            <a class="espacio" href={`/recorrido#${ancla}`}><img src={`/avances/${f}.jpg`} alt={alt} loading="lazy" /><div><h3>{t}</h3><p>{d}</p></div></a>
           ))}
         </div>
-        <p style="margin-top:1.4rem"><a class="btn" href="/avances">Ver todo el avance</a>{panos.length > 0 && <a class="btn claro" href="/360" style="margin-left:.6rem">Recorrer en 360°</a>}</p>
+        <p class="acciones"><a class="btn" href="/recorrido">Abrir el recorrido 3D</a><a class="btn claro" href="/interiores">Interiores y planos</a>{panos.length > 0 && <a class="btn claro" href="/360">Vista 360°</a>}</p>
       </div>
     </section>
 
@@ -89,37 +91,64 @@ const comparar = [
     <section class="seccion" id="espacios">
       <div class="container">
         <h2>Los espacios</h2>
-        <p class="lead">Así quedarán las áreas principales. Cada imagen vuelve a esa parada del recorrido.</p>
+        <p class="lead">Así quedarán las áreas principales. Cada imagen abre ese espacio en el recorrido 3D.</p>
         <div class="espacios">
-          <a class="espacio" href="#parada=gris"><img src="/fotos-despues/hospitalizacion.jpg" alt="Sala de personas encamadas con camas de hospital" loading="lazy" /><div><h3>Personas encamadas</h3><p>10 camas con estación de enfermería</p></div></a>
-          <a class="espacio" href="#parada=casa"><img src="/fotos-despues/comedor.jpg" alt="Comedor de la casa amarilla" loading="lazy" /><div><h3>Comedor y TV</h3><p>Casa amarilla</p></div></a>
-          <a class="espacio" href="#parada=terraza"><img src="/fotos-despues/refrigerios.jpg" alt="Área de coffee break del piso alto" loading="lazy" /><div><h3>Área de coffee break</h3><p>Edificio gris, piso alto</p></div></a>
-          <a class="espacio" href="#parada=terraza"><img src="/fotos-despues/terraza.jpg" alt="Terraza del piso alto" loading="lazy" /><div><h3>Terraza al aire libre</h3><p>Para las personas que deambulan o caminan</p></div></a>
-          <a class="espacio" href="#parada=entrada"><img src="/fotos-reales/fachada-reloj.jpg" alt="Fachada de la casa amarilla" loading="lazy" /><div><h3>Entrada</h3><p>Portón eléctrico y cerca perimetral</p></div></a>
-          <a class="espacio" href="#parada=gris"><img src="/fotos-reales/edificio-gris.jpg" alt="Edificio gris" loading="lazy" /><div><h3>Edificio gris</h3><p>Dos niveles, 22 camas</p></div></a>
+          <a class="espacio" href="/recorrido#hosp@gris"><img src="/fotos-despues/hospitalizacion.jpg" alt="Sala de personas encamadas con camas de hospital" loading="lazy" /><div><h3>Personas encamadas</h3><p>10 camas con estación de enfermería</p></div></a>
+          <a class="espacio" href="/recorrido#comedor@amarilla"><img src="/fotos-despues/comedor.jpg" alt="Comedor de la casa amarilla" loading="lazy" /><div><h3>Comedor y TV</h3><p>Casa amarilla</p></div></a>
+          <a class="espacio" href="/recorrido#galeria@gris"><img src="/fotos-despues/refrigerios.jpg" alt="Área de coffee break del piso alto" loading="lazy" /><div><h3>Área de coffee break</h3><p>Edificio gris, piso alto</p></div></a>
+          <a class="espacio" href="/recorrido#terraza@gris"><img src="/fotos-despues/terraza.jpg" alt="Terraza del piso alto" loading="lazy" /><div><h3>Terraza al aire libre</h3><p>Para las personas que deambulan o caminan</p></div></a>
+          <a class="espacio" href="/recorrido#calle"><img src="/fotos-reales/fachada-reloj.jpg" alt="Fachada de la casa amarilla" loading="lazy" /><div><h3>Entrada</h3><p>Portón eléctrico y cerca perimetral</p></div></a>
+          <a class="espacio" href="/recorrido#gris-ext"><img src="/fotos-reales/edificio-gris.jpg" alt="Edificio gris" loading="lazy" /><div><h3>Edificio gris</h3><p>Dos niveles, 22 camas</p></div></a>
         </div>
       </div>
     </section>
 
-    <section class="seccion" id="inversionistas">
+    <section class="seccion inv" id="inversionistas">
       <div class="container cols">
         <div>
-          <h2>Para inversionistas</h2>
-          <p class="lead">La propiedad se entrega adecuada y equipada según el programa de espacios. Solicita el expediente con planos, programa de espacios y proyección de operación.</p>
+          <p class="inv-sup">Para inversionistas</p>
+          <h2>Una residencia lista para operar</h2>
+          <p class="lead">La propiedad se entrega adecuada y equipada según el programa de espacios: residencia permanente, pasadía de 8 a. m. a 5 p. m. y estadías temporales en los cuartos privados.</p>
+          <ul class="lista-plana">
+            <li><span>Expediente</span><span>planos, programa de espacios y personal mínimo</span></li>
+            <li><span>Capacidad</span><span>26 camas en dos edificios</span></li>
+            <li><span>Licencias</span><span>las tramita el comprador</span></li>
+          </ul>
         </div>
-        <div>
-          <p class="muted">Formulario y datos de contacto pendientes de definir con la propietaria.</p>
-          <p class="small muted">¿Prefieres la maqueta técnica? <a href="/recorrido">Abrir la maqueta 3D navegable</a>.</p>
+        <div class="inv-caja">
+          <h3>Solicita el expediente completo</h3>
+          {hayContacto ? (
+            <>
+              <p>Escríbenos y te enviamos los planos, el programa de espacios y la proyección de operación.</p>
+              <div class="acciones">
+                {CONTACTO.whatsapp && <a class="btn" href={enlaceContacto()}>Escribir por WhatsApp</a>}
+                {CONTACTO.correo && <a class="btn claro" href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>}
+              </div>
+            </>
+          ) : (
+            <p>Te enviamos los planos, el programa de espacios y la proyección de operación.</p>
+          )}
+          <p class="small muted">Mientras tanto: <a href="/recorrido">recorrido 3D</a> · <a href="/360">vista 360°</a> · <a href="/interiores">interiores y planos</a>.</p>
         </div>
       </div>
     </section>
-    <footer>
-      <div class="container">Residencia Altos de San Cristóbal · David, Chiriquí, Panamá. Proyecto en comercialización.</div>
-    </footer>
+    <Pie />
   </main>
 </Base>
 
 <style is:global>
   .tras-recorrido { position: relative; z-index: 2; background: var(--bg); }
   .tras-recorrido .seccion:first-child { padding-top: 5rem; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.4rem; }
+  .inv { background: var(--verde); color: #fff; }
+  .inv h2, .inv h3 { color: #fff; }
+  .inv .lead { color: rgba(255, 255, 255, 0.85); }
+  .inv-sup { color: var(--ocre); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; }
+  .inv .lista-plana li { border-color: rgba(255, 255, 255, 0.16); }
+  .inv .lista-plana li span:last-child { color: rgba(255, 255, 255, 0.7); }
+  .inv-caja { background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 18px; padding: 1.8rem; }
+  .inv-caja p { color: rgba(255, 255, 255, 0.85); }
+  .inv-caja .muted { color: rgba(255, 255, 255, 0.6); }
+  .inv-caja .btn { background: var(--ocre); color: #17140a !important; }
+  .inv-caja .btn.claro { background: transparent; color: #fff !important; border-color: rgba(255, 255, 255, 0.4); }
 </style>

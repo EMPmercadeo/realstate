@@ -1,4 +1,27 @@
-# Estado del proyecto (29-10-2026, mañana; al día 01-11-2026)
+# Estado del proyecto (29-10-2026, mañana; al día 09-11-2026)
+
+## 09-11-2026 — navegación nueva y dominio
+- **Dominio:** `realstatepanama.com` (apex) y `www` (redirige al apex) agregados al proyecto `residencia-altos`
+  en Vercel. DNS en Hostinger: `A @ 216.150.1.1` y `CNAME www 75bf0d292af08fe7.vercel-dns-017.com` (valores que da
+  Vercel). `site` de `web/astro.config.mjs` ya es `https://realstatepanama.com`. `residencia-altos.vercel.app` sigue
+  funcionando.
+- **`/recorrido` rehecho con el patrón de los recorridos virtuales** (Matterport, iGUIDE, Ricoh, Kuula; fuentes en
+  `docs/referencias-navegacion.md`): una barra abajo con los modos con texto (Maqueta · Caminar · Planos), la tira
+  de paradas con miniaturas y ▶ (recorrido guiado de 13 paradas con barra de progreso y CTA al final) y el índice
+  "Todos los espacios"; niveles en una pila a la derecha; ficha del lugar (render, texto, 360°, hoy/así quedará,
+  "Caminar aquí"); planos en un modal con pestañas; comparador grande en modal.
+  - Caminar: arrastrar para mirar y tocar/clic en el piso para avanzar (anillo en el piso, no atraviesa muros);
+    W A S D siguen. Se quitaron el joystick y el bloqueo del mouse.
+  - Vuelos entre vistas en arco (sube y entra por arriba con el techo abierto) en vez de atravesar muros.
+  - Celular: barra de pestañas abajo, tira de paradas plegable, niveles en un botón, índice como hoja.
+  - Datos de las paradas y miniaturas: `web/src/data/paradas.ts`, `web/public/mini/`. Código: `web/src/visor/visor.ts`
+    (parte de UI), `web/src/pages/recorrido.astro`, `web/src/styles/visor.css`.
+- **Sitio:** menú único (`web/src/data/sitio.ts`) con botón de menú en celular (antes en el celular no había menú),
+  pie con enlaces, `/avances` pasa a `/interiores` ("Interiores y planos", redirección puesta), las tarjetas de la
+  portada abren ese espacio en el recorrido 3D, bloque de inversionistas nuevo, favicon y Open Graph.
+- **Contacto:** `CONTACTO` en `web/src/data/sitio.ts` (WhatsApp y correo). Vacío = los botones "Solicitar
+  información" llevan a la sección de inversionistas.
+
 
 ## 01-11-2026 (noche)
 - **Parqueo de grava de la casa** al costado noroeste (el que da a la calle de tierra), junto a la caseta del

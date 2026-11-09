@@ -212,7 +212,7 @@ Debe mostrar, como mínimo:
 - Afuera: gazebo con su letrero, tina de hidroterapia al medio, huerto con surcos y cerca.
 - El entorno: naturaleza, tranquilidad y espacio.
 
-El sitio con el recorrido se despliega en https://residencia-altos.vercel.app. Faltan fotos del interior de la casa amarilla.
+El sitio con el recorrido se despliega en https://realstatepanama.com (también https://residencia-altos.vercel.app). Faltan fotos del interior de la casa amarilla.
 
 **Nombres que pidió la propietaria para el sitio (30-10).** Nunca usar "pacientes" ni "hospitalizados".
 

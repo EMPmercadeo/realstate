@@ -1,0 +1,17 @@
+---
+import { MENU_PIE } from '@/data/sitio';
+---
+<footer class="pie">
+  <div class="container pie-in">
+    <div>
+      <strong>Residencia Altos de San Cristóbal</strong>
+      <p>Altos de San Cristóbal, David, Chiriquí, Panamá. Propiedad en venta como residencia de retiro llave en mano.</p>
+    </div>
+    <nav aria-label="Pie de página">
+      <a href="/recorrido">Recorrido 3D</a>
+      <a href="/360">Vista 360°</a>
+      <a href="/interiores">Interiores y planos</a>
+      {MENU_PIE.map((m) => <a href={m.href}>{m.t}</a>)}
+    </nav>
+  </div>
+</footer>

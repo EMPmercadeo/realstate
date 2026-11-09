@@ -1,0 +1,32 @@
+---
+// Menú del sitio en un botón (celular en todas las páginas; en la portada y el recorrido también en escritorio).
+import { MENU, MENU_PIE, enlaceContacto } from '@/data/sitio';
+interface Props { claro?: boolean; siempre?: boolean }
+const { claro = false, siempre = false } = Astro.props;
+const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<details class:list={['menu', { claro, siempre }]}>
+  <summary aria-label="Menú">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16" /></svg>
+    <span>Menú</span>
+  </summary>
+  <nav class="menu-hoja" aria-label="Secciones del sitio">
+    <a href="/" aria-current={actual === '/' ? 'page' : undefined}>Inicio · sobrevuelo</a>
+    {MENU.map((m) => <a href={m.href} aria-current={actual === m.href ? 'page' : undefined}>{m.t}</a>)}
+    <a class="menu-cta" href={enlaceContacto()}>Solicitar información</a>
+    <div class="menu-pie">{MENU_PIE.map((m) => <a href={m.href}>{m.t}</a>)}</div>
+  </nav>
+</details>
+
+<script>
+  // cierra el menú al tocar afuera, al elegir un enlace o con Esc
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll<HTMLDetailsElement>('details.menu[open]').forEach((d) => {
+      const t = e.target as Node;
+      if (!d.contains(t) || (t as HTMLElement).closest?.('.menu-hoja a')) d.open = false;
+    });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.querySelectorAll<HTMLDetailsElement>('details.menu[open]').forEach((d) => (d.open = false));
+  });
+</script>
