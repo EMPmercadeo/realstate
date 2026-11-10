@@ -75,7 +75,7 @@ const { oscuro = false } = Astro.props;
       };
       if (!f.dataset.envio) { fin(false); return; }
       const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
-      fetch(f.dataset.envio + f.dataset.correo, {
+      fetch(f.dataset.envio, {
         method: 'POST', signal: ctl.signal,
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({

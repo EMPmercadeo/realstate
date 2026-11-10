@@ -21,7 +21,8 @@ export const MENU_PIE = [
 export const CONTACTO = {
   whatsapp: '50763176183',
   correo: 'empsignature@gmail.com',
-  envio: 'https://formsubmit.co/ajax/',
+  // código que FormSubmit asigna al correo (va en lugar de la dirección, para no exponerla en el envío)
+  envio: 'https://formsubmit.co/ajax/5c0d7c8c5e200c16b90d3ab694c8fed7',
   mensaje: 'Hola, me interesa la Residencia Altos de San Cristóbal (David, Chiriquí). ¿Me envían el expediente para inversionistas?',
 };
 
