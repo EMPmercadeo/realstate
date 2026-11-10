@@ -5,7 +5,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://realstatepanama.com',
   redirects: { '/avances': '/interiores' },
-  integrations: [sitemap({ filter: (p) => !p.includes('/avances') })],
+  integrations: [// el índice del blog sale del sitemap mientras no haya artículos publicados (hoy va con noindex)
+  sitemap({ filter: (p) => !p.includes('/avances') && !/\/blog\/?$/.test(p) })],
   i18n: {
     defaultLocale: 'es',
     locales: ['es', 'en'],

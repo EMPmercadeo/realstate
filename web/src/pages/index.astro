@@ -26,7 +26,7 @@ const comparar = [
 <Base title="Residencia de retiro en David, Chiriquí · Altos de San Cristóbal" full sinHeader>
   <Cine />
 
-  <main class="tras-recorrido">
+  <main class="tras-recorrido" id="contenido">
     <section class="seccion" id="proyecto">
       <div class="container cols ancha">
         <div>
@@ -84,7 +84,7 @@ const comparar = [
     <script>
       document.querySelectorAll('.ad').forEach((el) => {
         const r = el.querySelector('input'); const a = el.querySelector('.ad-antes'); const l = el.querySelector('.ad-linea');
-        r?.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; l.style.left = `${r.value}%`; });
+        r?.addEventListener('input', () => { a.style.clipPath = `inset(0 ${100 - r.value}% 0 0)`; l.style.left = `${r.value}%`; r.setAttribute('aria-valuetext', `${r.value} % de la foto de hoy`); });
       });
     </script>
 

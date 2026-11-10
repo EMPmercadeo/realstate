@@ -1,20 +1,36 @@
 ---
 import Base from '@/layouts/Base.astro';
-import { getCollection } from 'astro:content';
-const posts = (await getCollection('blog')).sort((a, b) => b.data.fecha.valueOf() - a.data.fecha.valueOf());
+import { articulos, fechaLarga } from '@/data/blog';
+const posts = await articulos();
 ---
-<Base title="Blog · Retiro y vida para adultos mayores en Panamá">
-  <section class="seccion container">
-    <h2>Blog</h2>
-    <p class="muted">Guías sobre retirarse en Panamá, cuidado de adultos mayores y vida en Chiriquí.</p>
-    <div class="espacios">
-      {posts.map((p) => (
-        <a class="espacio" href={`/blog/${p.id}`}><div>
-          <h3>{p.data.titulo}</h3>
-          <p class="muted">{p.data.resumen}</p>
-          <p class="small muted">{p.data.pais} · {p.data.fecha.toLocaleDateString('es-PA')}</p>
-        </div></a>
-      ))}
+<Base title="Blog · Retiro y vida para adultos mayores en Panamá"
+      description="Guías sobre retirarse en Panamá, cuidado de adultos mayores y vida en Chiriquí."
+      noindex={posts.length === 0}>
+  <section class="seccion">
+    <div class="container">
+      <h1 class="blog-h1">Blog</h1>
+      <p class="lead">Guías sobre retirarse en Panamá, cuidado de adultos mayores y vida en Chiriquí.</p>
+      {posts.length === 0 ? (
+        <div class="vacio">
+          <h2 style="font-size:1.3rem">Estamos preparando los primeros artículos</h2>
+          <p>Mientras tanto puedes conocer la propiedad por dentro.</p>
+          <p class="acciones-b"><a class="btn" href="/recorrido">Abrir el recorrido 3D</a><a class="btn claro" href="/interiores">Interiores y planos</a></p>
+        </div>
+      ) : (
+        <div class="espacios" style="margin-top:2rem">
+          {posts.map((p) => (
+            <a class="espacio" href={`/blog/${p.id}`}><div>
+              <p class="small muted" style="margin-bottom:.5rem">{p.data.pais} · <time datetime={p.data.fecha.toISOString().slice(0, 10)}>{fechaLarga(p.data.fecha)}</time></p>
+              <h2 style="font-size:1.15rem;line-height:1.2;margin:0 0 .4rem">{p.data.titulo}</h2>
+              <p>{p.data.resumen}</p>
+            </div></a>
+          ))}
+        </div>
+      )}
     </div>
   </section>
 </Base>
+<style>
+  .blog-h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+  .acciones-b { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1.2rem 0 0; }
+</style>

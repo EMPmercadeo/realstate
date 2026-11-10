@@ -484,6 +484,7 @@ export function iniciarVisor(container: HTMLElement, opts: OpcionesVisor = {}) {
       } else if (!estado.vista.edificio) {
         // desde la vista aérea: se baja a la entrada principal
         const c = presets['calle'];
+        idActual = 'calle'; marcarReel('calle');
         camera.position.set(c.pos[0], alturaOjos, c.pos[2]); camera.lookAt(c.target[0], 1.6, c.target[2]);
       } else {
         const t = orbit.target.clone();

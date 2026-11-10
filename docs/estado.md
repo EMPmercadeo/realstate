@@ -123,3 +123,19 @@ cd web; npm run build; npx astro preview
   responde 200 sin "Vercel Authentication"; `/clips/sobrevuelo.mp4` 23,3 MB y `/clips/sobrevuelo-m.mp4` 7,4 MB
   se sirven como video/mp4. Playwright contra producción: escritorio y móvil 7/7 paradas, 5/5 fotos, 7/7 seeks,
   0 errores de consola en `/`, `/fotos` y `/recorrido`.
+
+## Revisión de UI/UX para producción (09-11-2026, noche)
+- **Tipografía:** Outfit servida desde el propio sitio (`@fontsource-variable/outfit`, con preload); ya no depende de Google Fonts.
+- **Fotos:** `fotos-reales`, `fotos-antes` y `fotos-despues` recomprimidas a 1600 px (22 MB → 12 MB).
+- **Portada:** el video del sobrevuelo se detecta con el manifiesto de build (sin 404 en consola); en celular el aviso
+  "Desliza para sobrevolar" ya no se monta sobre las etiquetas; comparador "Hoy / Así quedará" con manija visible.
+- **/recorrido:** al pasar a Caminar desde la vista aérea la ficha y el título dicen "Entrada principal" (antes "Vista general");
+  el botón del celular dice "Contacto" en vez de "Info".
+- **/fotos:** el velo oscuro volvió a quedar sobre la foto (el texto no se leía); "Solicitar expediente" lleva a `/contacto`.
+- **Blog:** los artículos con `borrador: true` no se publican (`src/data/blog.ts`); sin artículos, el índice muestra un aviso,
+  va con noindex, sale del sitemap y el enlace "Blog" se oculta del menú y del pie. Fechas en formato largo.
+- **Sitio:** pie en tres columnas con contacto, página 404, enlace "Saltar al contenido", texto gris con más contraste (AA),
+  datos estructurados (RealEstateListing), `web/vercel.json` con caché larga para `/_astro` y cabeceras de seguridad.
+- **Verificación:** Lighthouse móvil 100/100/100/100 en `/interiores` y `/contacto`; 0 errores de consola en todas las páginas
+  (escritorio 1440 y celular 390). En la portada y `/recorrido` no se pudo medir Lighthouse (3D por software en el entorno de prueba).
+- **Pendiente:** WhatsApp en `CONTACTO`; el formulario sigue abriendo el correo del visitante (mailto), no envía solo.

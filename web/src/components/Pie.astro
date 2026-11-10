@@ -1,18 +1,33 @@
 ---
-import { MENU_PIE } from '@/data/sitio';
+import { MENU_PIE, CONTACTO, enlaceWhatsapp } from '@/data/sitio';
+import { articulos } from '@/data/blog';
+const hayBlog = (await articulos()).length > 0;
+const extra = MENU_PIE.filter((m) => m.href !== '/blog' || hayBlog);
 ---
 <footer class="pie">
-  <div class="container pie-in">
-    <div>
-      <strong>Residencia Altos de San Cristóbal</strong>
-      <p>Altos de San Cristóbal, David, Chiriquí, Panamá. Propiedad en venta como residencia de retiro llave en mano.</p>
+  <div class="container">
+    <div class="pie-in">
+      <div>
+        <strong>Residencia Altos de San Cristóbal</strong>
+        <p>Altos de San Cristóbal, David, Chiriquí, Panamá. Propiedad en venta como residencia de retiro llave en mano.</p>
+      </div>
+      <nav aria-label="Conocer el proyecto">
+        <h2>El proyecto</h2>
+        <a href="/recorrido">Recorrido 3D</a>
+        <a href="/360">Vista 360°</a>
+        <a href="/interiores">Interiores y planos</a>
+        {extra.map((m) => <a href={m.href}>{m.t}</a>)}
+      </nav>
+      <nav aria-label="Contacto">
+        <h2>Contacto</h2>
+        <a href="/contacto">Solicitar el expediente</a>
+        {CONTACTO.whatsapp && <a href={enlaceWhatsapp()} rel="noopener">WhatsApp</a>}
+        {CONTACTO.correo && <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>}
+      </nav>
     </div>
-    <nav aria-label="Pie de página">
-      <a href="/recorrido">Recorrido 3D</a>
-      <a href="/360">Vista 360°</a>
-      <a href="/interiores">Interiores y planos</a>
-      <a href="/contacto">Contacto</a>
-      {MENU_PIE.map((m) => <a href={m.href}>{m.t}</a>)}
-    </nav>
+    <div class="pie-base">
+      <p>© {new Date().getFullYear()} Residencia Altos de San Cristóbal</p>
+      <p>Imágenes del proyecto: renders y propuestas de referencia. Medidas pendientes de verificar en sitio.</p>
+    </div>
   </div>
 </footer>

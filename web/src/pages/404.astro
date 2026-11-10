@@ -1,0 +1,23 @@
+---
+import Base from '@/layouts/Base.astro';
+---
+<Base title="Página no encontrada · Residencia Altos de San Cristóbal" noindex>
+  <section class="seccion">
+    <div class="container">
+      <p class="e404-sup">Error 404</p>
+      <h1 class="e404-h1">Esta página no existe</h1>
+      <p class="lead">Puede que el enlace haya cambiado. Desde aquí puedes seguir conociendo la propiedad.</p>
+      <p class="e404-acc">
+        <a class="btn" href="/">Ir al inicio</a>
+        <a class="btn claro" href="/recorrido">Recorrido 3D</a>
+        <a class="btn claro" href="/interiores">Interiores y planos</a>
+        <a class="btn claro" href="/contacto">Contacto</a>
+      </p>
+    </div>
+  </section>
+</Base>
+<style>
+  .e404-sup { color: var(--verde-2); font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.6rem; }
+  .e404-h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); }
+  .e404-acc { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.6rem; }
+</style>

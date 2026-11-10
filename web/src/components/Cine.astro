@@ -14,10 +14,10 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
     <div class="rc-velo"></div>
     <div class="rc-barra"><span></span></div>
 
-    <div class="cine-carga" id="cine-carga">
+    <div class="cine-carga" id="cine-carga" role="status">
       <div>
         <p class="rc-eyebrow">Altos de San Cristóbal · David, Chiriquí</p>
-        <h1 class="rc-titulo">Residencia de retiro</h1>
+        <p class="rc-titulo">Residencia de retiro</p>
         <p class="rc-texto">Preparando el sobrevuelo…</p>
         <div class="cine-barra"><span id="cine-pct"></span></div>
       </div>
@@ -64,7 +64,7 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
     <div class="rc-ruta" role="group" aria-label="Ir a una parada">
       {PARADAS_CINE.map((p) => <button type="button" data-u={p.u} aria-label={p.etiqueta}><span>{p.etiqueta}</span><i></i></button>)}
     </div>
-    <div class="rc-hint"><span>Desliza para sobrevolar</span><i></i></div>
+    <div class="rc-hint" aria-hidden="true"><span>Desliza para sobrevolar</span><i></i></div>
   </div>
 </section>
 
@@ -120,13 +120,8 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
   async function iniciar() {
     // v2 = sobrevuelo renderizado con el modelo amueblado; mientras no exista se usa el 3D en vivo
     const nombre = esMovil ? 'sobrevuelo-v2-m.mp4' : 'sobrevuelo-v2.mp4';
-    let hayVideo = false;
-    if (!new URLSearchParams(location.search).has('3d')) {
-      try {
-        const r = await fetch(`${B}/clips/${nombre}`, { headers: { Range: 'bytes=0-0' } });
-        hayVideo = r.ok && (r.headers.get('content-type') || '').startsWith('video');
-      } catch {}
-    }
+    // el manifiesto de build dice si el video existe: no se sondea la red (evita un 404 en consola)
+    const hayVideo = !new URLSearchParams(location.search).has('3d') && existe.has(`/clips/${nombre}`);
     if (hayVideo) {
       // póster inmediato mientras baja el video
       contVisor.style.backgroundImage = `url(${B}/clips/poster-v2.jpg)`; contVisor.style.backgroundSize = 'cover'; contVisor.style.backgroundPosition = 'center 45%';
@@ -239,5 +234,10 @@ const existentes = listarPublicos('clips', 'fotos-despues', 'fotos-antes', 'foto
   @media (max-width: 860px) {
     .cine-foto { right: 18px; left: auto; top: calc(70px + env(safe-area-inset-top)); transform: none; width: 42vw; }
     .cine-foto figcaption { display: none; }
+    .rc.cine .rc-copy { bottom: calc(clamp(64px, 10dvh, 96px) + env(safe-area-inset-bottom)); }
+    .rc.cine .rc-hint i { display: none; }
+    .rc.cine .rc-hint { bottom: calc(22px + env(safe-area-inset-bottom)); font-size: 0.66rem; }
+    .rc.cine .rc-hint span::after { content: ' ↓'; }
   }
+  @media (max-height: 560px) { .rc.cine .rc-hint { display: none; } .rc.cine .rc-tags { display: none; } }
 </style>

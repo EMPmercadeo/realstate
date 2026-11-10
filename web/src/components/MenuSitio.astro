@@ -1,12 +1,15 @@
 ---
 // Menú del sitio en un botón (celular en todas las páginas; en la portada y el recorrido también en escritorio).
 import { MENU, MENU_PIE, enlaceContacto } from '@/data/sitio';
+import { articulos } from '@/data/blog';
+const hayBlog = (await articulos()).length > 0;
+const extra = MENU_PIE.filter((m) => m.href !== '/blog' || hayBlog);
 interface Props { claro?: boolean; siempre?: boolean }
 const { claro = false, siempre = false } = Astro.props;
 const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 <details class:list={['menu', { claro, siempre }]}>
-  <summary aria-label="Menú">
+  <summary aria-label="Menú del sitio">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16" /></svg>
     <span>Menú</span>
   </summary>
@@ -14,7 +17,7 @@ const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
     <a href="/" aria-current={actual === '/' ? 'page' : undefined}>Inicio · sobrevuelo</a>
     {MENU.map((m) => <a href={m.href} aria-current={actual === m.href ? 'page' : undefined}>{m.t}</a>)}
     <a class="menu-cta" href={enlaceContacto()}>Solicitar información</a>
-    <div class="menu-pie">{MENU_PIE.map((m) => <a href={m.href}>{m.t}</a>)}</div>
+    <div class="menu-pie">{extra.map((m) => <a href={m.href}>{m.t}</a>)}</div>
   </nav>
 </details>
 

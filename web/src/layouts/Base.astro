@@ -1,10 +1,12 @@
 ---
+import '@fontsource-variable/outfit/wght.css';
+import fuente from '@fontsource-variable/outfit/files/outfit-latin-wght-normal.woff2?url';
 import '@/styles/global.css';
 import '@/styles/visor.css';
 import MenuSitio from '@/components/MenuSitio.astro';
 import Pie from '@/components/Pie.astro';
 import { MENU, enlaceContacto } from '@/data/sitio';
-interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; noindex?: boolean; imagen?: string; }
+interface Props { title: string; description?: string; lang?: string; full?: boolean; sinHeader?: boolean; noindex?: boolean; imagen?: string; sinSaltar?: boolean; }
 const {
   title,
   description = 'Residencia de retiro y cuidado para adultos mayores en Altos de San Cristóbal, David, Chiriquí: dos edificios, 26 camas y jardín, lista para operar. Recorrido 3D, vistas 360° y planos.',
@@ -12,11 +14,27 @@ const {
   full = false,
   sinHeader = false,
   noindex = false,
+  sinSaltar = false,
   imagen = '/avances/int_gris_hosp.jpg',
 } = Astro.props;
 const actual = Astro.url.pathname.replace(/\/$/, '') || '/';
 const canonica = new URL(Astro.url.pathname, Astro.site);
 const og = new URL(imagen, Astro.site);
+// datos estructurados: la propiedad como anuncio inmobiliario
+const datos = {
+  '@context': 'https://schema.org',
+  '@type': 'RealEstateListing',
+  name: 'Residencia Altos de San Cristóbal',
+  description,
+  url: new URL('/', Astro.site).href,
+  image: og.href,
+  inLanguage: 'es',
+  about: {
+    '@type': 'Place',
+    name: 'Residencia Altos de San Cristóbal',
+    address: { '@type': 'PostalAddress', streetAddress: 'Altos de San Cristóbal', addressLocality: 'David', addressRegion: 'Chiriquí', addressCountry: 'PA' },
+  },
+};
 ---
 <!doctype html>
 <html lang={lang}>
@@ -35,13 +53,15 @@ const og = new URL(imagen, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonica} />
     <meta property="og:image" content={og} />
+    <meta property="og:image:alt" content="Residencia Altos de San Cristóbal: interior del proyecto ya adecuado" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="twitter:card" content="summary_large_image" />
     {noindex && <meta name="robots" content="noindex" />}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="preload" href={fuente} as="font" type="font/woff2" crossorigin />
+    <script type="application/ld+json" set:html={JSON.stringify(datos)} />
   </head>
   <body>
+    {!sinSaltar && <a class="saltar" href="#contenido">Saltar al contenido</a>}
     {!sinHeader && (
       <header class="cabecera">
         <nav class="nav container" aria-label="Principal">
@@ -54,7 +74,7 @@ const og = new URL(imagen, Astro.site);
         </nav>
       </header>
     )}
-    {full ? <slot /> : <main><slot /></main>}
+    {full ? <slot /> : <main id="contenido"><slot /></main>}
     {!full && <Pie />}
   </body>
 </html>

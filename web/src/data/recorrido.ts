@@ -118,7 +118,7 @@ export const PARADAS: Parada[] = [
     acento: '#2c6b50',
     scroll: 1.6,
     cta: {
-      principal: { label: 'Solicitar expediente', href: '#inversionistas' },
+      principal: { label: 'Solicitar expediente', href: '/contacto' },
       secundaria: { label: 'Ver datos del proyecto', href: '#proyecto' },
     },
   },
