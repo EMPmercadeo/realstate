@@ -138,4 +138,11 @@ cd web; npm run build; npx astro preview
   datos estructurados (RealEstateListing), `web/vercel.json` con caché larga para `/_astro` y cabeceras de seguridad.
 - **Verificación:** Lighthouse móvil 100/100/100/100 en `/interiores` y `/contacto`; 0 errores de consola en todas las páginas
   (escritorio 1440 y celular 390). En la portada y `/recorrido` no se pudo medir Lighthouse (3D por software en el entorno de prueba).
-- **Pendiente:** WhatsApp en `CONTACTO`; el formulario sigue abriendo el correo del visitante (mailto), no envía solo.
+- **WhatsApp:** +507 6317-6183 en `CONTACTO.whatsapp` (botón del formulario y pie).
+- **Formulario:** envía directo al correo con FormSubmit (`CONTACTO.envio`); si falla o no está activado, abre el correo
+  del visitante. La primera solicitud dispara un correo de activación a `CONTACTO.correo` que hay que aceptar una vez.
+- **Planos** (`blender/planos.py`, no necesita Blender): los cuartos donde no cabe el nombre llevan un número y la lista
+  va bajo el plano; rótulos con halo. Regenerar: `python3 blender/planos.py` y copiar `build/bloqueo/plano_*.png` a
+  `web/public/avances/`.
+- **DNS:** `realstatepanama.com` y `www` ya apuntan a Vercel (verificado el 09-11: el dominio sirve este sitio).
+- "Seguridad certificada" pasó a "Seguridad" en la portada (no hay certificado en el expediente).

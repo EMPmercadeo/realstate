@@ -39,7 +39,7 @@ EXTRAS = {   # elementos exteriores de referencia (marco local), solo contorno p
                      ((1.2, 13.8, 4.4, 15.4), 'Porche en arco')],
     ('casa', 'pa'): [((4.4, -0.7, 10.0, 1.4), 'Balcón')],
     ('gris', 'pb'): [((14.45, 5.4, 15.55, 11.6), 'Esc. metálica'), ((1.0, -1.8, 6.3, 3.6), 'Estacionamientos')],
-    ('gris', 'pa'): [((0.15, 4.4, 2.5, 13.4), 'Galería en L con verjas · área recreativa y coffee break'),
+    ('gris', 'pa'): [((0.15, 4.4, 2.5, 13.4), 'Área de coffee break'),
                      ((4.6, 11.0, 13.9, 13.4), 'Terraza al aire libre'),
                      ((14.45, 5.4, 15.55, 11.6), 'Esc. metálica')],
 }
@@ -110,7 +110,7 @@ def dibujar(clave, ed, nv, rutas):
         f = F(13)
         tw = d.textlength(nombre, font=f)
         if tw < r[2] - r[0] - 4:
-            d.text(((r[0] + r[2]) / 2 - tw / 2, (r[1] + r[3]) / 2 - 7), nombre, font=f, fill=C_SUAVE)
+            d.text((r[0] + 4, r[1] - 17), nombre, font=f, fill=C_SUAVE)
         else:
             d.text((r[0] + 2, r[1] - 16), nombre, font=f, fill=C_SUAVE)
     # cuartos
@@ -214,39 +214,81 @@ def dibujar(clave, ed, nv, rutas):
         for a, b in zip(seg[:-1], seg[1:]):
             if math.dist(a, b) < S * 0.6:
                 d.line([a, b], fill=C_RUTA, width=3)
-    # rótulos
+    # rótulos: el nombre va dentro del cuarto si cabe legible; si no, un número y la lista bajo el plano
+    HALO = dict(stroke_width=3, stroke_fill=C_FONDO)
+    claves = []
     for c in nv['cuartos']:
         big = max(c['rects'], key=lambda r: (r[2] - r[0]) * (r[3] - r[1]))
         cx, cy = P((big[0] + big[2]) / 2, (big[1] + big[3]) / 2)
-        wpx = (big[2] - big[0]) * S - 8
-        hpx = (big[3] - big[1]) * S
+        wpx = (big[2] - big[0]) * S - 10
+        hpx = (big[3] - big[1]) * S - 8
         nombre = c['nombre']
         ncam = sum(1 for mu in ed.get('muebles', []) if mu['nivel'] == nv['id'] and mu['cuarto'] == c['id']
                    and mu['t'].startswith('cama'))
         if ncam:
             nombre += f' · {ncam} cama' + ('s' if ncam > 1 else '')
-        for sz in (15, 13, 11, 10):
+        con_area = (not c['escalera']) and c['area'] >= 3
+        area = f"{c['area']:.1f} m²".replace('.', ',')
+        cabe = False
+        for sz in (15, 14, 13, 12):
             f = F(sz, True)
-            palabras = nombre.split(' ')
             lineas, cur = [], ''
-            for w in palabras:
+            for w in nombre.split(' '):
                 t = (cur + ' ' + w).strip()
                 if d.textlength(t, font=f) <= wpx or not cur:
                     cur = t
                 else:
                     lineas.append(cur); cur = w
             lineas.append(cur)
-            if max(d.textlength(l, font=f) for l in lineas) <= max(wpx, 30) and len(lineas) * (sz + 3) + 16 <= max(hpx, 24):
+            alto = len(lineas) * (sz + 3) + (sz if con_area else 0)
+            if max(d.textlength(l, font=f) for l in lineas) <= wpx and alto <= hpx and len(lineas) <= 3:
+                cabe = True
                 break
-        alto = len(lineas) * (sz + 3)
-        yy = cy - alto / 2 - 7
-        for l in lineas:
-            tw = d.textlength(l, font=f)
-            d.text((cx - tw / 2, yy), l, font=f, fill=C_TXT); yy += sz + 3
-        if not c['escalera'] and c['area'] >= 3:
-            t = f"{c['area']:.1f} m²".replace('.', ',')
-            ff = F(max(10, sz - 3))
-            d.text((cx - d.textlength(t, font=ff) / 2, yy + 1), t, font=ff, fill=C_SUAVE)
+        if cabe:
+            yy = cy - alto / 2
+            for l in lineas:
+                tw = d.textlength(l, font=f)
+                d.text((cx - tw / 2, yy), l, font=f, fill=C_TXT, **HALO); yy += sz + 3
+            if con_area:
+                ff = F(max(11, sz - 3))
+                d.text((cx - d.textlength(area, font=ff) / 2, yy + 1), area, font=ff, fill=C_SUAVE, **HALO)
+        else:
+            claves.append(nombre + (f' · {area}' if con_area else ''))
+            n = str(len(claves))
+            f = F(14, True)
+            r = 12
+            d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=C_TXT, outline=C_FONDO, width=2)
+            d.text((cx - d.textlength(n, font=f) / 2, cy - 9), n, font=f, fill=(255, 255, 255))
+    # lista numerada bajo el plano (se agranda el lienzo)
+    if claves:
+        f = F(14)
+        filas = []
+        for i, t in enumerate(claves, 1):
+            cur = ''
+            primera = True
+            for w in t.split(' '):
+                tt = (cur + ' ' + w).strip()
+                if d.textlength(tt, font=f) <= W - 2 * (MG - 30) - 36 or not cur:
+                    cur = tt
+                else:
+                    filas.append((i if primera else 0, cur)); primera = False; cur = w
+            filas.append((i if primera else 0, cur))
+        extra_h = 14 + 24 * len(filas) + 10
+        im2 = Image.new('RGB', (W, H + extra_h), C_FONDO)
+        im2.paste(im, (0, 0))
+        # el rótulo de orientación de abajo se dibuja después, sobre el lienzo original; la lista va debajo
+        d2 = ImageDraw.Draw(im2)
+        d2.line([(MG - 30, H + 2), (W - (MG - 30), H + 2)], fill=(220, 222, 218), width=1)
+        y = H + 14
+        for i, t in filas:
+            if i:
+                d2.ellipse((MG - 30, y - 1, MG - 30 + 22, y + 21), fill=C_TXT)
+                n = str(i)
+                d2.text((MG - 30 + 11 - d2.textlength(n, font=F(13, True)) / 2, y + 2), n, font=F(13, True), fill=(255, 255, 255))
+            d2.text((MG - 30 + 32, y + 1), t, font=f, fill=C_TXT)
+            y += 24
+        im = im2
+        d = d2
     # orientación
     o = ORIENT[clave]
     f = F(14, True)

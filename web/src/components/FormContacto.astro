@@ -1,11 +1,12 @@
 ---
-// Formulario de contacto sin servidor: arma el mensaje y abre el correo (o WhatsApp, si hay número)
-// ya redactado hacia el contacto de web/src/data/sitio.ts. No usa servicios externos.
+// Formulario de contacto: envía la solicitud directo al correo de web/src/data/sitio.ts (CONTACTO.envio)
+// o abre WhatsApp con el mensaje ya redactado. Si el envío directo falla, abre el correo del visitante.
 import { CONTACTO, enlaceWhatsapp } from '@/data/sitio';
 interface Props { oscuro?: boolean }
 const { oscuro = false } = Astro.props;
 ---
-<form class:list={['fc', { oscuro }]} data-correo={CONTACTO.correo} data-whatsapp={CONTACTO.whatsapp} novalidate>
+<form class:list={['fc', { oscuro }]} data-correo={CONTACTO.correo} data-whatsapp={CONTACTO.whatsapp} data-envio={CONTACTO.envio} novalidate>
+  <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" class="fc-miel" />
   <div class="fc-fila">
     <label><span class="fc-t">Nombre</span><input name="nombre" autocomplete="name" required /></label>
     <label><span class="fc-t">Correo</span><input name="correo" type="email" autocomplete="email" required /></label>
@@ -23,11 +24,11 @@ const { oscuro = false } = Astro.props;
   <label><span class="fc-t">Mensaje <small>(opcional)</small></span><textarea name="mensaje" rows="3"></textarea></label>
   <p class="fc-error" role="alert" hidden>Escribe tu nombre y un correo válido.</p>
   <div class="fc-botones">
-    {CONTACTO.correo && <button class="btn" type="submit" value="correo">Enviar por correo</button>}
+    {CONTACTO.correo && <button class="btn" type="submit" value="correo">Enviar solicitud</button>}
     {CONTACTO.whatsapp && <button class="btn claro" type="submit" value="whatsapp">Enviar por WhatsApp</button>}
   </div>
-  <p class="fc-nota">Se abre tu correo{CONTACTO.whatsapp ? ' o WhatsApp' : ''} con el mensaje listo; solo falta enviarlo. También puedes escribir directo a <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>{CONTACTO.whatsapp && <> o por <a href={enlaceWhatsapp()}>WhatsApp</a></>}.</p>
-  <p class="fc-listo" role="status" hidden>Listo: se abrió tu correo con el mensaje. Si no se abrió, copia los datos y escribe a <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>.</p>
+  <p class="fc-nota">Te respondemos por correo{CONTACTO.whatsapp ? ' o WhatsApp' : ''}. También puedes escribir directo a <a href={`mailto:${CONTACTO.correo}`}>{CONTACTO.correo}</a>{CONTACTO.whatsapp && <> o por <a href={enlaceWhatsapp()} target="_blank" rel="noopener">WhatsApp</a></>}.</p>
+  <p class="fc-listo" role="status" hidden></p>
 </form>
 
 <script>
@@ -54,13 +55,35 @@ const { oscuro = false } = Astro.props;
       lineas.push('', '— Enviado desde realstatepanama.com');
       const texto = lineas.join('\n');
       const via = ((e as SubmitEvent).submitter as HTMLButtonElement | null)?.value || 'correo';
+      const listo = f.querySelector<HTMLElement>('.fc-listo')!;
+      const asunto = `Residencia Altos de San Cristóbal · ${v('interes')} · ${v('nombre')}`;
+      const abrirCorreo = () => { location.href = `mailto:${f.dataset.correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`; };
       if (via === 'whatsapp' && f.dataset.whatsapp) {
         window.open(`https://wa.me/${f.dataset.whatsapp}?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
-      } else {
-        const asunto = `Residencia Altos de San Cristóbal · ${v('interes')} · ${v('nombre')}`;
-        location.href = `mailto:${f.dataset.correo}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(texto)}`;
+        listo.textContent = 'Se abrió WhatsApp con el mensaje listo; solo falta enviarlo.'; listo.hidden = false;
+        return;
       }
-      f.querySelector<HTMLElement>('.fc-listo')!.hidden = false;
+      if (v('_honey')) return;                       // trampa para bots
+      const boton = f.querySelector<HTMLButtonElement>('button[value=correo]')!;
+      const rotulo = boton.textContent;
+      boton.disabled = true; boton.textContent = 'Enviando…';
+      const fin = (ok: boolean) => {
+        boton.disabled = false; boton.textContent = rotulo;
+        if (ok) { listo.textContent = `Gracias, ${v('nombre').split(' ')[0]}. Recibimos tu solicitud y te respondemos pronto.`; f.reset(); }
+        else { listo.textContent = `Se abrió tu correo con el mensaje listo; solo falta enviarlo. Si no se abrió, escribe a ${f.dataset.correo}.`; abrirCorreo(); }
+        listo.hidden = false;
+      };
+      if (!f.dataset.envio) { fin(false); return; }
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 12000);
+      fetch(f.dataset.envio + f.dataset.correo, {
+        method: 'POST', signal: ctl.signal,
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: asunto, _template: 'table', _replyto: v('correo'), _captcha: 'false',
+          Interés: v('interes'), Nombre: v('nombre'), Correo: v('correo'), País: v('pais'), Teléfono: v('telefono'), Mensaje: v('mensaje'),
+        }),
+      }).then((r) => r.json().then((j) => r.ok && String(j.success) === 'true')).catch(() => false)
+        .then((ok) => { clearTimeout(t); fin(ok); });
     });
   });
 </script>
@@ -80,6 +103,8 @@ const { oscuro = false } = Astro.props;
   .fc .fc-op input { accent-color: var(--verde); margin: 0; }
   .fc-botones { display: flex; flex-wrap: wrap; gap: 0.6rem; }
   .fc-botones .btn { min-height: 48px; font-size: 1rem; }
+  .fc-miel { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .fc-botones .btn:disabled { opacity: 0.6; cursor: progress; }
   .fc-error { margin: 0; color: #b3261e; font-size: 0.9rem; }
   .fc-nota, .fc-listo { margin: 0; font-size: 0.84rem; color: var(--muted); }
   .fc-listo { color: var(--verde); font-weight: 500; }

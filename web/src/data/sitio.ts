@@ -15,9 +15,13 @@ export const MENU_PIE = [
 // Contacto para "Solicitar información". Se cambia aquí y todo el sitio lo usa.
 //   whatsapp: solo dígitos con código de país, p. ej. '50760001234' (vacío = no se muestra)
 //   correo:   adonde llegan las solicitudes del formulario de /contacto
+//   envio:    servicio que entrega el formulario a ese correo sin abrir el programa de correo del visitante
+//             (FormSubmit; la primera vez manda un correo de activación a `correo` y hay que aceptarlo).
+//             Si falla o aún no está activado, el formulario abre el correo del visitante como respaldo.
 export const CONTACTO = {
-  whatsapp: '',
+  whatsapp: '50763176183',
   correo: 'empsignature@gmail.com',
+  envio: 'https://formsubmit.co/ajax/',
   mensaje: 'Hola, me interesa la Residencia Altos de San Cristóbal (David, Chiriquí). ¿Me envían el expediente para inversionistas?',
 };
 
